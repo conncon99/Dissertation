@@ -1,0 +1,77 @@
+from __future__ import annotations
+from actions.action_handler import Action
+from utils.root_types import Items
+from typing import TYPE_CHECKING
+from board.clearing import Clearing
+from controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
+
+if TYPE_CHECKING:
+    from factions.vagabond.vagabond import Vagabond
+    from factions.faction import Faction
+    from cards.card import Card
+
+
+class AidAction(Action):
+    def __init__(self, name='Aid', max_uses=None, is_action_group_modifier=False):
+        super().__init__(name, max_uses, is_action_group_modifier)
+
+    def can_perform(self, executor: Vagabond, game_state=None):
+        return executor.satchel.has_available_item() and isinstance(executor.vagabond_pawn.space, Clearing) \
+            and any(executor.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) and executor.faction_id != faction.faction_id for faction in game_state.faction_list) \
+            and any(card.suit == executor.vagabond_pawn.space.get_suit() for card in executor.hand)
+
+    def perform(self, game_state, executor: Vagabond):
+        # 1. Get available players to aid
+
+        assert isinstance(executor.vagabond_pawn.space, Clearing)
+        available_players = [
+            faction for faction in game_state.faction_list if executor.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) > 0 and faction.faction_id != executor.faction_id]
+
+        # 2. Choose player to aid
+        chosen_faction: Faction = executor.controller.send_game_message(
+            AidFactionChoiceMessage(available_players)).chosen_faction
+
+        # 3. Choose and exhaust item
+        available_items = [
+            item for item, amount in executor.satchel.available_items.items() for _ in range(amount)]
+        chosen_exhausted_item: Items = executor.controller.send_game_message(
+            AidExhaustItemChoiceMessage(available_items)).chosen_item
+
+        executor.satchel.exhaust_item(chosen_exhausted_item)
+
+        # 4. Get available cards to give aided player
+
+        available_cards = [card for card in executor.hand if card.suit ==
+                           executor.vagabond_pawn.space.get_suit()]
+
+        # 5. Choose card to give to aided player
+
+        chosen_card: Card = executor.controller.send_game_message(
+            AidCardChoiceMessage(available_cards)).chosen_card
+
+        chosen_faction.hand.append(chosen_card)
+        executor.hand.remove(chosen_card)
+        print(f" - Given card '{chosen_card.name}' to {chosen_faction}")
+
+        executor.relationship_track.aid_faction(chosen_faction.faction_id)
+
+        # 6. Choose item (or None) to take from aided player's satchel
+
+        available_items = [None]
+        if len(chosen_faction.items) > 0:
+            available_items.extend(chosen_faction.items)
+
+        taken_item: Items = executor.controller.send_game_message(
+            AidTakeItemChoiceMessage(available_items)).chosen_item
+
+        # 7. Take item and add it to available items in satchel
+
+        if taken_item is not None:
+            print(
+                f" -  Taken {taken_item.name.capitalize()} from {chosen_faction}")
+            chosen_faction.items.remove(taken_item)
+            executor.satchel.add_item(taken_item)
+        else:
+            print(f" - No item taken from {chosen_faction}")
+
+        return super().perform(game_state, executor)
