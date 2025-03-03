@@ -99,9 +99,14 @@ class WoodlandAlliance(Faction):
                 f" - The {self} has taken non-matching card '{chosen_card}' from {triggerer}")
         # 3. If the player has no cards, the alliance draws a card from the deck
         else:
-            chosen_card = self.deck.draw(1)[0]
-            print(
-                f" - {triggerer} has no cards, drew '{chosen_card}' from the deck")
+            chosen_card = self.deck.draw(1)
+            if chosen_card != []:
+                chosen_card = chosen_card[0]
+                print(
+                    f" - {triggerer} has no cards, drew '{chosen_card}' from the deck")
+            else:
+                set_print_colour(triggerer.print_colour)
+                return
 
         # 4. Wherever this card comes from, it gets added to the alliance's supporter deck
         self.supporters.append(chosen_card)
