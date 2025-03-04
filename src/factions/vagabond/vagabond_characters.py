@@ -72,7 +72,7 @@ class TinkerCharacter(VagabondCharacter):
             TinkerCardMessage(available_cards)).chosen_card
         executor.hand.append(chosen_card)
         game_state.deck.discard.remove(chosen_card)
-        print(f" - Taken '{chosen_card.name}' from the discard pile")
+        print(f" - Taken '{chosen_card}' from the discard pile")
 
 
 class RangerCharacter(VagabondCharacter):

@@ -21,6 +21,12 @@ class ControllerMessages(Enum):
     BATTLE_TARGET_RESPONSE = auto()
     DISCARD_CHOICE_RESPONSE = auto()
     BETTER_BURROW_BANK_RESPONSE = auto()
+    STAND_AND_DELIVER_RESPONSE = auto()
+    TAX_COLLECTOR_RESPONSE = auto()
+    CODEBREAKERS_RESPONSE = auto()
+    CLAIM_DOMINANCE_SUIT_RESPONSE = auto()
+    CLAIM_DOMINANCE_CARD_RESPONSE = auto()
+
     # Marquise messages
     KEEP_CLEARING_RESPONSE = auto()
     MARCH_1_RESPONSE = auto()
@@ -102,6 +108,30 @@ class BetterBurrowBankResponse(ControllerMessage):
         self.chosen_player = chosen_player
 
 
+class ClaimDominanceSuitResponse(ControllerMessage):
+    def __init__(self, chosen_dominance):
+        super().__init__(ControllerMessages.CLAIM_DOMINANCE_SUIT_RESPONSE)
+        self.chosen_dominance = chosen_dominance
+
+
+class ClaimDominanceCardResponse(ControllerMessage):
+    def __init__(self, chosen_discard):
+        super().__init__(ControllerMessages.CLAIM_DOMINANCE_CARD_RESPONSE)
+        self.chosen_discard = chosen_discard
+
+
+class TaxCollectorResponse(ControllerMessage):
+    def __init__(self, chosen_unit):
+        super().__init__(ControllerMessages.TAX_COLLECTOR_RESPONSE)
+        self.chosen_unit = chosen_unit
+
+
+class CodebreakersResponse(ControllerMessage):
+    def __init__(self, chosen_player):
+        super().__init__(ControllerMessages.CODEBREAKERS_RESPONSE)
+        self.chosen_player = chosen_player
+
+
 class PieceTargetingResponse(ControllerMessage):
     def __init__(self, targets: List['Piece']) -> None:
         super().__init__(ControllerMessages.PIECE_TARGETING_RESPONSE)
@@ -124,6 +154,12 @@ class ChooseDominanceResponse(ControllerMessage):
     def __init__(self, chosen_card):
         super().__init__(ControllerMessages.CHOOSE_DOMINANCE_RESPONSE)
         self.chosen_card = chosen_card
+
+
+class StandAndDeliverResponse(ControllerMessage):
+    def __init__(self, chosen_player):
+        super().__init__(ControllerMessages.STAND_AND_DELIVER_RESPONSE)
+        self.chosen_player = chosen_player
 
 
 class DiscardChoiceResponse(ControllerMessage):

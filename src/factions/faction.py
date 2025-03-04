@@ -5,7 +5,7 @@ from typing import Dict, List, TYPE_CHECKING, Optional, Callable
 
 from utils.root_types import Suits, Items
 from utils.callback_handler import CallbackTimes, BattleCallbackTimes
-from actions.action_handler import ActionGroup
+from actions.action_handler import ActionGroup, Action
 
 if TYPE_CHECKING:
     from cards.card import Card
@@ -45,6 +45,8 @@ class Faction(ABC):
             CallbackTimes.EVENING_START: [ActionGroup(
                 'Evening-Start', False, [], can_abort=True)],
             **{time: [] for time in CallbackTimes if time not in {CallbackTimes.DOMINANCE_TIME, CallbackTimes.BIRDSONG_START, CallbackTimes.DAYLIGHT_START, CallbackTimes.EVENING_START}}})
+
+    used_spanning_actions: Dict[Action, int] = field(default_factory=dict)
 
     @abstractmethod
     def get_crafting_resources(self) -> Dict[Suits, int]: ...

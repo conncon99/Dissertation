@@ -25,6 +25,7 @@ from actions.vagabond.empty_satchel_action import EmptySatchelAction
 from actions.vagabond.strike_action import StrikeAction
 from actions.vagabond.vagabond_battle_action import VagabondBattleAction
 from actions.vagabond.aid_action import AidAction
+from actions.factionless.play_dominance_action import PlayDominanceAction
 
 if TYPE_CHECKING:
     from board.map import Map
@@ -43,7 +44,6 @@ class Vagabond(Faction):
         self.character: VagabondCharacter = None
         self.relationship_track = RelationshipTrack(self)
         self.vagabond_pawn: VagabondPawn = None
-
         self.active_tea_count: int = 0
         self.active_coin_count: int = 0
         self.active_bag_count: int = 0
@@ -56,7 +56,7 @@ class Vagabond(Faction):
                                                    ActionGroup('Birdsong-2', False, [SlipAction()], 1, can_abort=True)]
 
         self.actions[CallbackTimes.IN_DAYLIGHT] = [
-            ActionGroup('Daylight', False, [VagabondMoveAction(), VagabondBattleAction(), ExploreAction(), AidAction(), RepairAction(), StrikeAction(), VagabondCraft(), SpecialAction(), QuestAction()], None, can_abort=True)]
+            ActionGroup('Daylight', False, [VagabondMoveAction(), VagabondBattleAction(), ExploreAction(), AidAction(), RepairAction(), StrikeAction(), VagabondCraft(), SpecialAction(), QuestAction(), PlayDominanceAction()], None, can_abort=True)]
 
         self.actions[CallbackTimes.IN_EVENING] = [
             ActionGroup('Evening', True, [EveningRestAction(), DrawAndDiscardAction(), EmptySatchelAction()])]

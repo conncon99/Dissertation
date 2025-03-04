@@ -4,7 +4,6 @@ from controllers.messages.game_messages import CraftMessage
 from cards.card import ItemCard
 from utils.root_types import Suits
 from utils.game_settings import CRAFTABLE_ITEMS
-from cards.cards import DOMINANCE_CARDS, SAPPERS
 
 if TYPE_CHECKING:
     from cards.card import Card
@@ -66,14 +65,13 @@ class CraftAction(Action):
         card: 'Card' = executor.controller.send_game_message(
             CraftMessage(crafting_options)).chosen_card
         # 3. Craft card
-        print(f" - Crafted '{card.name}'")
+        print(f" - Crafted '{card}'")
         card.owner = executor
 
         if card.is_persistent:
             executor.hand.remove(card)
             executor.active_cards.append(card)
-            if card not in DOMINANCE_CARDS:
-                card.activate(game_state)
+            card.activate(game_state)
         else:
             card.activate(game_state)
             executor.discard_card(card)

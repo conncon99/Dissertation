@@ -56,6 +56,21 @@ class AllianceRandomController(AllianceController):
     def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse:
         return BattleClearingResponse(random.choice(msg.available_clearings))
 
+    def _handle_stand_and_deliver(self, msg: StandAndDeliverMessage) -> StandAndDeliverResponse:
+        return StandAndDeliverResponse(random.choice(msg.available_players))
+
+    def _handle_tax_collector(self, msg: TaxCollectorMessage) -> TaxCollectorResponse:
+        return TaxCollectorResponse(random.choice(msg.available_units))
+
+    def _handle_claim_dominance_card(self, msg: ClaimDominanceCardMessage) -> ClaimDominanceCardResponse:
+        return ClaimDominanceCardResponse(random.choice(msg.available_discard_cards))
+
+    def _handle_claim_dominance_suit(self, msg: ClaimDominanceSuitMessage) -> ClaimDominanceSuitResponse:
+        return ClaimDominanceSuitResponse(random.choice(msg.available_dominance_cards))
+
+    def _handle_codebreakers(self, msg: CodebreakersMessage) -> CodebreakersResponse:
+        return CodebreakersResponse(random.choice(msg.available_players))
+
     def _handle_battle_target_choice(self, msg: BattleTargetChoiceMessage) -> BattleTargetResponse:
         return BattleTargetResponse(random.choice(msg.battle_target_list))
 

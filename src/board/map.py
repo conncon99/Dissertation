@@ -1,10 +1,14 @@
+from __future__ import annotations
 from board.clearing import Clearing
-from board.forest import Forest
 from abc import ABC, abstractmethod
 from utils.root_types import BASE_SUITS, Items
 from pieces.factionless.buildings.ruin import Ruin
 import random
-from typing import List
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from cards.card import DominanceCard
+    from board.forest import Forest
 
 AVAILABLE_RUIN_ITEMS = [Items.BAG, Items.BOOTS, Items.HAMMER, Items.SWORD]
 
@@ -16,6 +20,7 @@ class Map(ABC):
         self.clearings: List[Clearing] = []
         self.forests: List[Forest] = []
         self.corner_clearings: List[Clearing] = []
+        self.available_dominance_cards: List[DominanceCard] = []
         self.create_map()
 
     def create_map(self) -> None:

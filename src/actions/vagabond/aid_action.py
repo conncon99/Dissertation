@@ -51,7 +51,7 @@ class AidAction(Action):
 
         chosen_faction.hand.append(chosen_card)
         executor.hand.remove(chosen_card)
-        print(f" - Given card '{chosen_card.name}' to {chosen_faction}")
+        print(f" - Given card '{chosen_card}' to {chosen_faction}")
 
         executor.relationship_track.aid_faction(chosen_faction.faction_id)
 

@@ -30,6 +30,16 @@ class Controller(ABC):
                 return self._handle_crafting(msg)
             case GameMessages.CHOOSE_DOMINANCE_MESSAGE:
                 return self._handle_dominance_choice(msg)
+            case GameMessages.TAX_COLLECTOR_MESSAGE:
+                return self._handle_tax_collector(msg)
+            case GameMessages.STAND_AND_DELIVER_MESSAGE:
+                return self._handle_stand_and_deliver(msg)
+            case GameMessages.CODEBREAKERS_MESSAGE:
+                return self._handle_codebreakers(msg)
+            case GameMessages.CLAIM_DOMINANCE_CARD_MESSAGE:
+                return self._handle_claim_dominance_card(msg)
+            case GameMessages.CLAIM_DOMINANCE_SUIT_MESSAGE:
+                return self._handle_claim_dominance_suit(msg)
             case GameMessages.BATTLE_CLEARING_CHOICE_MESSAGE:
                 return self._handle_battle_clearing_choice(msg)
             case GameMessages.BATTLE_TARGET_CHOICE_MESSAGE:
@@ -52,6 +62,26 @@ class Controller(ABC):
 
     @abstractmethod
     def _handle_ambushes(self, msg: AmbushMessage) -> AmbushResponse: ...
+
+    @abstractmethod
+    def _handle_tax_collector(
+        self, msg: TaxCollectorMessage) -> TaxCollectorResponse: ...
+
+    @abstractmethod
+    def _handle_stand_and_deliver(
+        self, msg: StandAndDeliverMessage) -> StandAndDeliverResponse: ...
+
+    @abstractmethod
+    def _handle_claim_dominance_suit(
+        self, msg: ClaimDominanceSuitMessage) -> ClaimDominanceSuitResponse: ...
+
+    @abstractmethod
+    def _handle_claim_dominance_card(
+        self, msg: ClaimDominanceCardMessage) -> ClaimDominanceCardResponse: ...
+
+    @abstractmethod
+    def _handle_codebreakers(
+        self, msg: CodebreakersMessage) -> CodebreakersResponse: ...
 
     @abstractmethod
     def _handle_battle_end(

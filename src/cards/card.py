@@ -11,6 +11,10 @@ from actions.factionless.move_action import MoveAction
 from actions.cards.better_burrow_bank_action import BetterBurrowBankAction
 from controllers.messages.game_messages import BattleUseCardMessage
 from controllers.messages.controller_messages import AmbushResponse
+from actions.cards.stand_and_deliver_action import StandAndDeliverAction
+from actions.cards.tax_collector_action import TaxCollectorAction
+from actions.cards.codebreakers_action import CodebreakersAction
+from actions.cards.royal_claim_action import RoyalClaimAction
 
 if TYPE_CHECKING:
     from factions.faction import Faction
@@ -62,8 +66,12 @@ class Card:
         self.game_state = game_state
         if self.is_action_adder:
             assert self.owner
-            self.owner.actions[self.callback_time][0].actions.append(
-                self.action)
+            if self.action.group_spanning:
+                for action_group in self.owner.actions[self.callback_time]:
+                    action_group.actions.append(self.action)
+            else:
+                self.owner.actions[self.callback_time][0].actions.append(
+                    self.action)
         if self.is_battle_modifier:
             assert self.owner
             self.owner.battle_callbacks[self.callback_time].append(
@@ -106,6 +114,7 @@ class DominanceCard(Card):
     def activate(self, game_state: GameState):
         super().activate(game_state)
         self.owner.dominance = self.suit
+        self.owner.hand.remove(self)
 
 
 class CommandWarrenCard(Card):
@@ -239,15 +248,13 @@ class FavourCard(Card):
         super().__init__(suit, name, False, description)
 
     def activate(self, game_state: GameState):
-        friendly_id = self.owner.faction_id
         for clearing in game_state.board.clearings:
             if clearing.get_suit() == self.suit:
-                self._kill_all_enemies(clearing, friendly_id, game_state)
-        self.owner.hand.remove(self)
+                self._kill_all_enemies(clearing, game_state)
 
-    def _kill_all_enemies(self, clearing: "Clearing", friendly_id: int, game_state: GameState):
+    def _kill_all_enemies(self, clearing: Clearing, game_state: GameState):
         for faction in game_state.faction_list:
-            if faction.faction_id != friendly_id:
+            if faction.faction_id != self.owner.faction_id and clearing.get_faction_piece_count(faction.faction_id) > 0:
                 clearing.damage(faction, self.owner, 999)
 
 
@@ -258,3 +265,37 @@ class BetterBurrowBankCard(Card):
         self.make_craftable(rabbit_count=2)
         self.make_action_adder(
             CallbackTimes.BIRDSONG_START, BetterBurrowBankAction())
+
+
+class StandAndDeliverCard(Card):
+    def __init__(self):
+        super().__init__(Suits.FOX, "Stand and Deliver", True,
+                         "In Birdsong, may take a random card from another player. That player scores one point")
+        self.make_craftable(mouse_count=3)
+        self.make_action_adder(CallbackTimes.IN_BIRDSONG,
+                               StandAndDeliverAction())
+
+
+class TaxCollectorsCard(Card):
+    def __init__(self):
+        super().__init__(Suits.FOX, "Tax Collector", True,
+                         "Once in Daylight, may remove one of your warriors to draw a card.")
+        self.make_craftable(fox_count=1, mouse_count=1, rabbit_count=1)
+        self.make_action_adder(CallbackTimes.IN_DAYLIGHT, TaxCollectorAction())
+
+
+class CodebreakersCard(Card):
+    def __init__(self):
+        super().__init__(Suits.MOUSE, "Codebreakers", True,
+                         "Once in Daylight, may look at another player's hand.")
+        self.make_craftable(mouse_count=1)
+        self.make_action_adder(CallbackTimes.IN_DAYLIGHT, CodebreakersAction())
+
+
+class RoyalClaimCard(Card):
+    def __init__(self):
+        super().__init__(Suits.BIRD, "Royal Claim", True,
+                         "In Birdsong, may discard this to score one point per clearing you rule.")
+        self.make_craftable(wild_count=4)
+        self.make_action_adder(CallbackTimes.IN_BIRDSONG,
+                               RoyalClaimAction(self))

@@ -11,7 +11,6 @@ from controllers.random_controllers.vagabond_random_controller import VagabondRa
 from utils.colour_utils import colored_print
 import builtins
 
-
 builtins.print = colored_print
 marquise = Marquise(MarquiseRandomController())
 eyrie = EyrieDynasties(EyrieRandomController())

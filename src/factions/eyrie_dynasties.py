@@ -51,7 +51,7 @@ class EyrieDynasties(Faction):
             ActionGroup("Daylight-Decree-Move", ordered=True, actions=[]),
             ActionGroup("Daylight-Decree-Battle", ordered=True, actions=[]),
             ActionGroup("Daylight-Decree-Build", ordered=True, actions=[]),
-            ActionGroup("Daylight-End", False, PlayDominanceAction(), 1, can_abort=True)]
+            ActionGroup("Daylight-End", False, [PlayDominanceAction()], 1, can_abort=True)]
         self.actions[CallbackTimes.IN_BIRDSONG] = [ActionGroup(
             "Birdsong", ordered=True, actions=[ReplenishHandAction(), ExtendDecreeAction(), RoostlessAction()])]
         self.actions[CallbackTimes.IN_EVENING] = [

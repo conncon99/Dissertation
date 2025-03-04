@@ -15,6 +15,11 @@ class GameMessages(Enum):
     DISCARD_CHOICE_MESSAGE = auto()
     ACTION_CHOICE_MESSAGE = auto()
     CHOOSE_DOMINANCE_MESSAGE = auto()
+    STAND_AND_DELIVER_MESSAGE = auto()
+    TAX_COLLECTOR_MESSAGE = auto()
+    CODEBREAKERS_MESSAGE = auto()
+    CLAIM_DOMINANCE_SUIT_MESSAGE = auto()
+    CLAIM_DOMINANCE_CARD_MESSAGE = auto()
 
     BATTLE_CLEARING_CHOICE_MESSAGE = auto()
     BATTLE_TARGET_CHOICE_MESSAGE = auto()
@@ -126,6 +131,30 @@ class BetterBurrowBankMessage(GameMessage):
         self.available_players = available_players
 
 
+class ClaimDominanceSuitMessage(GameMessage):
+    def __init__(self, available_dominance_cards):
+        super().__init__(GameMessages.CLAIM_DOMINANCE_SUIT_MESSAGE)
+        self.available_dominance_cards = available_dominance_cards
+
+
+class ClaimDominanceCardMessage(GameMessage):
+    def __init__(self, available_discard_cards):
+        super().__init__(GameMessages.CLAIM_DOMINANCE_CARD_MESSAGE)
+        self.available_discard_cards = available_discard_cards
+
+
+class TaxCollectorMessage(GameMessage):
+    def __init__(self, available_units):
+        super().__init__(GameMessages.TAX_COLLECTOR_MESSAGE)
+        self.available_units = available_units
+
+
+class CodebreakersMessage(GameMessage):
+    def __init__(self, available_players):
+        super().__init__(GameMessages.CODEBREAKERS_MESSAGE)
+        self.available_players = available_players
+
+
 class PieceTargetingMessage(GameMessage):
     def __init__(self, friendly_faction, enemy_faction, remaining_dmg, targets) -> None:
         super().__init__(GameMessages.PIECE_TARGETING_MESSAGE)
@@ -164,6 +193,12 @@ class ActionChoiceMessage(GameMessage):
     def __init__(self, available_actions) -> None:
         super().__init__(GameMessages.ACTION_CHOICE_MESSAGE)
         self.available_actions = available_actions
+
+
+class StandAndDeliverMessage(GameMessage):
+    def __init__(self, available_players):
+        super().__init__(GameMessages.STAND_AND_DELIVER_MESSAGE)
+        self.available_players = available_players
 
 
 class BattleClearingChoiceMessage(GameMessage):

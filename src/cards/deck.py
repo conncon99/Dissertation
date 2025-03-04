@@ -2,15 +2,17 @@ from __future__ import annotations
 from cards.cards import *
 from random import shuffle
 from typing import TYPE_CHECKING, List
+from cards.cards import DOMINANCE_CARDS
 
 if TYPE_CHECKING:
     from cards.card import Card
     from factions.faction import Faction
+    from board.map import Map
 
 
 class Deck:
 
-    def __init__(self) -> None:
+    def __init__(self, map: Map) -> None:
         self.deck = [
             # Item Cards
             SWORD_MOUSE,
@@ -55,8 +57,13 @@ class Deck:
             SAPPERS,
             BRUTAL_TACTICS,
             ARMORERS,
-            BETTER_BURROW_BANK
+            BETTER_BURROW_BANK,
+            STAND_AND_DELIVER,
+            TAX_COLLECTOR,
+            CODEBREAKERS,
+            ROYAL_CLAIM
         ]
+        self.map = map
 
         self.discard = []
 
@@ -85,7 +92,12 @@ class Deck:
             self.discard.clear()
 
     def discard_card(self, card: Card, executor: Faction):
-        self.discard.append(card)
         if card in executor.hand:
             executor.hand.remove(card)
-        print(f" - Discarded '{card}'")
+
+        if card in DOMINANCE_CARDS:
+            self.map.available_dominance_cards.append(card)
+            print(f" - Placed {card} in available dominance card pile")
+        else:
+            self.discard.append(card)
+            print(f" - Discarded '{card}'")

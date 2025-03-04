@@ -23,20 +23,29 @@ class Action(ABC):
                         (within an ordered group).
     """
 
-    def __init__(self, name: str, max_uses: Optional[int] = None, is_action_group_modifier: bool = False) -> None:
+    def __init__(self, name: str, max_uses: Optional[int] = None, is_action_group_modifier: bool = False, group_spanning: bool = False) -> None:
         self.name = name
         self.max_uses = max_uses if max_uses is not None else inf
         self.times_used = 0
         self.is_action_group_modifier = is_action_group_modifier
+        # Whether the action exists across multiple groups
+        self.group_spanning = group_spanning
 
     @abstractmethod
     def can_perform(self, executor: Faction, game_state: Optional[GameState] = None) -> bool:
+        if self.group_spanning and self in executor.used_spanning_actions.keys():
+            self.times_used = executor.used_spanning_actions[self]
         return self.times_used < self.max_uses
 
     @abstractmethod
     def perform(self, game_state: GameState, executor: Faction) -> None:
         print(f" - {self.name} action completed\n")
-        self.times_used += 1
+        if self.group_spanning and self in executor.used_spanning_actions.keys():
+            executor.used_spanning_actions[self] += 1
+        elif self.group_spanning:
+            executor.used_spanning_actions[self] = 1
+        else:
+            self.times_used += 1
         return
 
 
