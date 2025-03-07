@@ -12,9 +12,10 @@ from utils.colour_utils import colored_print
 import builtins
 
 builtins.print = colored_print
-marquise = Marquise(MarquiseRandomController())
-eyrie = EyrieDynasties(EyrieRandomController())
-woodland_alliance = WoodlandAlliance(AllianceRandomController())
-vagabond = Vagabond(VagabondRandomController())
-settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
-game_manager = GameManager(settings)
+for _ in range(5):
+    marquise = Marquise(MarquiseRandomController())
+    eyrie = EyrieDynasties(EyrieRandomController())
+    woodland_alliance = WoodlandAlliance(AllianceRandomController())
+    vagabond = Vagabond(VagabondRandomController())
+    settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
+    game_manager = GameManager(settings)

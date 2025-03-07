@@ -43,9 +43,9 @@ class GameManager:
         while not self.winner:
             turn_order = self.settings.randomize_turn_order()
             self.turn_count += 1
+            print(f"TURN {self.turn_count}")
             for faction in turn_order:
                 set_print_colour(RESET)
-                print(f"TURN {self.turn_count}")
                 self.game_state.current_player = faction
                 set_print_colour(faction.print_colour)
                 for time in CallbackTimes:
@@ -58,11 +58,15 @@ class GameManager:
                         action_group.run_group(faction, self.game_state)
                         self._handle_wins(faction)
                     faction.used_spanning_actions.clear()
-        if not isinstance(self.winner, list):
-            set_print_colour(self.winner.print_colour)
-            print(f"{self.winner} has won")
-        else:
-            print("TIE")
+        set_print_colour(self.winner.print_colour)
+        print(f"{self.winner} has won")
+
+        for faction in self.settings.faction_list:
+            if faction.faction_id == Factions.VAGABOND.value:
+                if faction.dominance and faction.dominance.faction_id == self.winner.faction_id:
+                    print(
+                        f"{faction} has won through a coalition with {self.winner}")
+                    break
 
     def get_game_phase(self) -> GamePhase:
         """Gets the current game phase"""
@@ -84,27 +88,12 @@ class GameManager:
                 print(f"{faction} VP: {faction.victory_points}")
 
             if faction.dominance and faction.has_won:
-                potential_winners.append(faction)
+                self.winner = faction
             elif faction.victory_points >= 30:
-                potential_winners.append(faction)
-
-        for faction in self.settings.faction_list:
-            if faction.faction_id == Factions.VAGABOND.value:
-                if faction.dominance and faction.dominance in potential_winners:
-                    potential_winners.append(faction)
-                break
-
-        if len(potential_winners) == 1:
-            self.winner = potential_winners[0]
-        elif len(potential_winners) > 1:
-            if current_faction in potential_winners:
-                self.winner = current_faction
-            else:
-                self.winner = potential_winners
+                self.winner = faction
 
     def _initialize_game_state(self):
         assert self.map is not None
         self.game_state.board = self.map
         self.game_state.faction_list = self.settings.faction_list
         self.game_state.deck = self.deck
-        # TODO: Maybe pass game state to factions here

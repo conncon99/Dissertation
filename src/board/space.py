@@ -14,7 +14,7 @@ class Space:
     # Change to make it a list of units
     def __init__(self, index: int, settings: GameSettings) -> None:
         self.settings = settings
-        self.units: Dict[Factions, List[Pawn]] = {
+        self.units: Dict[int, List[Pawn]] = {
             faction_id: [] for faction_id in self.settings.faction_ids}
         self.index = index
         self.adjacent_clearings: List[Clearing] = []

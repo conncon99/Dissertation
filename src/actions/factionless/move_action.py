@@ -18,7 +18,6 @@ class MoveAction(Action):
         super().__init__(name, max_uses, is_action_group_modifier)
 
     def can_perform(self, executor, game_state):
-        # TODO: Replace with lightweight version if this causes performance issues
         return super().can_perform(executor, game_state) and self.get_all_possible_moves(game_state, executor) != []
 
     def get_all_possible_moves(self, game_state: GameState, executor: Faction) -> List[Tuple[Clearing, Clearing, List[Pawn]]]:

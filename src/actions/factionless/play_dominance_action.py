@@ -3,7 +3,7 @@ from actions.action_handler import Action
 from cards.cards import DOMINANCE_CARDS
 from typing import TYPE_CHECKING
 from utils.root_types import Factions
-from controllers.messages.game_messages import ChooseDominanceMessage
+from controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
 from factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
 
 if TYPE_CHECKING:
@@ -49,8 +49,8 @@ class PlayDominanceAction(Action):
             if len(lowest_scoring_factions) == 1:
                 chosen_faction: Faction = lowest_scoring_factions[0]
             else:
-                # TODO: Choose faction
-                chosen_faction: Faction = lowest_scoring_factions[0]
+                chosen_faction: Faction = executor.controller.send_game_message(
+                    CoalitionChoiceMessage(lowest_scoring_factions)).chosen_faction
             executor.dominance = chosen_faction
             # If the faction is hostile, move their relationship to indifferent
             if executor.relationship_track.relationship_level[chosen_faction.faction_id] == HOSTILE:

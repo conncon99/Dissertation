@@ -68,7 +68,7 @@ class AidAction(Action):
 
         if taken_item is not None:
             print(
-                f" -  Taken {taken_item.name.capitalize()} from {chosen_faction}")
+                f" - Taken {taken_item.name.capitalize()} from {chosen_faction}")
             chosen_faction.items.remove(taken_item)
             executor.satchel.add_item(taken_item)
         else:

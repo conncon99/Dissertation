@@ -2,8 +2,9 @@ from __future__ import annotations
 from board.space import Space
 from typing import Dict, TYPE_CHECKING, List
 from utils.root_types import BASE_SUITS, Factions, Suits, EyrieLeaders, Items
-from controllers.messages.game_messages import PieceTargetingMessage
+from controllers.messages.game_messages import PieceTargetingMessage, AllyDamageSplitMessage
 from utils.colour_utils import set_print_colour
+from factions.vagabond.relationship_track import HOSTILE
 
 if TYPE_CHECKING:
     from pieces.token import Token
@@ -23,7 +24,7 @@ class Clearing(Space):
         self.slots = slots
         self.adjacent_clearings = adjacent_clearings
         self.adjacent_forests = adjacent_forests
-        self.tokens: Dict[Factions, List[Token]] = {
+        self.tokens: Dict[int, List[Token]] = {
             faction_id: [] for faction_id in self.settings.faction_ids}
 
     def get_owner(self):
@@ -78,7 +79,7 @@ class Clearing(Space):
                 count += 1
         return count
 
-    def damage(self, victim: Faction, attacker: Faction, amount):
+    def damage(self, victim: Faction, attacker: Faction, amount: int):
 
         victim_warrior_count = self.get_faction_warrior_count(
             victim.faction_id)
@@ -89,11 +90,7 @@ class Clearing(Space):
             amount += 1
 
         if amount > 0 and victim.faction_id == Factions.VAGABOND.value:
-            if amount == REMOVAL_DAMAGE:
-                print(f" - {victim} cannot be removed, dealing 3 damage")
-                victim.vagabond_pawn.damage(3, attacker)
-            else:
-                victim.vagabond_pawn.damage(amount, attacker)
+            self._handle_vagabond_take_damage(victim, attacker, amount)
         elif amount > 0:
             for i in range(min(victim_warrior_count, amount)):
                 self.units[victim.faction_id][0].damage(1, attacker)
@@ -128,3 +125,24 @@ class Clearing(Space):
             if attacker.eyrie_leader == EyrieLeaders.Despot and attacker.gained_despot_bonus:
                 attacker.add_vp(1)
             attacker.gained_despot_bonus = False
+
+    def _handle_vagabond_take_damage(self, victim: Vagabond, attacker: Faction, amount: int):
+        if amount == REMOVAL_DAMAGE:
+            print(f" - {victim} cannot be removed, dealing 3 damage")
+            victim.vagabond_pawn.damage(3, attacker)
+            return
+        elif victim.battle_ally is not None:
+            chosen_damage_split = victim.controller.send_game_message(AllyDamageSplitMessage(
+                min(amount, self.get_faction_warrior_count(victim.battle_ally.faction_id)))).chosen_damage_split
+            if chosen_damage_split != 0:
+                print(
+                    f" - Allied faction '{victim.battle_ally}' has taken {chosen_damage_split} hits for the {victim}")
+                self.damage(victim.battle_ally, attacker, chosen_damage_split)
+            victim.vagabond_pawn.damage(
+                amount - chosen_damage_split, attacker)
+            if chosen_damage_split > amount - chosen_damage_split:
+                print(
+                    f" - Allied faction '{victim.battle_ally}' has taken more hits than the {victim} and has become hostile")
+                victim.relationship_track.relationship_level[victim.battle_ally.faction_id] = HOSTILE
+            return
+        victim.vagabond_pawn.damage(amount, attacker)

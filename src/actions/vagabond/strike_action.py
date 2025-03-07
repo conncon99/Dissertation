@@ -59,6 +59,4 @@ class StrikeAction(Action):
         # Exhaust crossbow
         executor.satchel.exhaust_item(Items.CROSSBOW)
 
-        # TODO: Hostility
-
         return super().perform(game_state, executor)

@@ -79,6 +79,10 @@ class GameMessages(Enum):
     AID_EXHAUST_ITEM_CHOICE_MESSAGE = auto()
     AID_TAKE_ITEM_CHOICE_MESSAGE = auto()
     BATTLE_DAMAGE_ITEM_MESSAGE = auto()
+    COALITION_CHOICE_MESSAGE = auto()
+    ALLY_MOVEMENT_MESSAGE = auto()
+    CHOOSE_ALLY_MESSAGE = auto()
+    ALLY_DAMAGE_SPLIT_MESSAGE = auto()
 
 
 class GameMessage:
@@ -529,5 +533,29 @@ class BattleDamageItemMessage(GameMessage):
         self.active_coint_count = active_coint_count
         self.active_tea_count = active_tea_count
 
+
+class CoalitionChoiceMessage(GameMessage):
+    def __init__(self, available_factions):
+        super().__init__(GameMessages.COALITION_CHOICE_MESSAGE)
+        self.available_factions = available_factions
+
+
+class AllyMovementMessage(GameMessage):
+    def __init__(self, available_allies, from_clearing):
+        super().__init__(GameMessages.ALLY_MOVEMENT_MESSAGE)
+        self.available_allies = available_allies
+        self.from_clearing = from_clearing
+
+
+class ChooseAllyMessage(GameMessage):
+    def __init__(self, available_allies):
+        super().__init__(GameMessages.CHOOSE_ALLY_MESSAGE)
+        self.available_allies = available_allies
+
+
+class AllyDamageSplitMessage(GameMessage):
+    def __init__(self, max_damage):
+        super().__init__(GameMessages.ALLY_DAMAGE_SPLIT_MESSAGE)
+        self.max_damage = max_damage
 
 # endregion

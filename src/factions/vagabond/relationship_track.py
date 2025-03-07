@@ -34,6 +34,10 @@ class RelationshipTrack:
             self.aids_this_turn[faction_id] = 0
 
     def aid_faction(self, faction_id: int):
+
+        if self.relationship_level[faction_id] == ALLIED:
+            self.vagabond.add_vp(2)
+            print(f" - Gained 2 VP for aiding an allied faction")
         self.aids_this_turn[faction_id] += 1
         print(f" - Aids This Turn: {self.aids_this_turn[faction_id]}")
         relationship_level = self.relationship_level[faction_id]

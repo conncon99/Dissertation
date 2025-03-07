@@ -1,3 +1,4 @@
 print.log
 *.pyc
 .vscode/
+*.cpython-310.pyc

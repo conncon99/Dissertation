@@ -45,7 +45,7 @@ class ThiefCharacter(VagabondCharacter):
     def perform_special_action(self, executor, game_state):
         executor.satchel.exhaust_item(Items.TORCH)
         available_players = [faction for faction in game_state.faction_list if executor.vagabond_pawn.space.get_faction_piece_count(
-            faction.faction_id) and faction.faction_id != executor.faction_id]
+            faction.faction_id) and faction.faction_id != executor.faction_id and len(faction.hand) > 0]
 
         chosen_player = executor.controller.send_game_message(
             ThiefStealMessage(available_players)).chosen_player

@@ -1,7 +1,7 @@
 from __future__ import annotations
 import random
 from actions.action_handler import Action
-from controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage, AmbushMessage
+from controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage, AmbushMessage, ChooseAllyMessage
 from controllers.messages.controller_messages import AmbushResponse
 from utils.root_types import EyrieLeaders, Factions, Items, Suits
 
@@ -92,6 +92,30 @@ class BattleAction(Action):
             if ambush_response.ambush_card is not None:
                 ambush_response.ambush_card._callback(battle_modifier)
 
+        if attacker.faction_id == Factions.VAGABOND.value:
+            pass
+            # Get allies excluding the other faction involved
+            # Choose ally (can be None), friendly_warrior_count = undamaged swords + allied warriors on clearing
+            available_allies = attacker.get_allied_warriors_in_clearing(
+                clearing)
+            if defender in available_allies:
+                available_allies.remove(defender)
+
+            if available_allies != []:
+                available_allies.append(None)
+                chosen_ally = attacker.controller.send_game_message(
+                    ChooseAllyMessage(available_allies)).chosen_ally
+                attacker.battle_ally = chosen_ally
+                friendly_warrior_count = attacker.satchel.get_non_damaged_count(Items.SWORD) if chosen_ally is None else attacker.satchel.get_non_damaged_count(
+                    Items.SWORD) + clearing.get_faction_warrior_count(chosen_ally.faction_id)
+                if chosen_ally is not None:
+                    print(f" - Attacking with '{chosen_ally}' as ally")
+            else:
+                friendly_warrior_count = attacker.satchel.get_non_damaged_count(
+                    Items.SWORD)
+        else:
+            friendly_warrior_count = clearing.get_faction_warrior_count(
+                attacker.faction_id)
         friendly_warrior_count = clearing.get_faction_warrior_count(
             attacker.faction_id) if attacker.faction_id != Factions.VAGABOND.value else attacker.satchel.get_non_damaged_count(Items.SWORD)
         enemy_warrior_count = clearing.get_faction_warrior_count(
@@ -126,4 +150,6 @@ class BattleAction(Action):
                         amount=attacker_dmg)
         clearing.damage(victim=attacker, attacker=defender,
                         amount=defender_dmg)
+        if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
+            attacker.battle_ally = None
         set_print_colour(attacker.print_colour)

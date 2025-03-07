@@ -1,6 +1,6 @@
 from __future__ import annotations
 from factions.faction import Faction
-from typing import List, TYPE_CHECKING, Dict
+from typing import List, TYPE_CHECKING, Dict, Optional
 from utils.root_types import Items, Suits
 from factions.vagabond.satchel import Satchel
 from factions.vagabond.quests import QuestCard, QuestDeck
@@ -8,7 +8,7 @@ from pieces.vagabond.vagabond_pawn import VagabondPawn
 from factions.vagabond.vagabond_characters import Characters
 from board.clearing import Clearing
 from controllers.messages.game_messages import ChooseCharacterMessage, VagabondPlacementMessage
-from factions.vagabond.relationship_track import RelationshipTrack
+from factions.vagabond.relationship_track import RelationshipTrack, ALLIED
 from utils.callback_handler import CallbackTimes
 from actions.action_handler import ActionGroup
 from actions.vagabond.slip_action import SlipAction
@@ -48,6 +48,7 @@ class Vagabond(Faction):
         self.active_coin_count: int = 0
         self.active_bag_count: int = 0
         self.max_track_count: int = 3
+        self.battle_ally: Optional[Faction] = None
 
         self.completed_quests: Dict[Suits, int] = {
             suit: 0 for suit in Suits if suit != Suits.BIRD}
@@ -101,3 +102,12 @@ class Vagabond(Faction):
 
         print(f"- Finished {self} Set Up\n")
         return super().setup_faction(map, deck)
+
+    def get_allied_warriors_in_clearing(self, clearing: Clearing) -> List[Faction]:
+        available_allies = []
+        for faction in clearing.settings.faction_list:
+            if faction.faction_id == self.faction_id or len(clearing.units[faction.faction_id]) == 0:
+                continue
+            if self.relationship_track.relationship_level[faction.faction_id] == ALLIED:
+                available_allies.append(faction)
+        return available_allies

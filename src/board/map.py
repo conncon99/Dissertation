@@ -10,8 +10,6 @@ if TYPE_CHECKING:
     from cards.card import DominanceCard
     from board.forest import Forest
 
-AVAILABLE_RUIN_ITEMS = [Items.BAG, Items.BOOTS, Items.HAMMER, Items.SWORD]
-
 
 class Map(ABC):
 
@@ -21,6 +19,8 @@ class Map(ABC):
         self.forests: List[Forest] = []
         self.corner_clearings: List[Clearing] = []
         self.available_dominance_cards: List[DominanceCard] = []
+        self.available_ruin_items: List[Items] = [
+            Items.BAG, Items.BOOTS, Items.HAMMER, Items.SWORD]
         self.create_map()
 
     def create_map(self) -> None:
@@ -49,9 +49,10 @@ class Map(ABC):
         slots = [None] * slot_count
         clearing = Clearing(index, suit, slots, [], [], self.settings)
         if has_ruin:
-            ruin_item_idx = random.randint(0, len(AVAILABLE_RUIN_ITEMS) - 1)
+            ruin_item_idx = random.randint(
+                0, len(self.available_ruin_items) - 1)
             clearing.slots[0] = Ruin(
-                clearing, AVAILABLE_RUIN_ITEMS.pop(ruin_item_idx), 0)
+                clearing, self.available_ruin_items.pop(ruin_item_idx), 0)
         self.clearings.append(clearing)
 
     def add_clearing_connections(self, clearing: Clearing, clearing_indexes: list[int]) -> None:

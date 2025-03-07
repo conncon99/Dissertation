@@ -81,6 +81,10 @@ class ControllerMessages(Enum):
     AID_EXHAUST_ITEM_CHOICE_RESPONSE = auto()
     AID_TAKE_ITEM_CHOICE_RESPONSE = auto()
     BATTLE_DAMAGE_ITEM_RESPONSE = auto()
+    COALITION_CHOICE_RESPONSE = auto()
+    ALLY_MOVEMENT_RESPONSE = auto()
+    CHOOSE_ALLY_RESPONSE = auto()
+    ALLY_DAMAGE_SPLIT_RESPONSE = auto()
 
 
 class ControllerMessage:
@@ -495,5 +499,30 @@ class BattleDamageItemResponse(ControllerMessage):
         self.chosen_item = chosen_item
         self.is_exhausted = is_exhausted
         self.use_item_track = use_item_track
+
+
+class CoalitionChoiceResponse(ControllerMessage):
+    def __init__(self, chosen_faction):
+        super().__init__(ControllerMessages.COALITION_CHOICE_RESPONSE)
+        self.chosen_faction = chosen_faction
+
+
+class AllyMovementResponse(ControllerMessage):
+    def __init__(self, chosen_ally, chosen_units):
+        super().__init__(ControllerMessages.ALLY_MOVEMENT_RESPONSE)
+        self.chosen_ally = chosen_ally
+        self.chosen_units = chosen_units
+
+
+class ChooseAllyResponse(ControllerMessage):
+    def __init__(self, chosen_ally):
+        super().__init__(ControllerMessages.CHOOSE_ALLY_RESPONSE)
+        self.chosen_ally = chosen_ally
+
+
+class AllyDamageSplitResponse(ControllerMessage):
+    def __init__(self, chosen_damage_split):
+        super().__init__(ControllerMessages.ALLY_DAMAGE_SPLIT_RESPONSE)
+        self.chosen_damage_split = chosen_damage_split
 
 # endregion

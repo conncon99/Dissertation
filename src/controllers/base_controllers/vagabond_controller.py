@@ -46,6 +46,14 @@ class VagabondController(Controller):
                 return self._handle_aid_take_item_choice(msg)
             case GameMessages.BATTLE_DAMAGE_ITEM_MESSAGE:
                 return self._handle_battle_damage_item(msg)
+            case GameMessages.COALITION_CHOICE_MESSAGE:
+                return self._handle_coalition_choice(msg)
+            case GameMessages.ALLY_MOVEMENT_MESSAGE:
+                return self._handle_ally_movement(msg)
+            case GameMessages.CHOOSE_ALLY_MESSAGE:
+                return self._handle_choose_ally(msg)
+            case GameMessages.ALLY_DAMAGE_SPLIT_MESSAGE:
+                return self._handle_ally_damage_split(msg)
         return None
 
     @abstractmethod
@@ -122,3 +130,19 @@ class VagabondController(Controller):
     @abstractmethod
     def _handle_battle_damage_item(
         self, msg: BattleDamageItemMessage) -> BattleDamageItemResponse: ...
+
+    @abstractmethod
+    def _handle_coalition_choice(
+        self, msg: CoalitionChoiceMessage) -> CoalitionChoiceResponse: ...
+
+    @abstractmethod
+    def _handle_ally_movement(
+        self, msg: AllyMovementMessage) -> AllyMovementResponse: ...
+
+    @abstractmethod
+    def _handle_choose_ally(
+        self, msg: ChooseAllyMessage) -> ChooseAllyResponse: ...
+
+    @abstractmethod
+    def _handle_ally_damage_split(
+        self, msg: AllyDamageSplitMessage) -> AllyDamageSplitResponse: ...

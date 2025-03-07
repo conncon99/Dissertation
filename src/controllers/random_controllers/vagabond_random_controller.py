@@ -227,3 +227,24 @@ class VagabondRandomController(VagabondController):
             f" - chosen_item: {chosen_item}, is_exhausted: {is_exhausted}, use_item_track: {use_item_track}")
 
         return BattleDamageItemResponse(chosen_item, is_exhausted, use_item_track)
+
+    def _handle_coalition_choice(self, msg: CoalitionChoiceMessage) -> CoalitionChoiceResponse:
+        return CoalitionChoiceResponse(random.choice(msg.available_factions))
+
+    def _handle_ally_movement(self, msg: AllyMovementMessage) -> AllyMovementResponse:
+        chosen_ally = random.choice(msg.available_allies)
+        if chosen_ally is None:
+            chosen_units = []
+        else:
+            if len(msg.from_clearing.units[chosen_ally.faction_id]) > 1:
+                chosen_units = random.sample(
+                    msg.from_clearing.units[chosen_ally.faction_id], random.randint(1, len(msg.from_clearing.units[chosen_ally.faction_id]) - 1))
+            else:
+                chosen_units = msg.from_clearing.units[chosen_ally.faction_id]
+        return AllyMovementResponse(chosen_ally, chosen_units)
+
+    def _handle_choose_ally(self, msg: ChooseAllyMessage) -> ChooseAllyResponse:
+        return ChooseAllyResponse(random.choice(msg.available_allies))
+
+    def _handle_ally_damage_split(self, msg: AllyDamageSplitMessage) -> AllyDamageSplitResponse:
+        return AllyDamageSplitResponse(random.randint(0, msg.max_damage))
