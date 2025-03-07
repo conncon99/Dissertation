@@ -70,6 +70,7 @@ class CraftAction(Action):
 
         if card.is_persistent:
             executor.hand.remove(card)
+            print(f"- Before Active Cards: {executor.active_cards}")
             executor.active_cards.append(card)
             print(f"- Active Cards: {executor.active_cards}")
             card.activate(game_state)

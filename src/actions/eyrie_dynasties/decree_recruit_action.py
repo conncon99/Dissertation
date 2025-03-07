@@ -37,6 +37,11 @@ class DecreeRecruitAction(Action):
         available_clearings = [roost.space for roost in valid_roosts if not any(isinstance(
             token, Keep) for token in roost.space.tokens[Factions.MARQUISE_DE_CAT.value])]
 
+        if available_clearings == []:
+            print(f" - No available roosts: TURMOIL TRIGGERED")
+            executor.trigger_turmoil()
+            return
+
         roost_clearing: Clearing = executor.controller.send_game_message(
             DecreeRecruitClearingMessage(available_clearings)).chosen_clearing
         Pawn(roost_clearing, executor)

@@ -8,14 +8,30 @@ from controllers.random_controllers.marquise_random_controller import MarquiseRa
 from controllers.random_controllers.eyrie_random_controller import EyrieRandomController
 from controllers.random_controllers.alliance_random_controller import AllianceRandomController
 from controllers.random_controllers.vagabond_random_controller import VagabondRandomController
-from utils.colour_utils import colored_print
+import gc
 import builtins
+from utils.colour_utils import colored_print, original_print
 
 builtins.print = colored_print
-for _ in range(10):
+
+
+def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manager):
+    del marquise
+    del eyrie
+    del woodland_alliance
+    del vagabond
+    del settings
+    del game_manager
+    gc.collect()
+
+
+for i in range(3000):
+    original_print(f"RUN {i}")
     marquise = Marquise(MarquiseRandomController())
     eyrie = EyrieDynasties(EyrieRandomController())
     woodland_alliance = WoodlandAlliance(AllianceRandomController())
     vagabond = Vagabond(VagabondRandomController())
     settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
     game_manager = GameManager(settings)
+    clean_up(marquise, eyrie, woodland_alliance,
+             vagabond, settings, game_manager)

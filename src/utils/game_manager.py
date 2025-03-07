@@ -7,7 +7,7 @@ from utils.root_types import Items, GamePhase, Suits, Factions
 from utils.callback_handler import CallbackTimes
 from cards.deck import Deck
 from utils.game_state import GameState
-from utils.colour_utils import set_print_colour, RESET
+from utils.colour_utils import set_print_colour, RESET, original_print
 from actions.cards.claim_dominance_action import ClaimDominanceAction
 
 
@@ -58,6 +58,10 @@ class GameManager:
                         action_group.run_group(faction, self.game_state)
                         self._handle_wins(faction)
                     faction.used_spanning_actions.clear()
+            if self.turn_count >= 200:
+                original_print(
+                    "Turn count has reached 200, cancelling game...")
+                return
         set_print_colour(self.winner.print_colour)
         print(f"{self.winner} has won")
 

@@ -140,31 +140,42 @@ class VagabondRandomController(VagabondController):
     def _handle_empty_satchel(self, msg: EmptySatchelMessage) -> EmptySatchelResponse:
         print(f"ed: {len(msg.exhausted_damaged_items)} , e: {len(msg.exhausted_items)}, ad: {len(msg.available_damaged_items)}, a: {len(msg.available_items)}")
 
-        exhausted_options = [msg.exhausted_items != []
-                             or msg.exhausted_damaged_items != [], not (msg.available_items != [] or msg.available_damaged_items != [])]
-        damaged_options = [msg.available_damaged_items !=
-                           [] or msg.exhausted_damaged_items != [], not (msg.available_items != [] or msg.exhausted_items != [])]
+        has_exhausted = bool(
+            msg.exhausted_items or msg.exhausted_damaged_items)
+        has_available = bool(
+            msg.available_items or msg.available_damaged_items)
 
-        can_be_both = msg.exhausted_damaged_items != []
-        can_be_neither = msg.available_items != []
+        has_damaged_exhausted = bool(msg.exhausted_damaged_items)
+        has_damaged_available = bool(msg.available_damaged_items)
 
-        is_exhausted = random.choice(exhausted_options)
-        if not can_be_both and is_exhausted:
+        if has_exhausted and has_available:
+            is_exhausted = random.choice([True, False])
+        elif has_exhausted:
+            is_exhausted = True
+        else:
+            is_exhausted = False
+
+        if has_damaged_exhausted or has_damaged_available:
+            is_damaged = random.choice([True, False])
+        else:
             is_damaged = False
-        elif not can_be_neither and not is_exhausted:
-            is_damaged = True
-        else:
-            is_damaged = random.choice(damaged_options)
 
-        if is_exhausted and is_damaged:
-            chosen_item = random.choice(msg.exhausted_damaged_items)
-        elif is_exhausted:
-            chosen_item = random.choice(msg.exhausted_items)
-        elif is_damaged:
-            chosen_item = random.choice(msg.available_damaged_items)
+        if is_exhausted:
+            if is_damaged:
+                candidates = msg.exhausted_damaged_items if msg.exhausted_damaged_items else msg.exhausted_items
+            else:
+                candidates = msg.exhausted_items if msg.exhausted_items else msg.exhausted_damaged_items
         else:
-            chosen_item = random.choice(msg.available_items)
+            if is_damaged:
+                candidates = msg.available_damaged_items if msg.available_damaged_items else msg.available_items
+            else:
+                candidates = msg.available_items if msg.available_items else msg.available_damaged_items
 
+        # If no candidates exist, you might want to raise an error or handle it gracefully.
+        if not candidates:
+            raise ValueError("No items available to choose from.")
+
+        chosen_item = random.choice(candidates)
         return EmptySatchelResponse(chosen_item, is_damaged, is_exhausted)
 
     def _handle_strike_faction_choice(self, msg: StrikeFactionChoiceMessage) -> StrikeFactionChoiceResponse:

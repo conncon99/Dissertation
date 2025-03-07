@@ -29,7 +29,7 @@ class ClaimDominanceAction(Action):
             ClaimDominanceCardMessage(available_cards)).chosen_discard
 
         executor.discard_card(chosen_discard)
-        executor.hand.append(chosen_discard)
+        executor.hand.append(chosen_dominance)
         game_state.board.available_dominance_cards.remove(chosen_dominance)
         print(
             f" - {executor} expended '{chosen_discard}' to take '{chosen_dominance}'")

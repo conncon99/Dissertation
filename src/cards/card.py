@@ -155,6 +155,7 @@ class SappersCard(Card):
 
         if use_card:
             battle_modifier.defender_damage_modifier += 1
+            print(f"Active cards: {self.owner.active_cards}")
             print(f" - {self.owner} played {self.name} to deal an extra hit")
             self.owner.active_cards.remove(self)
             self.owner.discard_card(self)
