@@ -13,13 +13,14 @@ from actions.cards.claim_dominance_action import ClaimDominanceAction
 
 class GameManager:
 
-    def __init__(self, settings: 'GameSettings') -> None:
+    def __init__(self, settings: 'GameSettings', turn_limit) -> None:
         self._initialized = True
         self.settings = settings
         self.winner = None
         self.game_phase = GamePhase.BIRDSONG
         self.game_state = GameState()
         self.turn_count = -1
+        self.turn_limit = turn_limit
         self.create_map()
         self.setup_game()
         self._initialize_game_state()
@@ -58,9 +59,9 @@ class GameManager:
                         action_group.run_group(faction, self.game_state)
                         self._handle_wins(faction)
                     faction.used_spanning_actions.clear()
-            if self.turn_count >= 200:
+            if self.turn_count >= self.turn_limit:
                 original_print(
-                    "Turn count has reached 200, cancelling game...")
+                    f"Turn count has reached {self.turn_limit}, cancelling game...")
                 return
         set_print_colour(self.winner.print_colour)
         print(f"{self.winner} has won")
