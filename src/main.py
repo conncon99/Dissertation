@@ -12,7 +12,7 @@ from utils.colour_utils import colored_print
 import builtins
 
 builtins.print = colored_print
-for _ in range(5):
+for _ in range(10):
     marquise = Marquise(MarquiseRandomController())
     eyrie = EyrieDynasties(EyrieRandomController())
     woodland_alliance = WoodlandAlliance(AllianceRandomController())

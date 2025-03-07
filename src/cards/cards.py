@@ -87,22 +87,36 @@ DOMINANCE_CARDS = [BIRD_DOMINANCE, FOX_DOMINANCE,
 
 # Ambush Cards
 BIRD_AMBUSH = AmbushCard(Suits.BIRD, "Bird Ambush")
+BIRD_AMBUSH_2 = AmbushCard(Suits.BIRD, "Bird Ambush")
 FOX_AMBUSH = AmbushCard(Suits.FOX, "Fox Ambush")
 RABBIT_AMBUSH = AmbushCard(Suits.RABBIT, "Rabbit Ambush")
 MOUSE_AMBUSH = AmbushCard(Suits.MOUSE, "Mouse Ambush")
 
-AMBUSH_CARDS = [BIRD_AMBUSH, FOX_AMBUSH, RABBIT_AMBUSH, MOUSE_AMBUSH]
+AMBUSH_CARDS = [BIRD_AMBUSH, FOX_AMBUSH,
+                RABBIT_AMBUSH, MOUSE_AMBUSH, BIRD_AMBUSH_2]
 
 # Misc Cards
 SCOUTING_PARTY = Card(Suits.MOUSE, "Scouting Party", True,
                       "As attacker in battle, you are not affected by ambush cards.").make_craftable(mouse_count=2)
+SCOUTING_PARTY_2 = Card(Suits.MOUSE, "Scouting Party", True,
+                        "As attacker in battle, you are not affected by ambush cards.").make_craftable(mouse_count=2)
 COMMAND_WARREN = CommandWarrenCard()
+COMMAND_WARREN_2 = CommandWarrenCard()
 COBBLER = CobblerCard()
+COBBLER_2 = CobblerCard()
 SAPPERS = SappersCard()
+SAPPERS_2 = SappersCard()
 BRUTAL_TACTICS = BrutalTacticsCard()
+BRUTAL_TACTICS_2 = BrutalTacticsCard()
 ARMORERS = ArmorersCard()
+ARMORERS_2 = ArmorersCard()
 BETTER_BURROW_BANK = BetterBurrowBankCard()
+BETTER_BURROW_BANK_2 = BetterBurrowBankCard()
 STAND_AND_DELIVER = StandAndDeliverCard()
+STAND_AND_DELIVER_2 = StandAndDeliverCard()
 TAX_COLLECTOR = TaxCollectorsCard()
+TAX_COLLECTOR_2 = TaxCollectorsCard()
+TAX_COLLECTOR_3 = TaxCollectorsCard()
 CODEBREAKERS = CodebreakersCard()
+CODEBREAKERS_2 = CodebreakersCard()
 ROYAL_CLAIM = RoyalClaimCard()

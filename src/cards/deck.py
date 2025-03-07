@@ -37,7 +37,7 @@ class Deck:
             SMUGGLERS_TRAIL,
             # Ambush Cards
             BIRD_AMBUSH,
-            BIRD_AMBUSH,
+            BIRD_AMBUSH_2,
             FOX_AMBUSH,
             MOUSE_AMBUSH,
             RABBIT_AMBUSH,
@@ -52,15 +52,26 @@ class Deck:
             FAVOR_OF_THE_MICE,
             # Misc Cards
             SCOUTING_PARTY,
+            SCOUTING_PARTY_2,
             COMMAND_WARREN,
+            COMMAND_WARREN_2,
             COBBLER,
+            COBBLER_2,
             SAPPERS,
+            SAPPERS_2,
             BRUTAL_TACTICS,
+            BRUTAL_TACTICS_2,
             ARMORERS,
+            ARMORERS_2,
             BETTER_BURROW_BANK,
+            BETTER_BURROW_BANK_2,
             STAND_AND_DELIVER,
+            STAND_AND_DELIVER_2,
             TAX_COLLECTOR,
+            TAX_COLLECTOR_2,
+            TAX_COLLECTOR_3,
             CODEBREAKERS,
+            CODEBREAKERS_2,
             ROYAL_CLAIM
         ]
         self.map = map

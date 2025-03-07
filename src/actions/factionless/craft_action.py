@@ -30,7 +30,7 @@ class CraftAction(Action):
             return False
 
         # Can't Craft Duplicate Persistent Cards
-        if card in executor.active_cards:
+        if card.name in [card.name for card in executor.active_cards]:
             return False
 
         # # Can't craft if there is no item available
@@ -65,12 +65,13 @@ class CraftAction(Action):
         card: 'Card' = executor.controller.send_game_message(
             CraftMessage(crafting_options)).chosen_card
         # 3. Craft card
-        print(f" - Crafted '{card}'")
+        print(f" - '{executor}' Crafted '{card}'")
         card.owner = executor
 
         if card.is_persistent:
             executor.hand.remove(card)
             executor.active_cards.append(card)
+            print(f"- Active Cards: {executor.active_cards}")
             card.activate(game_state)
         else:
             card.activate(game_state)

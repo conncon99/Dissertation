@@ -215,8 +215,8 @@ class AmbushCard(Card):
 
     def _callback(self, battle_modifer: BattleModifier) -> None:
 
-        from cards.cards import SCOUTING_PARTY
-        if SCOUTING_PARTY in battle_modifer.attacker.active_cards:
+        from cards.cards import SCOUTING_PARTY, SCOUTING_PARTY_2
+        if SCOUTING_PARTY in battle_modifer.attacker.active_cards or SCOUTING_PARTY_2 in battle_modifer.attacker.active_cards:
             print(" - Scouting party blocked ambush")
             # Scouting Party blocks ambushes
             return
