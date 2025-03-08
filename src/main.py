@@ -25,13 +25,16 @@ def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manage
     gc.collect()
 
 
-for i in range(200):
+RUN_COUNT = 1
+TURN_LIMIT = 300
+
+for i in range(RUN_COUNT):
     original_print(f"RUN {i}")
     marquise = Marquise(MarquiseRandomController())
     eyrie = EyrieDynasties(EyrieRandomController())
     woodland_alliance = WoodlandAlliance(AllianceRandomController())
     vagabond = Vagabond(VagabondRandomController())
     settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
-    game_manager = GameManager(settings, turn_limit=300)
+    game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
     clean_up(marquise, eyrie, woodland_alliance,
              vagabond, settings, game_manager)

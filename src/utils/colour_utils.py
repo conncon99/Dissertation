@@ -1,7 +1,7 @@
 import builtins
 
 VERBOSE = False
-LOG = False
+LOG = True
 
 
 RESET = "\033[0m"

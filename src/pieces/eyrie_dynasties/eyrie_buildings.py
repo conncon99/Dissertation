@@ -9,11 +9,8 @@ if TYPE_CHECKING:
 
 class Roost(Building):
     def __init__(self, clearing: Clearing, faction: EyrieDynasties, slot_idx: int):
-        super().__init__(clearing, faction, slot_idx)
+        super().__init__(clearing, faction, slot_idx, "Roost")
         faction.roosts.append(self)
-
-    def __repr__(self):
-        return "Roost"
 
     def destroy(self, attacker):
         self.faction.roosts.remove(self)

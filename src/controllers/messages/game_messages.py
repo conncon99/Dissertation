@@ -69,6 +69,7 @@ class GameMessages(Enum):
     REFRESH_ITEM_MESSAGE = auto()
     VAGABOND_MOVE_MESSAGE = auto()
     CHOOSE_QUEST_MESSAGE = auto()
+    QUEST_USE_ITEM_TRACK_MESSAGE = auto()
     CHOOSE_QUEST_REWARD_MESSAGE = auto()
     REPAIR_ITEM_MESSAGE = auto()
     EMPTY_SATCHEL_MESSAGE = auto()
@@ -513,9 +514,12 @@ class AidCardChoiceMessage(GameMessage):
 
 
 class AidExhaustItemChoiceMessage(GameMessage):
-    def __init__(self, available_items):
+    def __init__(self, available_items, bag_track, coin_track, tea_track):
         super().__init__(GameMessages.AID_EXHAUST_ITEM_CHOICE_MESSAGE)
         self.available_items = available_items
+        self.bag_track = bag_track
+        self.coin_track = coin_track
+        self.tea_track = tea_track
 
 
 class AidTakeItemChoiceMessage(GameMessage):
@@ -525,12 +529,12 @@ class AidTakeItemChoiceMessage(GameMessage):
 
 
 class BattleDamageItemMessage(GameMessage):
-    def __init__(self, available_items, exhausted_items, active_bag_count, active_coint_count, active_tea_count):
+    def __init__(self, available_items, exhausted_items, active_bag_count, active_coin_count, active_tea_count):
         super().__init__(GameMessages.BATTLE_DAMAGE_ITEM_MESSAGE)
         self.available_items = available_items
         self.exhausted_items = exhausted_items
         self.active_bag_count = active_bag_count
-        self.active_coint_count = active_coint_count
+        self.active_coin_count = active_coin_count
         self.active_tea_count = active_tea_count
 
 
@@ -557,5 +561,12 @@ class AllyDamageSplitMessage(GameMessage):
     def __init__(self, max_damage):
         super().__init__(GameMessages.ALLY_DAMAGE_SPLIT_MESSAGE)
         self.max_damage = max_damage
+
+
+class QuestUseItemTrackMessage(GameMessage):
+    def __init__(self, available_count, track_count):
+        super().__init__(GameMessages.QUEST_USE_ITEM_TRACK_MESSAGE)
+        self.available_count = available_count
+        self.track_count = track_count
 
 # endregion

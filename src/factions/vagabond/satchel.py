@@ -44,18 +44,22 @@ class Satchel:
     def get_all_of_item(self, item: Items):
         return self.available_items[item], self.exhausted_items[item], self.available_damaged_items[item], self.exhausted_damaged_items[item]
 
-    def exhaust_item(self, item: Items):
-        if item == Items.COINS and self.owner.active_coin_count > 0:
+    def exhaust_item(self, item: Items, use_item_track: bool = False):
+        if item == Items.COINS and use_item_track:
+            assert self.owner.active_coin_count > 0
             self.owner.active_coin_count -= 1
-        elif item == Items.BAG and self.owner.active_bag_count > 0:
+        elif item == Items.BAG and use_item_track:
+            assert self.owner.active_bag_count > 0
             self.owner.active_bag_count -= 1
-        elif item == Items.TEA and self.owner.active_tea_count > 0:
+        elif item == Items.TEA and use_item_track:
+            assert self.owner.active_tea_count > 0
             self.owner.active_tea_count -= 1
         else:
             assert self.available_items[item] > 0
             self.available_items[item] -= 1
         self.exhausted_items[item] += 1
-        print(f" - Exhausting {item.name.capitalize()}")
+        print(f" - Exhausting {item.name.capitalize()}" +
+              (" from item track" if use_item_track else ""))
 
     def refresh_item(self, item: Items, is_damaged: bool):
         if is_damaged:

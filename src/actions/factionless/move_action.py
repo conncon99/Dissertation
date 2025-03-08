@@ -4,7 +4,7 @@ from factions.faction import Faction
 from utils.game_state import GameState
 from typing import List, Tuple, TYPE_CHECKING
 from controllers.messages.game_messages import MoveMessage
-from utils.root_types import Factions
+from utils.root_types import Factions, Items
 from pieces.woodland_alliance.alliance_tokens import Sympathy
 
 if TYPE_CHECKING:

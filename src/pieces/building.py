@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 
 
 class Building(Piece):
-    def __init__(self, clearing: Clearing, faction: Faction, slot_idx: int) -> None:
+    def __init__(self, clearing: Clearing, faction: Faction, slot_idx: int, name: str) -> None:
         self.slot_idx = slot_idx
-        super().__init__(clearing, faction)
+        super().__init__(clearing, faction, name)
         assert isinstance(self.space, Clearing)
         self.space.slots[slot_idx] = self
 
@@ -30,5 +30,5 @@ class Building(Piece):
                 attacker.gained_despot_bonus = True
         assert isinstance(self.space, Clearing)
         self.space.slots[self.slot_idx] = None
-        print("destroyed building")
-        print(f"attacker dominance: {attacker.dominance}")
+        if attacker:
+            print(f" - {attacker} destroyed {self}")

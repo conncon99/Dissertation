@@ -1,6 +1,6 @@
 from __future__ import annotations
 from actions.action_handler import Action
-from utils.root_types import Items
+from utils.root_types import Items, Factions
 from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from board.forest import Forest
@@ -16,26 +16,22 @@ if TYPE_CHECKING:
 
 
 class VagabondMoveAction(Action):
-    def __init__(self, name='Move', max_uses=None, is_action_group_modifier=False):
+    def __init__(self, name='Move', max_uses=None, is_action_group_modifier=False, cobbler_move=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.cobbler_move = cobbler_move
 
     def can_perform(self, executor: Vagabond, game_state: GameState):
-        if executor.satchel.available_items[Items.BOOTS] >= 2:
-            return True
-        elif executor.satchel.available_items[Items.BOOTS] == 1:
-            for clearing in executor.vagabond_pawn.space.adjacent_clearings:
-                for faction in game_state.faction_list:
-                    if faction.faction_id == executor.faction_id:
-                        continue
-                    if clearing.get_faction_warrior_count(faction.faction_id) != 0:
-                        return False
+        available_clearings = self._generate_clearing_costs(
+            executor, game_state, self.cobbler_move)
+        for clearing, cost in available_clearings.items():
+            if executor.satchel.available_items[Items.BOOTS] > cost:
                 return True
         return False
 
     def perform(self, game_state: GameState, executor: Vagabond):
 
         available_clearings = self._generate_clearing_costs(
-            executor, game_state)
+            executor, game_state, self.cobbler_move)
 
         chosen_clearing: Clearing = executor.controller.send_game_message(
             VagabondMoveMessage(available_clearings)).chosen_clearing
@@ -83,19 +79,19 @@ class VagabondMoveAction(Action):
         else:
             return "Error"
 
-    def _generate_clearing_costs(self, executor: Vagabond, game_state: GameState):
+    def _generate_clearing_costs(self, executor: Vagabond, game_state: GameState, cobbler_move: bool):
         clearing_costs = {
-            clearing: 1 for clearing in executor.vagabond_pawn.space.adjacent_clearings}
+            clearing: 0 if cobbler_move else 1 for clearing in executor.vagabond_pawn.space.adjacent_clearings}
 
         for clearing in executor.vagabond_pawn.space.adjacent_clearings:
             for faction in game_state.faction_list:
                 if faction.faction_id == executor.faction_id:
                     continue
                 if clearing.get_faction_warrior_count(faction.faction_id) != 0 and executor.relationship_track.relationship_level[faction.faction_id] == HOSTILE:
-                    if executor.satchel.available_items[Items.BOOTS] < 2:
+                    if (executor.satchel.available_items[Items.BOOTS] < 2 and not cobbler_move) or (cobbler_move and executor.satchel.available_items[Items.BOOTS] < 1):
                         del clearing_costs[clearing]
                     else:
-                        clearing_costs[clearing] = 2
+                        clearing_costs[clearing] = 1 if cobbler_move else 2
                     break
         return clearing_costs
 
@@ -103,3 +99,6 @@ class VagabondMoveAction(Action):
         from_space.units[faction_id].remove(unit)
         to_clearing.units[faction_id].append(unit)
         unit.space = to_clearing
+
+    def _handle_move(self):
+        pass

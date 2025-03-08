@@ -3,7 +3,7 @@ from actions.action_handler import Action
 from typing import TYPE_CHECKING
 from utils.root_types import Items, Suits
 from board.clearing import Clearing
-from controllers.messages.game_messages import ChooseQuestMessage, ChooseQuestRewardMessage
+from controllers.messages.game_messages import ChooseQuestMessage, ChooseQuestRewardMessage, QuestUseItemTrackMessage
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -30,8 +30,15 @@ class QuestAction(Action):
             f" - completed quest: '{chosen_quest}' in Clearing {executor.vagabond_pawn.space.index}")
 
         item1, item2 = chosen_quest.items
-        executor.satchel.exhaust_item(item1)
-        executor.satchel.exhaust_item(item2)
+        use_item_track_1, use_item_track_2 = False, False
+        if self._get_track_item_count(executor, item1) > 0:
+            use_item_track_1 = executor.controller.send_game_message(QuestUseItemTrackMessage(
+                executor.satchel.available_items[item1], self._get_track_item_count(executor, item1))).use_item_track
+        executor.satchel.exhaust_item(item1, use_item_track_1)
+        if self._get_track_item_count(executor, item2) > 0:
+            use_item_track_2 = executor.controller.send_game_message(QuestUseItemTrackMessage(
+                executor.satchel.available_items[item2], self._get_track_item_count(executor, item2))).use_item_track
+        executor.satchel.exhaust_item(item2, use_item_track_2)
 
         executor.completed_quests[chosen_quest.suit] += 1
         new_quest_card = executor.quest_deck.draw(1)
@@ -56,7 +63,21 @@ class QuestAction(Action):
     def _can_complete_quest(self, executor: Vagabond, quest_card: QuestCard) -> bool:
         item1, item2 = quest_card.items
         # Needs two of the same item
+
+        item1_track_val = self._get_track_item_count(executor, item1)
+        item2_track_val = self._get_track_item_count(executor, item2)
+
         if item1 == item2:
-            return executor.satchel.available_items[item1] >= 2
+            return executor.satchel.available_items[item1] + item1_track_val >= 2
         else:
-            return executor.satchel.available_items[item1] >= 1 and executor.satchel.available_items[item2] >= 1
+            return executor.satchel.available_items[item1] + item1_track_val >= 1 and executor.satchel.available_items[item2] + item2_track_val >= 1
+
+    def _get_track_item_count(self, executor: Vagabond, item: Items) -> int:
+        item_track_val = 0
+        if item == Items.BAG:
+            item_track_val = executor.active_bag_count
+        elif item == Items.COINS:
+            item_track_val = executor.active_coin_count
+        elif item == Items.TEA:
+            item_track_val = executor.active_tea_count
+        return item_track_val

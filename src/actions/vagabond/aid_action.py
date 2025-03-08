@@ -4,6 +4,7 @@ from utils.root_types import Items
 from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
+from controllers.messages.controller_messages import AidExhaustItemChoiceResponse
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -34,10 +35,11 @@ class AidAction(Action):
         # 3. Choose and exhaust item
         available_items = [
             item for item, amount in executor.satchel.available_items.items() for _ in range(amount)]
-        chosen_exhausted_item: Items = executor.controller.send_game_message(
-            AidExhaustItemChoiceMessage(available_items)).chosen_item
+        exhaust_item_response: AidExhaustItemChoiceResponse = executor.controller.send_game_message(
+            AidExhaustItemChoiceMessage(available_items, executor.active_bag_count, executor.active_coin_count, executor.active_tea_count))
 
-        executor.satchel.exhaust_item(chosen_exhausted_item)
+        executor.satchel.exhaust_item(
+            exhaust_item_response.chosen_item, exhaust_item_response.use_item_track)
 
         # 4. Get available cards to give aided player
 

@@ -15,6 +15,7 @@ from actions.cards.stand_and_deliver_action import StandAndDeliverAction
 from actions.cards.tax_collector_action import TaxCollectorAction
 from actions.cards.codebreakers_action import CodebreakersAction
 from actions.cards.royal_claim_action import RoyalClaimAction
+from actions.vagabond.vagabond_move_action import VagabondMoveAction
 
 if TYPE_CHECKING:
     from factions.faction import Faction
@@ -139,6 +140,13 @@ class CobblerCard(Card):
         self.make_craftable(rabbit_count=2)
         self.make_action_adder(
             CallbackTimes.EVENING_START, MoveAction(max_uses=1))
+
+    def activate(self, game_state):
+        if self.owner.faction_id == Factions.VAGABOND.value:
+            self.action = VagabondMoveAction(cobbler_move=True, max_uses=1)
+        else:
+            self.action = MoveAction(max_uses=1)
+        return super().activate(game_state)
 
 
 class SappersCard(Card):

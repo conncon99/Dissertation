@@ -7,9 +7,13 @@ if TYPE_CHECKING:
 
 class Piece(ABC):
 
-    def __init__(self, space: 'Space', faction: 'Faction') -> None:
+    def __init__(self, space: 'Space', faction: 'Faction', name: str) -> None:
         self.space = space
         self.faction = faction
+        self.name = name
+
+    def __repr__(self):
+        return self.name
 
     @abstractmethod
     def damage(self, amount: int, attacker: 'Faction'):

@@ -71,6 +71,7 @@ class ControllerMessages(Enum):
     REFRESH_ITEM_RESPONSE = auto()
     VAGABOND_MOVE_RESPONSE = auto()
     CHOOSE_QUEST_RESPONSE = auto()
+    QUEST_USE_ITEM_TRACK_RESPONSE = auto()
     CHOOSE_QUEST_REWARD_RESPONSE = auto()
     REPAIR_ITEM_RESPONSE = auto()
     EMPTY_SATCHEL_RESPONSE = auto()
@@ -482,9 +483,10 @@ class AidCardChoiceResponse(ControllerMessage):
 
 
 class AidExhaustItemChoiceResponse(ControllerMessage):
-    def __init__(self, chosen_item):
+    def __init__(self, chosen_item, use_item_track):
         super().__init__(ControllerMessages.AID_EXHAUST_ITEM_CHOICE_RESPONSE)
         self.chosen_item = chosen_item
+        self.use_item_track = use_item_track
 
 
 class AidTakeItemChoiceResponse(ControllerMessage):
@@ -524,5 +526,11 @@ class AllyDamageSplitResponse(ControllerMessage):
     def __init__(self, chosen_damage_split):
         super().__init__(ControllerMessages.ALLY_DAMAGE_SPLIT_RESPONSE)
         self.chosen_damage_split = chosen_damage_split
+
+
+class QuestUseItemTrackResponse(ControllerMessage):
+    def __init__(self, use_item_track):
+        super().__init__(ControllerMessages.QUEST_USE_ITEM_TRACK_RESPONSE)
+        self.use_item_track = use_item_track
 
 # endregion

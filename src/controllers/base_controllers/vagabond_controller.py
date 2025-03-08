@@ -26,6 +26,8 @@ class VagabondController(Controller):
                 return self._handle_vagabond_move(msg)
             case GameMessages.CHOOSE_QUEST_MESSAGE:
                 return self._handle_choose_quest(msg)
+            case GameMessages.QUEST_USE_ITEM_TRACK_MESSAGE:
+                return self._handle_quest_use_item_track(msg)
             case GameMessages.CHOOSE_QUEST_REWARD_MESSAGE:
                 return self._handle_choose_quest_reward(msg)
             case GameMessages.REPAIR_ITEM_MESSAGE:
@@ -90,6 +92,10 @@ class VagabondController(Controller):
     @abstractmethod
     def _handle_choose_quest(
         self, msg: ChooseQuestMessage) -> ChooseQuestResponse: ...
+
+    @abstractmethod
+    def _handle_quest_use_item_track(
+        self, msg: QuestUseItemTrackMessage) -> QuestUseItemTrackResponse: ...
 
     @abstractmethod
     def _handle_choose_quest_reward(

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Ruin(Building):
     def __init__(self, clearing: Clearing, item: Items, slot_idx: int) -> None:
-        super().__init__(clearing, None, slot_idx)
+        super().__init__(clearing, None, slot_idx, "Ruin")
         self.item = item
 
     def destroy(self, attacker):

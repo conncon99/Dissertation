@@ -124,6 +124,15 @@ class VagabondRandomController(VagabondController):
     def _handle_choose_quest(self, msg: ChooseQuestMessage) -> ChooseQuestResponse:
         return ChooseQuestResponse(random.choice(msg.available_quests))
 
+    def _handle_quest_use_item_track(self, msg: QuestUseItemTrackMessage) -> QuestUseItemTrackResponse:
+        if msg.available_count > 0 and msg.track_count > 0:
+            use_item_track = random.choice([True, False])
+        elif msg.available_count > 0:
+            use_item_track = False
+        else:
+            use_item_track = True
+        return QuestUseItemTrackResponse(use_item_track)
+
     def _handle_choose_quest_reward(self, msg: ChooseQuestRewardMessage) -> ChooseQuestRewardResponse:
         return ChooseQuestRewardResponse(random.choice([True, False]))
 
@@ -191,7 +200,22 @@ class VagabondRandomController(VagabondController):
         return AidCardChoiceResponse(random.choice(msg.available_cards))
 
     def _handle_aid_exhaust_item_choice(self, msg: AidExhaustItemChoiceMessage) -> AidExhaustItemChoiceResponse:
-        return AidExhaustItemChoiceResponse(random.choice(msg.available_items))
+        if (msg.bag_track > 0 or msg.tea_track > 0 or msg.coin_track > 0) and msg.available_items != []:
+            use_item_track = random.choice([True, False])
+        elif msg.available_items == []:
+            use_item_track = True
+        else:
+            use_item_track = False
+
+        if use_item_track:
+            track_items = []
+            track_items.extend([Items.BAG] * msg.bag_track)
+            track_items.extend([Items.COINS] * msg.coin_track)
+            track_items.extend([Items.TEA] * msg.tea_track)
+            chosen_item = random.choice(track_items)
+        else:
+            chosen_item = random.choice(msg.available_items)
+        return AidExhaustItemChoiceResponse(chosen_item, use_item_track)
 
     def _handle_aid_take_item_choice(self, msg: AidTakeItemChoiceMessage) -> AidTakeItemChoiceResponse:
         return AidTakeItemChoiceResponse(random.choice(msg.available_items))
@@ -202,7 +226,7 @@ class VagabondRandomController(VagabondController):
             is_exhausted = False
             track_items = []
             track_items.extend([Items.BAG] * msg.active_bag_count)
-            track_items.extend([Items.COINS] * msg.active_coint_count)
+            track_items.extend([Items.COINS] * msg.active_coin_count)
             track_items.extend([Items.TEA] * msg.active_tea_count)
             chosen_item = random.choice(track_items)
             print(
@@ -215,18 +239,18 @@ class VagabondRandomController(VagabondController):
         if is_exhausted:
             use_item_track = False
             chosen_item = random.choice(msg.exhausted_items)
-        elif msg.active_bag_count == 0 and msg.active_coint_count == 0 and msg.active_tea_count == 0:
+        elif msg.active_bag_count == 0 and msg.active_coin_count == 0 and msg.active_tea_count == 0:
             use_item_track = False
             chosen_item = random.choice(msg.available_items)
         else:
             all_available_items = []
             all_available_items.extend(msg.available_items)
             all_available_items.extend([Items.BAG] * msg.active_bag_count)
-            all_available_items.extend([Items.COINS] * msg.active_coint_count)
+            all_available_items.extend([Items.COINS] * msg.active_coin_count)
             all_available_items.extend([Items.TEA] * msg.active_tea_count)
             chosen_item = random.choice(all_available_items)
 
-            if (chosen_item == Items.BAG and msg.active_bag_count > 0) or (chosen_item == Items.COINS and msg.active_coint_count > 0) or (chosen_item == Items.TEA and msg.active_tea_count > 0):
+            if (chosen_item == Items.BAG and msg.active_bag_count > 0) or (chosen_item == Items.COINS and msg.active_coin_count > 0) or (chosen_item == Items.TEA and msg.active_tea_count > 0):
                 if chosen_item in msg.available_items:
                     use_item_track = random.choice([True, False])
                 else:

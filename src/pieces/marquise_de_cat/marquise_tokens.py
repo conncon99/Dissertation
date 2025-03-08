@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Keep(Token):
     def __init__(self, clearing, faction: Marquise):
-        super().__init__(clearing, faction)
+        super().__init__(clearing, faction, "Keep Token")
 
     def destroy(self, attacker):
         self.faction.keep = None
@@ -17,7 +17,7 @@ class Keep(Token):
 
 class Wood(Token):
     def __init__(self, clearing, faction: Marquise):
-        super().__init__(clearing, faction)
+        super().__init__(clearing, faction, "Wood Token")
         faction.wood.append(self)
 
     def destroy(self, attacker):

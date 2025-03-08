@@ -11,11 +11,8 @@ if TYPE_CHECKING:
 
 class Sawmill(Building):
     def __init__(self, clearing: Clearing, faction: Marquise, slot_idx: int):
-        super().__init__(clearing, faction, slot_idx)
+        super().__init__(clearing, faction, slot_idx, "Sawmill")
         faction.sawmills.append(self)
-
-    def __repr__(self):
-        return "Sawmill"
 
     def add_wood(self) -> None:
         Wood(self.space, self.faction)
@@ -24,11 +21,8 @@ class Sawmill(Building):
 class Workshop(Building):
 
     def __init__(self, clearing: Clearing, faction: Marquise, slot_idx: int) -> None:
-        super().__init__(clearing, faction, slot_idx)
+        super().__init__(clearing, faction, slot_idx, "Workshop")
         faction.workshops.append(self)
-
-    def __repr__(self):
-        return "Workshop"
 
     def get_suit(self):
         assert isinstance(self.space, Clearing)
@@ -37,11 +31,8 @@ class Workshop(Building):
 
 class Recruiter(Building):
     def __init__(self, clearing: Clearing, faction: Marquise, slot_idx: int) -> None:
-        super().__init__(clearing, faction, slot_idx)
+        super().__init__(clearing, faction, slot_idx, "Recruiter")
         faction.recruiters.append(self)
-
-    def __repr__(self):
-        return "Recruiter"
 
     def recruit(self):
         if len(self.faction.units) < self.faction.max_warriors:

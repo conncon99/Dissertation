@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 class Token(Piece):
 
-    def __init__(self, clearing: Clearing, faction: Faction) -> None:
-        super().__init__(clearing, faction)
+    def __init__(self, clearing: Clearing, faction: Faction, name: str) -> None:
+        super().__init__(clearing, faction, name)
         clearing.tokens[faction.faction_id].append(self)
 
     def damage(self, amount: int, attacker: Faction):
@@ -30,3 +30,5 @@ class Token(Piece):
                 attacker.gained_despot_bonus = True
         assert isinstance(self.space, Clearing)
         self.space.tokens[self.faction.faction_id].remove(self)
+        if attacker:
+            print(f" - {attacker} destroyed {self}")

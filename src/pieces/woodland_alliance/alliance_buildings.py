@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class AllianceBase(Building):
     def __init__(self, suit: Suits, clearing: Clearing, faction: WoodlandAlliance, slot_idx: int):
-        super().__init__(clearing, faction, slot_idx)
+        super().__init__(clearing, faction, slot_idx, f"Alliance {suit} Base")
         self.suit = suit
         faction.bases[self.suit] = self
 
