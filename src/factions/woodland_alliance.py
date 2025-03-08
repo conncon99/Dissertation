@@ -73,7 +73,7 @@ class WoodlandAlliance(Faction):
     def get_bonus_card_draws(self):
         return len([base for base in self.bases.values() if base is not None])
 
-    def get_base_count(self) -> bool:
+    def get_base_count(self) -> int:
         return sum(base is not None for base in self.bases.values())
 
     def trigger_outrage(self, triggerer: Faction, clearing: Clearing):
@@ -109,5 +109,12 @@ class WoodlandAlliance(Faction):
                 return
 
         # 4. Wherever this card comes from, it gets added to the alliance's supporter deck
-        self.supporters.append(chosen_card)
+        self.add_supporter(chosen_card)
         set_print_colour(triggerer.print_colour)
+
+    def add_supporter(self, card: Card):
+        if self.get_base_count() > 0 or len(self.supporters) < 5:
+            self.supporters.append(card)
+        else:
+            print(f" - Reached Supporter Limit, unable to add '{card}'")
+            self.discard_card(card)

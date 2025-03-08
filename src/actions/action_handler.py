@@ -101,18 +101,34 @@ class ActionGroup:
         if not self.was_max_assigned:
             self.max_total_uses = len(self.actions)
 
-        for action in self.actions:
+        remaining_actions = self.actions[:]  # Copy of the action list
+
+        while remaining_actions:
             if self.cancel_group:
                 print(f"- Cancelling action group")
                 return
             if not self.can_perform_any_action():
-                print(
-                    f"- Skipping action '{action.name}' (limit reached or not available)")
+                print(f"- No more actions can be performed in this group")
                 break
-            if action.can_perform(executor, game_state):
-                print(f"- Performing ordered action '{action.name}'")
-                action.perform(game_state, executor)
-                self.total_uses += 1
+
+            # Filter actions that can still be performed
+            available_actions = [
+                action for action in remaining_actions if action.can_perform(executor, game_state)]
+
+            if not available_actions:
+                print(f"- No available actions left to perform")
+                break
+
+            # Send a game message to choose the next action
+            chosen_action = executor.controller.send_game_message(
+                ActionChoiceMessage(available_actions)
+            ).chosen_action
+
+            print(f"- Performing action '{chosen_action.name}'")
+            chosen_action.perform(game_state, executor)
+            self.total_uses += 1
+            remaining_actions.remove(chosen_action)
+
         self._perform_available_modifiers(executor, game_state)
 
     def _run_non_ordered_group(self, executor: Faction, game_state):

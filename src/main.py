@@ -25,7 +25,7 @@ def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manage
     gc.collect()
 
 
-RUN_COUNT = 1
+RUN_COUNT = 10
 TURN_LIMIT = 300
 
 for i in range(RUN_COUNT):

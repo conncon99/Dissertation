@@ -60,7 +60,9 @@ class Vagabond(Faction):
             ActionGroup('Daylight', False, [VagabondMoveAction(), VagabondBattleAction(), ExploreAction(), AidAction(), RepairAction(), StrikeAction(), VagabondCraft(), SpecialAction(), QuestAction(), PlayDominanceAction()], None, can_abort=True)]
 
         self.actions[CallbackTimes.IN_EVENING] = [
-            ActionGroup('Evening', True, [EveningRestAction(), DrawAndDiscardAction(), EmptySatchelAction()])]
+            ActionGroup('Evening-1', False, [EveningRestAction()], 1),
+            ActionGroup('Evening-2', False, [DrawAndDiscardAction()], 1),
+            ActionGroup('Evening-3', False, [EmptySatchelAction()], 1)]
 
     def __repr__(self):
         return "Vagabond"

@@ -18,6 +18,6 @@ class MobilizeAction(Action):
         chosen_card = executor.controller.send_game_message(
             MobilizeMessage(executor.hand)).chosen_card
         executor.hand.remove(chosen_card)
-        executor.supporters.append(chosen_card)
+        executor.add_supporter(chosen_card)
         print(f" - Added '{chosen_card}' to Supporters")
         return super().perform(game_state, executor)
