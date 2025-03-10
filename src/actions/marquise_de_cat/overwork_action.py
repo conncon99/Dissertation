@@ -6,6 +6,7 @@ from utils.root_types import Suits
 from pieces.marquise_de_cat.marquise_tokens import Wood
 from controllers.messages.game_messages import OverworkMessage
 from controllers.messages.controller_messages import OverworkResponse
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
@@ -15,6 +16,7 @@ class OverworkAction(Action):
 
     def __init__(self):
         super().__init__("Overwork", None)
+        self.id = ActionIDs.OVERWORK
 
     def has_card_for_clearing(self, executor: Marquise):
         hand_suits = [card.suit for card in executor.hand]

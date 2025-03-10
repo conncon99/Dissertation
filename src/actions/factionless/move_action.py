@@ -6,6 +6,7 @@ from typing import List, Tuple, TYPE_CHECKING
 from controllers.messages.game_messages import MoveMessage
 from utils.root_types import Factions, Items
 from pieces.woodland_alliance.alliance_tokens import Sympathy
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from board.clearing import Clearing
@@ -16,6 +17,7 @@ class MoveAction(Action):
 
     def __init__(self, name="Move", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.MOVE
 
     def can_perform(self, executor, game_state):
         return super().can_perform(executor, game_state) and self.get_all_possible_moves(game_state, executor) != []

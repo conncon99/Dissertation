@@ -3,6 +3,7 @@ from actions.action_handler import Action
 from typing import TYPE_CHECKING
 from controllers.messages.game_messages import RefreshItemMessage
 from controllers.messages.controller_messages import RefreshItemResponse
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 class RefreshAction(Action):
     def __init__(self, name='Refresh', max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.REFRESH
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.has_any_exhausted_items() and super().can_perform(executor, game_state)

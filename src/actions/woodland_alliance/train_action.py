@@ -3,6 +3,7 @@ from actions.action_handler import Action
 from typing import TYPE_CHECKING
 from controllers.messages.game_messages import TrainMessage
 from utils.root_types import Suits
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 class TrainAction(Action):
     def __init__(self, name="Train", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.TRAIN
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
         return len(executor.hand) > 0 and super().can_perform(executor, game_state) and (len(executor.units) + executor.officers) < executor.max_warriors and any(base is not None for base in executor.bases.values()) and self.get_available_cards_for_suits(executor)

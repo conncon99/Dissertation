@@ -3,6 +3,7 @@ from __future__ import annotations
 from actions.action_handler import Action
 from controllers.messages.game_messages import CodebreakersMessage
 from typing import TYPE_CHECKING
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.faction import Faction
@@ -11,6 +12,7 @@ if TYPE_CHECKING:
 class CodebreakersAction(Action):
     def __init__(self, name="Codebreakers", max_uses=1, is_action_group_modifier=True, group_spanning=True):
         super().__init__(name, max_uses, is_action_group_modifier, group_spanning)
+        self.id = ActionIDs.CODEBREAKERS
 
     def can_perform(self, executor, game_state=None):
         return super().can_perform(executor, game_state) and any(len(faction.hand) > 0 and faction.faction_id != executor.faction_id for faction in game_state.faction_list)

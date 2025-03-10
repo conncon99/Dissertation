@@ -1,6 +1,7 @@
 from __future__ import annotations
 from actions.action_handler import Action
 from typing import TYPE_CHECKING
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
@@ -9,6 +10,7 @@ if TYPE_CHECKING:
 class RecruitAction(Action):
     def __init__(self):
         super().__init__("Recruit", 1)
+        self.id = ActionIDs.MARQUISE_RECRUIT
 
     def can_perform(self, executor: Marquise, game_state=None):
         return len(executor.recruiters) > 0 and super().can_perform(executor, game_state)

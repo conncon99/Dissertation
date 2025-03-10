@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, List
 from pieces.woodland_alliance.alliance_tokens import Sympathy
 from controllers.messages.game_messages import SpreadSympathyClearingMessage, SpreadSympathyDiscardMessage
 from utils.root_types import Suits
+from actions.action_group_registry import ActionIDs
+
 if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
     from utils.game_state import GameState
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 class SpreadSympathyAction(Action):
     def __init__(self, name="Spread Sympathy", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.SPREAD_SYMPATHY
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
         return len(executor.sympathy) < executor.max_sympathy and self.get_valid_clearings(executor, game_state) and super().can_perform(executor, game_state)

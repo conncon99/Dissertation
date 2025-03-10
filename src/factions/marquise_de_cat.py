@@ -60,7 +60,7 @@ class Marquise(Faction):
                         [PlayDominanceAction()], 1, can_abort=True)
         ]
         self.actions[CallbackTimes.IN_EVENING] = [ActionGroup(
-            "Evening", False, DrawAndDiscardAction(), 1)]
+            "Evening", False, [DrawAndDiscardAction()], 1)]
 
     def __repr__(self) -> str:
         return "Marquise de Cat"

@@ -7,6 +7,7 @@ from board.forest import Forest
 from controllers.messages.game_messages import VagabondMoveMessage, AllyMovementMessage
 from controllers.messages.controller_messages import AllyMovementResponse
 from factions.vagabond.relationship_track import HOSTILE, ALLIED
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -19,6 +20,7 @@ class VagabondMoveAction(Action):
     def __init__(self, name='Move', max_uses=None, is_action_group_modifier=False, cobbler_move=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.cobbler_move = cobbler_move
+        self.id = ActionIDs.VAGABOND_MOVE
 
     def can_perform(self, executor: Vagabond, game_state: GameState):
         available_clearings = self._generate_clearing_costs(

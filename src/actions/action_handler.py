@@ -7,10 +7,11 @@
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Dict
 from math import inf
 from utils.game_state import GameState
 from controllers.messages.game_messages import ActionChoiceMessage
+from actions.action_group_registry import ActionGroupRegistry
 if TYPE_CHECKING:
     from factions.faction import Faction
 
@@ -30,6 +31,8 @@ class Action(ABC):
         self.is_action_group_modifier = is_action_group_modifier
         # Whether the action exists across multiple groups
         self.group_spanning = group_spanning
+        self.id = -1
+        self.action_group: ActionGroup = None
 
     @abstractmethod
     def can_perform(self, executor: Faction, game_state: Optional[GameState] = None) -> bool:
@@ -60,6 +63,7 @@ class ActionGroup:
                                None -> no shared limit. Each Action might still have its own limit.
         """
         self.name = name
+        self.id = id
         self.ordered = ordered
         self.actions = actions if actions is not None else []
         self.was_max_assigned = max_total_uses != None
@@ -71,6 +75,13 @@ class ActionGroup:
 
         # Whether this action group can be aborted before all actions are played
         self.can_abort = can_abort
+        self.id = self._assign_unique_id()
+        print(f"ID: {self.id}: {self.name}")
+
+    def _assign_unique_id(self):
+        """Generate a globally unique integer ID for this ActionGroup."""
+        registry = ActionGroupRegistry()  # Singleton instance
+        return registry.get_unique_id()
 
     def can_perform_any_action(self):
         return self.total_uses < self.max_total_uses
@@ -81,6 +92,7 @@ class ActionGroup:
             - If 'ordered=True', iterate in sequence.
             - If 'ordered=False', let the player pick any action
         """
+        self._assign_action_group()
         if self.cancel_group:
             return
 
@@ -179,6 +191,10 @@ class ActionGroup:
         for modifier in (a for a in self.actions if a.is_action_group_modifier and a.can_perform(executor, game_state)):
             print(f"- Performing available modifier action '{modifier.name}")
             modifier.perform(game_state, executor)
+
+    def _assign_action_group(self):
+        for action in self.actions:
+            action.action_group = self
 
     def modify_max_uses(self, amount: int):
         if self.max_total_uses == inf:

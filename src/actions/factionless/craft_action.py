@@ -4,6 +4,7 @@ from controllers.messages.game_messages import CraftMessage
 from cards.card import ItemCard
 from utils.root_types import Suits
 from utils.game_settings import CRAFTABLE_ITEMS
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from cards.card import Card
@@ -18,6 +19,7 @@ if TYPE_CHECKING:
 class CraftAction(Action):
     def __init__(self, max_uses=None) -> None:
         super().__init__("Craft", max_uses)
+        self.id = ActionIDs.CRAFT
 
     def can_perform(self, executor, game_state=None) -> bool:
         """If we are free to craft this turn and we hold a craftable card in our hand, this function returns True"""

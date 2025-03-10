@@ -1,10 +1,12 @@
 from actions.action_handler import Action
 from controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
+from actions.action_group_registry import ActionIDs
 
 
 class ClaimDominanceAction(Action):
     def __init__(self, name="Claim Dominance", max_uses=None, is_action_group_modifier=True, group_spanning=True):
         super().__init__(name, max_uses, is_action_group_modifier, group_spanning)
+        self.id = ActionIDs.CLAIM_DOMINANCE
 
     def can_perform(self, executor, game_state=None):
         return super().can_perform(executor, game_state) and game_state.board.available_dominance_cards != [] and any(card.suit in self.get_suit_list(game_state) for card in executor.hand)

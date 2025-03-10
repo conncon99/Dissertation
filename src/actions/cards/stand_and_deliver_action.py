@@ -3,6 +3,7 @@ from actions.action_handler import Action
 from controllers.messages.game_messages import StandAndDeliverMessage
 import random
 from typing import TYPE_CHECKING
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.faction import Faction
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class StandAndDeliverAction(Action):
     def __init__(self, name="Stand and Deliver", max_uses=1, is_action_group_modifier=True, group_spanning=True):
         super().__init__(name, max_uses, is_action_group_modifier, group_spanning=group_spanning)
+        self.id = ActionIDs.STAND_AND_DELIVER
 
     def can_perform(self, executor, game_state):
         return super().can_perform(executor, game_state) and any(len(faction.hand) > 0 and faction.faction_id != executor.faction_id for faction in game_state.faction_list)

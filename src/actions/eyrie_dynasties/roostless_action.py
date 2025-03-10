@@ -7,6 +7,7 @@ from pieces.eyrie_dynasties.eyrie_buildings import Roost
 from pieces.marquise_de_cat.marquise_tokens import Keep
 from controllers.messages.game_messages import RoostlessMessage
 from utils.root_types import Factions
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
 class RoostlessAction(Action):
     def __init__(self, name="Roostless", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.ROOSTLESS
 
     def can_perform(self, executor: EyrieDynasties, game_state=None):
         return executor.roosts == [] and super().can_perform(executor, game_state)

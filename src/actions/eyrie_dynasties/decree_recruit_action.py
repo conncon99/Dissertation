@@ -5,6 +5,7 @@ from utils.root_types import Suits, EyrieLeaders, Factions
 from pieces.pawn import Pawn
 from controllers.messages.game_messages import DecreeRecruitClearingMessage
 from pieces.marquise_de_cat.marquise_tokens import Keep
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
@@ -15,6 +16,7 @@ class DecreeRecruitAction(Action):
     def __init__(self, suit: Suits, name="Decree Recruit", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.suit = suit
+        self.id = ActionIDs.DECREE_RECRUIT
 
     def can_perform(self, executor, game_state=None):
         return True

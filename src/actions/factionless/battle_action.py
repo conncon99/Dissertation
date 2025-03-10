@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, List
 
 from utils.callback_handler import BattleCallbackTimes
 from utils.colour_utils import set_print_colour
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from utils.game_state import GameState
@@ -30,6 +31,7 @@ class BattleAction(Action):
 
     def __init__(self, name="Battle", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.BATTLE
 
     def can_perform(self, executor, game_state):
         # ensure there exists a clearing to battle on

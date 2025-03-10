@@ -3,6 +3,7 @@ from actions.action_handler import Action
 from typing import TYPE_CHECKING
 from utils.root_types import Items
 from actions.factionless.craft_action import CraftAction
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class VagabondCraft(CraftAction):
     def __init__(self, max_uses=None):
         super().__init__(max_uses)
+        self.id = ActionIDs.VAGABOND_CRAFT
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.available_items[Items.HAMMER] > 0 and super().can_perform(executor, game_state)

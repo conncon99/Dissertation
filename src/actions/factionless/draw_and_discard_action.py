@@ -1,11 +1,13 @@
 from actions.action_handler import Action
 from controllers.messages.game_messages import DiscardChoiceMessage
 from controllers.messages.controller_messages import DiscardChoiceResponse
+from actions.action_group_registry import ActionIDs
 
 
 class DrawAndDiscardAction(Action):
     def __init__(self, max_uses=1):
         super().__init__("Draw and Discard", max_uses)
+        self.id = ActionIDs.DRAW_AND_DISCARD
 
     def can_perform(self, executor, game_state=None):
         return super().can_perform(executor, game_state)

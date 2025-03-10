@@ -3,6 +3,8 @@ from actions.action_handler import Action
 from typing import TYPE_CHECKING
 from controllers.messages.game_messages import OrganizeMessage
 from pieces.woodland_alliance.alliance_tokens import Sympathy
+from actions.action_group_registry import ActionIDs
+
 if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
     from pieces.pawn import Pawn
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
 class OrganizeAction(Action):
     def __init__(self, name="Organize", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.ORGANIZE
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
         return self.get_replaceable_units(executor) and super().can_perform(executor, game_state) and len(executor.sympathy) < executor.max_sympathy and len(executor.units) > 0

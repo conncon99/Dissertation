@@ -33,10 +33,10 @@ class Items(Enum):
 
 
 class Factions(Enum):
-    MARQUISE_DE_CAT = auto()
-    EYRIE_DYNASTY = auto()
-    WOODLAND_ALLIANCE = auto()
-    VAGABOND = auto()
+    MARQUISE_DE_CAT = 1
+    EYRIE_DYNASTY = 2
+    WOODLAND_ALLIANCE = 3
+    VAGABOND = 4
 
 
 # Eyrie Decree Types

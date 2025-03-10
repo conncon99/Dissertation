@@ -7,6 +7,8 @@ from controllers.messages.game_messages import RevoltClearingMessage, RevoltDisc
 from utils.colour_utils import set_print_colour
 from utils.root_types import Suits, Factions
 from pieces.marquise_de_cat.marquise_tokens import Keep
+from actions.action_group_registry import ActionIDs
+
 if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
     from utils.game_state import GameState
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 class RevoltAction(Action):
     def __init__(self, name="Revolt", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.REVOLT
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
         return self.get_valid_clearings(executor) and super().can_perform(executor, game_state)

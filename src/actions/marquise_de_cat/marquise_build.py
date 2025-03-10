@@ -6,6 +6,7 @@ from pieces.marquise_de_cat.marquise_buildings import Sawmill, Recruiter, Worksh
 from controllers.messages.game_messages import WoodRemovalMessage, MarquiseBuildingMessage
 from controllers.messages.controller_messages import WoodRemovalResponse, MarquiseBuildingResponse
 from pieces.building import Building
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
@@ -22,6 +23,7 @@ if TYPE_CHECKING:
 class MarquiseBuild(Action):
     def __init__(self):
         super().__init__("Marquise Build", None)
+        self.id = ActionIDs.MARQUISE_BUILD
 
     def can_perform(self, executor: Marquise, game_state=None):
         # 1. Generate wood availability map

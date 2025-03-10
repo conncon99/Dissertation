@@ -4,6 +4,7 @@ from actions.factionless.move_action import MoveAction
 from typing import TYPE_CHECKING, List, Tuple
 from utils.root_types import Suits
 from controllers.messages.game_messages import MoveMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
@@ -16,6 +17,7 @@ class DecreeMoveAction(MoveAction):
     def __init__(self, suit: Suits, name="Decree Move", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.suit = suit
+        self.id = ActionIDs.DECREE_MOVE
 
     def can_perform(self, executor, game_state=None):
         return True

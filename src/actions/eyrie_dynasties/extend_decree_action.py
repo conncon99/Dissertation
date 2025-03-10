@@ -1,20 +1,20 @@
 from __future__ import annotations
 from actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.callback_handler import CallbackTimes
 from utils.root_types import Suits, RECRUIT, MOVE, BATTLE, BUILD
 from controllers.messages.controller_messages import ExtendDecreeResponse1, ExtendDecreeResponse2
 from controllers.messages.game_messages import ExtendDecreeMessage1, ExtendDecreeMessage2
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
-    from cards.card import Card
 
 
 class ExtendDecreeAction(Action):
 
     def __init__(self, name="Extend Decree", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.EXTEND_DECREE
 
     def perform(self, game_state, executor: EyrieDynasties):
         # 1. Choose card 1 and choose which part of the decree to add it to

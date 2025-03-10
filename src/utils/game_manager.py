@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from utils.game_settings import GameSettings
@@ -13,12 +14,13 @@ from actions.cards.claim_dominance_action import ClaimDominanceAction
 
 class GameManager:
 
-    def __init__(self, settings: 'GameSettings', turn_limit) -> None:
+    def __init__(self, settings: GameSettings, turn_limit: int) -> None:
         self._initialized = True
         self.settings = settings
         self.winner = None
         self.game_phase = GamePhase.BIRDSONG
         self.game_state = GameState()
+        self.game_state.turn_limit = turn_limit
         self.turn_count = -1
         self.turn_limit = turn_limit
         self.create_map()
@@ -44,6 +46,7 @@ class GameManager:
         while not self.winner:
             turn_order = self.settings.randomize_turn_order()
             self.turn_count += 1
+            self.game_state.turn_count = self.turn_count
             print(f"TURN {self.turn_count}")
             for faction in turn_order:
                 set_print_colour(RESET)
@@ -77,7 +80,7 @@ class GameManager:
         """Gets the current game phase"""
         return self.game_phase
 
-    def _handle_wins(self, current_faction):
+    def _handle_wins(self, current_faction: Faction):
         """Determines if anyone has won the game by reaching 30 VP. 
         If multiple people win at the same turn, the person whose turn it is wins"""
         potential_winners = []
@@ -102,3 +105,18 @@ class GameManager:
         self.game_state.board = self.map
         self.game_state.faction_list = self.settings.faction_list
         self.game_state.deck = self.deck
+        self.game_state.turn_limit = self.turn_limit
+        self.game_state.marquise = self._get_faction_by_id(
+            Factions.MARQUISE_DE_CAT.value)
+        self.game_state.eyrie_dynasties = self._get_faction_by_id(
+            Factions.EYRIE_DYNASTY.value)
+        self.game_state.woodland_alliance = self._get_faction_by_id(
+            Factions.WOODLAND_ALLIANCE.value)
+        self.game_state.vagabond = self._get_faction_by_id(
+            Factions.VAGABOND.value)
+
+    def _get_faction_by_id(self, faction_id: int) -> Faction:
+        for faction in self.settings.faction_list:
+            if faction.faction_id == faction_id:
+                return faction
+        return None

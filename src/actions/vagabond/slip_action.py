@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from board.forest import Forest
 from controllers.messages.game_messages import SlipMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class SlipAction(Action):
     def __init__(self, name='Slip', max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.SLIP
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return super().can_perform(executor, game_state)

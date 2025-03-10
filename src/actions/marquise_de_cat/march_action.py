@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from actions.factionless.move_action import MoveAction
 from controllers.messages.controller_messages import March1Response, March2Response
 from controllers.messages.game_messages import March1Message, March2Message
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
@@ -13,6 +14,7 @@ class MarchAction(MoveAction):
 
     def __init__(self):
         super().__init__("March", None)
+        self.id = ActionIDs.MARCH
 
     def perform(self, game_state, executor: Marquise):
         valid_moves = self.get_all_possible_moves(game_state, executor)

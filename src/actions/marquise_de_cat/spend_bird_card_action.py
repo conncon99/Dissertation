@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from utils.root_types import Suits
 from utils.callback_handler import CallbackTimes
 from controllers.messages.game_messages import MarquiseSpendBirdCardMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class SpendBirdCardAction(Action):
     def __init__(self, name="Spend Bird Card", max_uses=None):
         super().__init__(name, None, is_action_group_modifier=True)
+        self.id = ActionIDs.SPEND_BIRD_CARD
 
     def can_perform(self, executor, game_state=None):
         return any(card.suit == Suits.BIRD for card in executor.hand)

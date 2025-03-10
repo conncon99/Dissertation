@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from controllers.messages.game_messages import EmptySatchelMessage
 from controllers.messages.controller_messages import EmptySatchelResponse
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -12,6 +13,7 @@ if TYPE_CHECKING:
 class EmptySatchelAction(Action):
     def __init__(self, name="Check Satchel Capacity", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.EMPTY_SATCHEL
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.get_total_items() > 6 + (2 * executor.active_bag_count) and super().can_perform(executor, game_state)

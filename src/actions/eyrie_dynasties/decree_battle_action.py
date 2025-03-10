@@ -1,9 +1,9 @@
 from __future__ import annotations
-from actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Suits,  EyrieLeaders
+from utils.root_types import Suits
 from actions.factionless.battle_action import BattleAction
 from controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
@@ -13,6 +13,7 @@ class DecreeBattleAction(BattleAction):
     def __init__(self, suit: Suits, name="Decree Battle", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.suit = suit
+        self.id = ActionIDs.DECREE_BATTLE
 
     def can_perform(self, executor: EyrieDynasties, game_state=None):
         return True

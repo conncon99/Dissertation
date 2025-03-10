@@ -1,10 +1,12 @@
 from actions.action_handler import Action
 from utils.root_types import Suits
+from actions.action_group_registry import ActionIDs
 
 
 class DominanceAction(Action):
     def __init__(self, name="Dominance Action", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.DOMINANCE
 
     def can_perform(self, executor, game_state):
         return super().can_perform(executor, game_state)

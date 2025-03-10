@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from utils.root_types import Items, Suits
 from board.clearing import Clearing
 from controllers.messages.game_messages import ChooseQuestMessage, ChooseQuestRewardMessage, QuestUseItemTrackMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -13,6 +14,7 @@ if TYPE_CHECKING:
 class QuestAction(Action):
     def __init__(self, name="Quest", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.QUEST
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return len(executor.quest_cards) > 0 and isinstance(executor.vagabond_pawn.space, Clearing) and any(self._can_complete_quest(executor, quest_card) and quest_card.suit == executor.vagabond_pawn.space.get_suit() for quest_card in executor.quest_cards)

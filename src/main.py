@@ -11,6 +11,7 @@ from controllers.random_controllers.vagabond_random_controller import VagabondRa
 import gc
 import builtins
 from utils.colour_utils import colored_print, original_print
+from actions.action_group_registry import ActionGroupRegistry
 
 builtins.print = colored_print
 
@@ -22,10 +23,11 @@ def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manage
     del vagabond
     del settings
     del game_manager
+    ActionGroupRegistry.reset()
     gc.collect()
 
 
-RUN_COUNT = 10
+RUN_COUNT = 2
 TURN_LIMIT = 300
 
 for i in range(RUN_COUNT):

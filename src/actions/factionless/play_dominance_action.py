@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from utils.root_types import Factions
 from controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
 from factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from cards.card import DominanceCard
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 class PlayDominanceAction(Action):
     def __init__(self, name="Play Dominance", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.PLAY_DOMINANCE
 
     def can_perform(self, executor, game_state=None):
         if executor.faction_id != Factions.VAGABOND.value:

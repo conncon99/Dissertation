@@ -1,10 +1,12 @@
 from actions.action_handler import Action
 from controllers.messages.game_messages import BetterBurrowBankMessage
+from actions.action_group_registry import ActionIDs
 
 
 class BetterBurrowBankAction(Action):
     def __init__(self):
         super().__init__("Better Burrow Bank", 1, False)
+        self.id = ActionIDs.BETTER_BURROW_BANK
 
     def can_perform(self, executor, game_state=None):
         return super().can_perform(executor, game_state)

@@ -5,6 +5,7 @@ from utils.root_types import Items
 
 from controllers.messages.game_messages import RepairItemMessage
 from controllers.messages.controller_messages import RepairItemResponse
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -13,6 +14,7 @@ if TYPE_CHECKING:
 class RepairAction(Action):
     def __init__(self, name='Repair', max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.REPAIR
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.has_damaged_items() and executor.satchel.available_items[Items.HAMMER] > 0

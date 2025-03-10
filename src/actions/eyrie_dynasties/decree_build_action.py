@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from utils.root_types import Suits
 from pieces.eyrie_dynasties.eyrie_buildings import Roost
 from controllers.messages.game_messages import DecreeBuildMessage
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.eyrie_dynasties import EyrieDynasties
@@ -14,6 +15,7 @@ class DecreeBuildAction(Action):
     def __init__(self, suit: Suits, name="Decree Build", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.suit = suit
+        self.id = ActionIDs.DECREE_BUILD
 
     def can_perform(self, executor, game_state=None):
         return True

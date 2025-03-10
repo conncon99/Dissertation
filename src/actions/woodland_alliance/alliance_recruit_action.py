@@ -5,6 +5,8 @@ from pieces.pawn import Pawn
 from controllers.messages.game_messages import AllianceRecruitMessage
 from utils.root_types import Factions
 from pieces.marquise_de_cat.marquise_tokens import Keep
+from actions.action_group_registry import ActionIDs
+
 if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
     from board.clearing import Clearing
@@ -13,6 +15,7 @@ if TYPE_CHECKING:
 class AllianceRecruitAction(Action):
     def __init__(self, name="Alliance Recruit", max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.ALLIANCE_RECRUIT
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
         return len(executor.units) + executor.officers < executor.max_warriors and super().can_perform(executor, game_state) and any(base is not None for base in executor.bases.values())

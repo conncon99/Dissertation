@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
 from controllers.messages.controller_messages import AidExhaustItemChoiceResponse
+from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
 class AidAction(Action):
     def __init__(self, name='Aid', max_uses=None, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
+        self.id = ActionIDs.AID
 
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.has_available_item() and isinstance(executor.vagabond_pawn.space, Clearing) \
