@@ -17,7 +17,10 @@ class AllianceBase(Building):
         self.suit = suit
         faction.bases[self.suit] = self
 
-    def destroy(self, attacker):
+    def damage(self, amount, attacker, action_group):
+        return self.destroy(attacker, action_group)
+
+    def destroy(self, attacker, action_group):
         set_print_colour(self.faction.print_colour)
         self.faction.bases[self.suit] = None
         # Discard all matching and bird supporters
@@ -38,10 +41,10 @@ class AllianceBase(Building):
             print(f" - No bases remaining, discarding supporters down to 5")
             if self.faction.supporters != []:
                 chosen_discards = self.faction.controller.send_game_message(AllianceNoBaseMessage(
-                    self.faction.supporters, abs(5-len(self.faction.supporters)))).chosen_cards
+                    self.faction.game_state, action_group, self.faction.supporters, abs(5-len(self.faction.supporters)))).chosen_cards
 
                 for card in chosen_discards:
                     self.faction.discard_card(card)
                     self.faction.supporters.remove(card)
         set_print_colour(attacker.print_colour)
-        return super().destroy(attacker)
+        return super().destroy(attacker, action_group)

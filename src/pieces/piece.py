@@ -16,8 +16,8 @@ class Piece(ABC):
         return self.name
 
     @abstractmethod
-    def damage(self, amount: int, attacker: 'Faction'):
-        self.destroy(attacker)
+    def damage(self, amount: int, attacker: 'Faction', action_group=None):
+        self.destroy(attacker, action_group)
 
     @abstractmethod
-    def destroy(self, attacker: 'Faction'): ...
+    def destroy(self, attacker: 'Faction', action_group=None): ...

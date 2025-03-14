@@ -179,7 +179,7 @@ class ActionChoiceResponse(ControllerMessage):
         self.chosen_action = chosen_action
 
 
-class BattleClearingResponse(ControllerMessage):
+class BattleClearingChoiceResponse(ControllerMessage):
     def __init__(self, chosen_clearing):
         super().__init__(ControllerMessages.BATTLE_CLEARING_RESPONSE)
         self.chosen_clearing = chosen_clearing

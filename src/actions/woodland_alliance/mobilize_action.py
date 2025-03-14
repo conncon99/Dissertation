@@ -18,7 +18,7 @@ class MobilizeAction(Action):
 
     def perform(self, game_state, executor: WoodlandAlliance):
         chosen_card = executor.controller.send_game_message(
-            MobilizeMessage(executor.hand)).chosen_card
+            MobilizeMessage(game_state, self.action_group, executor.hand)).chosen_card
         executor.hand.remove(chosen_card)
         executor.add_supporter(chosen_card)
         print(f" - Added '{chosen_card}' to Supporters")

@@ -26,7 +26,7 @@ class RepairAction(Action):
             item for item, amount in executor.satchel.exhausted_damaged_items.items() for _ in range(amount)]
 
         repair_response: RepairItemResponse = executor.controller.send_game_message(
-            RepairItemMessage(available_damaged_items, exhausted_damaged_items))
+            RepairItemMessage(game_state, self.action_group, available_damaged_items, exhausted_damaged_items))
         executor.satchel.repair_item(
             repair_response.chosen_item, repair_response.is_exhausted)
         executor.satchel.exhaust_item(Items.HAMMER)

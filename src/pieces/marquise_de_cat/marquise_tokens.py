@@ -10,7 +10,7 @@ class Keep(Token):
     def __init__(self, clearing, faction: Marquise):
         super().__init__(clearing, faction, "Keep Token")
 
-    def destroy(self, attacker):
+    def destroy(self, attacker, action_group=None):
         self.faction.keep = None
         return super().destroy(attacker)
 
@@ -20,7 +20,7 @@ class Wood(Token):
         super().__init__(clearing, faction, "Wood Token")
         faction.wood.append(self)
 
-    def destroy(self, attacker):
+    def destroy(self, attacker, action_group=None):
         self.remove_wood()
         return super().destroy(attacker)
 

@@ -12,7 +12,7 @@ class Roost(Building):
         super().__init__(clearing, faction, slot_idx, "Roost")
         faction.roosts.append(self)
 
-    def destroy(self, attacker):
+    def destroy(self, attacker, action_group=None):
         self.faction.roosts.remove(self)
         return super().destroy(attacker)
 

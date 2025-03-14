@@ -53,8 +53,8 @@ class AllianceRandomController(AllianceController):
     def _handle_dominance_choice(self, msg: ChooseDominanceMessage) -> ChooseDominanceResponse:
         return ChooseDominanceResponse(random.choice(msg.available_cards))
 
-    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse:
-        return BattleClearingResponse(random.choice(msg.available_clearings))
+    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
+        return BattleClearingChoiceResponse(random.choice(msg.available_clearings))
 
     def _handle_stand_and_deliver(self, msg: StandAndDeliverMessage) -> StandAndDeliverResponse:
         return StandAndDeliverResponse(random.choice(msg.available_players))
@@ -112,3 +112,5 @@ class AllianceRandomController(AllianceController):
 
     def _handle_alliance_outrage_message(self, msg: AllianceOutrageMessage) -> AllianceOutrageResponse:
         return AllianceOutrageResponse(random.choice(msg.triggerer_hand))
+
+    def train(self, reward): ...

@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from board.map import Map
     from cards.deck import Deck
     from factions.vagabond.vagabond_characters import VagabondCharacter
+    from utils.game_state import GameState
 
 
 class Vagabond(Faction):
@@ -77,18 +78,19 @@ class Vagabond(Faction):
             )] += self.satchel.available_items[Items.HAMMER]
         return crafting_resources
 
-    def setup_faction(self, map: Map, deck: Deck):
+    def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
         print(f"Setting up {self}")
         self.deck = deck
+        self.game_state = game_state
 
         # 1. Choose Character
         self.character: VagabondCharacter = self.controller.send_game_message(
-            ChooseCharacterMessage([character for character in Characters])).chosen_character.value
+            ChooseCharacterMessage(game_state, None, [character for character in Characters])).chosen_character.value
         print(f" - Chosen {self.character} as Character")
 
         # 2. Place Pawn in forest
         VagabondPawn(self.controller.send_game_message(
-            VagabondPlacementMessage(map.forests)).chosen_forest, self)
+            VagabondPlacementMessage(game_state, None, map.forests)).chosen_forest, self)
 
         print(
             f" - Placed Vagabond Pawn in Forest {self.vagabond_pawn.space.index}")
@@ -103,11 +105,11 @@ class Vagabond(Faction):
         print(f" - Starting Items: {self.character.starting_items}")
 
         print(f"- Finished {self} Set Up\n")
-        return super().setup_faction(map, deck)
+        return super().setup_faction(map, deck, game_state)
 
     def get_allied_warriors_in_clearing(self, clearing: Clearing) -> List[Faction]:
         available_allies = []
-        for faction in clearing.settings.faction_list:
+        for faction in clearing.game_state.faction_list:
             if faction.faction_id == self.faction_id or len(clearing.units[faction.faction_id]) == 0:
                 continue
             if self.relationship_track.relationship_level[faction.faction_id] == ALLIED:

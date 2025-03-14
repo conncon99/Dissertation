@@ -43,7 +43,7 @@ class OverworkAction(Action):
         valid_clearings = self.get_all_valid_clearings(executor)
         # Choose from that intersection
         overwork_response: OverworkResponse = executor.controller.send_game_message(
-            OverworkMessage(valid_clearings, executor.hand))
+            OverworkMessage(game_state, self.action_group, valid_clearings, executor.hand))
         executor.discard_card(overwork_response.discard_choice)
         Wood(overwork_response.chosen_clearing, executor)
         return super().perform(game_state, executor)

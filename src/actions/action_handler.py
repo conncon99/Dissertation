@@ -133,7 +133,7 @@ class ActionGroup:
 
             # Send a game message to choose the next action
             chosen_action = executor.controller.send_game_message(
-                ActionChoiceMessage(available_actions)
+                ActionChoiceMessage(game_state, self, available_actions)
             ).chosen_action
 
             print(f"- Performing action '{chosen_action.name}'")
@@ -162,13 +162,13 @@ class ActionGroup:
 
             if not self.can_perform_any_action() and modifiers:
                 chosen_action: Optional[Action] = executor.controller.send_game_message(
-                    ActionChoiceMessage(modifiers)).chosen_action
+                    ActionChoiceMessage(game_state, self, modifiers)).chosen_action
             elif primaries:
                 chosen_action: Optional[Action] = executor.controller.send_game_message(
-                    ActionChoiceMessage(primaries)).chosen_action
+                    ActionChoiceMessage(game_state, self, primaries)).chosen_action
             elif modifiers:
                 chosen_action: Optional[Action] = executor.controller.send_game_message(
-                    ActionChoiceMessage(modifiers)).chosen_action
+                    ActionChoiceMessage(game_state, self, modifiers)).chosen_action
             else:
                 break
 

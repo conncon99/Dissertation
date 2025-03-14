@@ -27,7 +27,7 @@ class StrikeAction(Action):
                               executor.faction_id and executor.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) > 0]
         # Choose Faction to target
         chosen_faction = executor.controller.send_game_message(
-            StrikeFactionChoiceMessage(available_factions)).chosen_faction
+            StrikeFactionChoiceMessage(game_state, self.action_group, available_factions)).chosen_faction
         print(
             f" - Targeting {chosen_faction} with strike on Clearing {executor.vagabond_pawn.space.index}")
 
@@ -42,20 +42,20 @@ class StrikeAction(Action):
                 available_targets.append(token)
 
             chosen_piece = executor.controller.send_game_message(
-                StrikePieceTargetingMessage(available_targets)).chosen_piece
+                StrikePieceTargetingMessage(game_state, self.action_group, available_targets)).chosen_piece
             print(
                 f" - Destroying Token/Building on Clearing {executor.vagabond_pawn.space.index}")
-            chosen_piece.destroy(executor)
+            chosen_piece.destroy(executor, self.action_group)
         else:
             print(
                 f" - Destroying warrior on Clearing {executor.vagabond_pawn.space.index}")
             executor.vagabond_pawn.space.units[chosen_faction.faction_id][0].destroy(
-                executor)
+                executor, self.action_group)
 
             if chosen_faction.faction_id == Factions.MARQUISE_DE_CAT.value and chosen_faction.keep is not None:
                 set_print_colour(chosen_faction.print_colour)
                 chosen_faction.use_field_hospital(
-                    executor.vagabond_pawn.space, 1)
+                    executor.vagabond_pawn.space, 1, self.action_group)
                 set_print_colour(executor.print_colour)
 
         # Exhaust crossbow

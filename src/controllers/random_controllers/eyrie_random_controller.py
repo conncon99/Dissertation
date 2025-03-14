@@ -68,8 +68,8 @@ class EyrieRandomController(EyrieDynastiesController):
     def _handle_dominance_choice(self, msg: ChooseDominanceMessage) -> ChooseDominanceResponse:
         return ChooseDominanceResponse(random.choice(msg.available_cards))
 
-    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse:
-        return BattleClearingResponse(random.choice(msg.available_clearings))
+    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
+        return BattleClearingChoiceResponse(random.choice(msg.available_clearings))
 
     def _handle_battle_target_choice(self, msg: BattleTargetChoiceMessage) -> BattleTargetResponse:
         return BattleTargetResponse(random.choice(msg.battle_target_list))
@@ -105,3 +105,5 @@ class EyrieRandomController(EyrieDynastiesController):
 
     def _handle_turmoil_leader_message(self, msg: TurmoilLeaderMessage) -> TurmoilLeaderResponse:
         return TurmoilLeaderResponse(random.choice(msg.available_leaders))
+
+    def train(self, reward): ...

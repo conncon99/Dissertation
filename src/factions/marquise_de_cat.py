@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from board.clearing import Clearing
     from pieces.marquise_de_cat.marquise_tokens import Wood
     from cards.deck import Deck
+    from utils.game_state import GameState
 
 
 class Marquise(Faction):
@@ -72,15 +73,16 @@ class Marquise(Faction):
             crafting_resources[workshop.get_suit()] += 1
         return crafting_resources
 
-    def setup_faction(self, map: Map, deck: Deck) -> None:
+    def setup_faction(self, map: Map, deck: Deck, game_state: GameState) -> None:
         print(f"Setting Up {self}")
 
         self.deck = deck
+        self.game_state = game_state
         # Place Keep in corner clearing
         free_corner_clearings = [
             clearing for clearing in map.corner_clearings if all(slot is None or slot.faction.faction_id == self.faction_id for slot in clearing.slots) and all(token_list == [] for token_list in clearing.tokens.values())]
         keep_clearing: Clearing = self.controller.send_game_message(
-            KeepClearingMessage(free_corner_clearings)).keep_clearing
+            KeepClearingMessage(game_state, None, free_corner_clearings)).keep_clearing
         self.keep = Keep(keep_clearing, self)
         print(f"- Placed Keep in clearing {keep_clearing.index}")
         # Place warrior in each clearing except the diagonally opposite corner from the keep
@@ -100,7 +102,7 @@ class Marquise(Faction):
             available_clearings.append(keep_clearing)
 
         setup_response: MarquiseBuildingSetupResponse = self.controller.send_game_message(
-            MarquiseBuildingSetupMessage(available_clearings))
+            MarquiseBuildingSetupMessage(game_state, None, available_clearings))
 
         sawmill = Sawmill(setup_response.sawmill_clearing, self,
                           setup_response.sawmill_clearing.get_first_free_slot())
@@ -125,14 +127,14 @@ class Marquise(Faction):
             return 1
         return 0
 
-    def use_field_hospital(self, clearing: Clearing, units_destroyed: int):
+    def use_field_hospital(self, clearing: Clearing, units_destroyed: int, action_group):
         field_hospital_cards = [
             card for card in self.hand if card.suit == Suits.BIRD or card.suit == clearing.get_suit()]
         if field_hospital_cards != []:
             # send game message to allow marquise to use field hospital
             field_hospital_cards.append(None)
             chosen_card = self.controller.send_game_message(
-                FieldHospitalMessage(field_hospital_cards)).chosen_card
+                FieldHospitalMessage(self.game_state, action_group, field_hospital_cards)).chosen_card
             if chosen_card is not None:
                 print(
                     f" - Using Field Hospital to save {units_destroyed} units on clearing {clearing.index}")

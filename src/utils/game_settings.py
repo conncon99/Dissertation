@@ -1,10 +1,6 @@
 from typing import List
 from factions.faction import Faction
 from random import shuffle
-from utils.root_types import Items
-
-CRAFTABLE_ITEMS = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
-                   Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
 
 
 class GameSettings:

@@ -68,7 +68,7 @@ class MarquiseBuild(Action):
                                      building_options in clearing_building_options.items() if building_options}
 
         building_response: MarquiseBuildingResponse = executor.controller.send_game_message(
-            MarquiseBuildingMessage(clearing_building_options))
+            MarquiseBuildingMessage(game_state, self.action_group, clearing_building_options))
         clearing = building_response.chosen_clearing
         BuildingChoice = building_response.chosen_building_type
 
@@ -87,9 +87,9 @@ class MarquiseBuild(Action):
             executor.add_vp(executor.workshop_track[len(
                 executor.workshops)][1])
         chosen_wood_tokens = executor.controller.send_game_message(
-            WoodRemovalMessage(executor.wood, cost)).chosen_wood_tokens
+            WoodRemovalMessage(game_state, self.action_group, executor.wood, cost)).chosen_wood_tokens
         for wood in chosen_wood_tokens:
-            wood.destroy(None)
+            wood.destroy(None, self.action_group)
 
         # 5. Build the building
         building = BuildingChoice(

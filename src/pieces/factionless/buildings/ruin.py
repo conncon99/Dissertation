@@ -11,6 +11,6 @@ class Ruin(Building):
         super().__init__(clearing, None, slot_idx, "Ruin")
         self.item = item
 
-    def destroy(self, attacker):
+    def destroy(self, attacker, action_group=None):
         self.space.slots[self.slot_idx] = None
         print(" - Ruin is empty, destroying")

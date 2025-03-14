@@ -59,8 +59,8 @@ class VagabondRandomController(VagabondController):
     def _handle_action_choice(self, msg: ActionChoiceMessage) -> ActionChoiceResponse:
         return ActionChoiceResponse(random.choice(msg.available_actions))
 
-    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse:
-        return BattleClearingResponse(random.choice(msg.available_clearings))
+    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
+        return BattleClearingChoiceResponse(random.choice(msg.available_clearings))
 
     def _handle_better_burrow_bank(self, msg: BetterBurrowBankMessage) -> BetterBurrowBankResponse:
         return BetterBurrowBankResponse(random.choice(msg.available_players))
@@ -283,3 +283,5 @@ class VagabondRandomController(VagabondController):
 
     def _handle_ally_damage_split(self, msg: AllyDamageSplitMessage) -> AllyDamageSplitResponse:
         return AllyDamageSplitResponse(random.randint(0, msg.max_damage))
+
+    def train(self, reward): ...

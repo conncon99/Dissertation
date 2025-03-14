@@ -55,7 +55,7 @@ class EyrieLeaders(Enum):
         member.vizier_2 = vizier_2
         return member
 
-    Despot = (0, MOVE, BUILD)
-    Commander = (1, MOVE, BATTLE)
-    Charismatic = (2, RECRUIT, BATTLE)
-    Builder = (3, RECRUIT, MOVE)
+    Despot = (1, MOVE, BUILD)
+    Commander = (2, MOVE, BATTLE)
+    Charismatic = (3, RECRUIT, BATTLE)
+    Builder = (4, RECRUIT, MOVE)

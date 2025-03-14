@@ -25,8 +25,8 @@ from utils.colour_utils import set_print_colour
 if TYPE_CHECKING:
     from board.map import Map
     from cards.deck import Deck
-    from pieces.pawn import Pawn
     from board.clearing import Clearing
+    from utils.game_state import GameState
 
 
 class WoodlandAlliance(Faction):
@@ -57,9 +57,10 @@ class WoodlandAlliance(Faction):
     def __repr__(self):
         return "Woodland Alliance"
 
-    def setup_faction(self, map: Map, deck: Deck):
+    def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
         print(f"Setting up {self}")
         self.deck = deck
+        self.game_state = game_state
         self.supporters.extend(self.deck.draw(3))
         print(f"- Added 3 Supporters")
         print(f"- Finished {self} Set Up\n")
@@ -76,7 +77,7 @@ class WoodlandAlliance(Faction):
     def get_base_count(self) -> int:
         return sum(base is not None for base in self.bases.values())
 
-    def trigger_outrage(self, triggerer: Faction, clearing: Clearing):
+    def trigger_outrage(self, triggerer: Faction, clearing: Clearing, action_group):
         set_print_colour(self.print_colour)
         print(
             f" - OUTRAGE TRIGGERED by {triggerer} in clearing {clearing.index}")
@@ -86,14 +87,14 @@ class WoodlandAlliance(Faction):
             valid_cards = [card for card in triggerer.hand if card.suit ==
                            Suits.BIRD or card.suit == clearing.get_suit()]
             chosen_card = triggerer.controller.send_game_message(
-                TriggererOutrageMessage(valid_cards)).chosen_card
+                TriggererOutrageMessage(self.game_state, action_group, valid_cards)).chosen_card
             triggerer.hand.remove(chosen_card)
             print(
                 f" - {triggerer} has given matching card '{chosen_card}' to The {self}")
         # 2. If the player does not have a matching card, they must show the alliance their hand, and the alliance chooses which card to take
         elif len(triggerer.hand) > 0:
             chosen_card = self.controller.send_game_message(
-                AllianceOutrageMessage(triggerer.hand)).chosen_card
+                AllianceOutrageMessage(self.game_state, action_group, triggerer.hand)).chosen_card
             triggerer.hand.remove(chosen_card)
             print(
                 f" - The {self} has taken non-matching card '{chosen_card}' from {triggerer}")

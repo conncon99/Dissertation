@@ -14,7 +14,7 @@ class VagabondPawn(Pawn):
         super().__init__(space, faction)
         faction.vagabond_pawn = self
 
-    def damage(self, amount, attacker):
+    def damage(self, amount, attacker, action_group):
         set_print_colour(self.faction.print_colour)
         for _ in range(amount):
             self.faction: Vagabond
@@ -26,11 +26,11 @@ class VagabondPawn(Pawn):
             exhausted_items = [
                 item for item, amount in self.faction.satchel.exhausted_items.items() for _ in range(amount)]
             response: BattleDamageItemResponse = self.faction.controller.send_game_message(
-                BattleDamageItemMessage(available_items, exhausted_items, self.faction.active_bag_count, self.faction.active_coin_count, self.faction.active_tea_count))
+                BattleDamageItemMessage(self.faction.game_state, action_group, available_items, exhausted_items, self.faction.active_bag_count, self.faction.active_coin_count, self.faction.active_tea_count))
             self.faction.satchel.damage_item(
                 response.chosen_item, response.is_exhausted, response.use_item_track)
         set_print_colour(attacker.print_colour)
 
-    def destroy(self, attacker):
+    def destroy(self, attacker, action_group=None):
         print(" - Vagabond cannot be destroyed")
         return

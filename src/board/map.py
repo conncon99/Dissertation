@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 
 class Map(ABC):
 
-    def __init__(self, settings) -> None:
-        self.settings = settings
+    def __init__(self, game_state) -> None:
+        self.game_state = game_state
         self.clearings: List[Clearing] = []
         self.forests: List[Forest] = []
         self.corner_clearings: List[Clearing] = []
@@ -47,7 +47,7 @@ class Map(ABC):
 
     def create_new_clearing(self, index, suit: BASE_SUITS, slot_count: int, has_ruin: bool) -> None:
         slots = [None] * slot_count
-        clearing = Clearing(index, suit, slots, [], [], self.settings)
+        clearing = Clearing(index, suit, slots, [], [], self.game_state)
         if has_ruin:
             ruin_item_idx = random.randint(
                 0, len(self.available_ruin_items) - 1)

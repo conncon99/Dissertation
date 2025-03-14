@@ -1,6 +1,6 @@
 from __future__ import annotations
 from actions.action_handler import Action
-from utils.root_types import Items, Factions
+from utils.root_types import Items
 from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from board.forest import Forest
@@ -36,7 +36,7 @@ class VagabondMoveAction(Action):
             executor, game_state, self.cobbler_move)
 
         chosen_clearing: Clearing = executor.controller.send_game_message(
-            VagabondMoveMessage(available_clearings)).chosen_clearing
+            VagabondMoveMessage(game_state, self.action_group, available_clearings)).chosen_clearing
         clearing_cost = available_clearings[chosen_clearing]
 
         from_space = executor.vagabond_pawn.space
@@ -54,7 +54,7 @@ class VagabondMoveAction(Action):
             available_allies.append(None)
 
             ally_movement_response: AllyMovementResponse = executor.controller.send_game_message(
-                AllyMovementMessage(available_allies, from_space))
+                AllyMovementMessage(game_state, self.action_group, available_allies, from_space))
             if ally_movement_response.chosen_ally is not None:
                 print(
                     f" - {executor} is bringing along {len(ally_movement_response.chosen_units)} allied warriors from {ally_movement_response.chosen_ally}")

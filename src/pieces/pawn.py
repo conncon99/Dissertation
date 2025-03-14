@@ -16,10 +16,10 @@ class Pawn(Piece):
         self.space.units[faction.faction_id].append(self)
         self.faction.units.append(self)
 
-    def damage(self, amount: int, attacker: Faction):
-        return super().damage(amount, attacker)
+    def damage(self, amount: int, attacker: Faction, action_group=None):
+        return super().damage(amount, attacker, action_group)
 
-    def destroy(self, attacker: Faction):
+    def destroy(self, attacker: Faction, action_group=None):
         if attacker and attacker.faction_id == Factions.VAGABOND.value:
             if attacker.relationship_track.relationship_level[self.faction.faction_id] != HOSTILE:
                 attacker.relationship_track.relationship_level[self.faction.faction_id] = HOSTILE

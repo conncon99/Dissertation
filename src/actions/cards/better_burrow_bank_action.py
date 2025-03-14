@@ -17,7 +17,7 @@ class BetterBurrowBankAction(Action):
         player_list = [
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id]
         other_player = executor.controller.send_game_message(
-            BetterBurrowBankMessage(player_list)).chosen_player
+            BetterBurrowBankMessage(game_state, self.action_group, player_list)).chosen_player
         print(f" - Selected {other_player} to draw card")
         # 2. Both of you draw a card
         card = executor.deck.draw(1)

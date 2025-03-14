@@ -34,7 +34,7 @@ class EmptySatchelAction(Action):
                 item for item, amount in executor.satchel.exhausted_damaged_items.items() for _ in range(amount)]
 
             satchel_response: EmptySatchelResponse = executor.controller.send_game_message(EmptySatchelMessage(
-                available_items, exhausted_items, available_damaged_items, exhausted_damaged_items))
+                game_state, self.action_group, available_items, exhausted_items, available_damaged_items, exhausted_damaged_items))
 
             if satchel_response.is_damaged and satchel_response.is_exhausted:
                 executor.satchel.exhausted_damaged_items[satchel_response.chosen_item] -= 1

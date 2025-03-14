@@ -1,12 +1,12 @@
 from __future__ import annotations
 from pieces.piece import Piece
-from board.clearing import Clearing
 from typing import TYPE_CHECKING
 from utils.root_types import EyrieLeaders, Factions
 from factions.vagabond.relationship_track import HOSTILE
 
 if TYPE_CHECKING:
     from factions.faction import Faction
+    from board.clearing import Clearing
 
 
 class Token(Piece):
@@ -15,10 +15,10 @@ class Token(Piece):
         super().__init__(clearing, faction, name)
         clearing.tokens[faction.faction_id].append(self)
 
-    def damage(self, amount: int, attacker: Faction):
-        return super().damage(amount, attacker)
+    def damage(self, amount: int, attacker: Faction, action_group=None):
+        return super().damage(amount, attacker, action_group)
 
-    def destroy(self, attacker: Faction):
+    def destroy(self, attacker: Faction, action_group=None):
         if attacker and not attacker.dominance:
 
             if attacker.faction_id == Factions.VAGABOND.value and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:

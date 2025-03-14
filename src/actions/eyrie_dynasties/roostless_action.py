@@ -40,7 +40,7 @@ class RoostlessAction(Action):
 
         # 2. Choose which peaceful clearing to use
         chosen_clearing: Clearing = executor.controller.send_game_message(
-            RoostlessMessage(peaceful_clearings)).chosen_clearing
+            RoostlessMessage(game_state, self.action_group, peaceful_clearings)).chosen_clearing
 
         # 3. Place a roost and 3 troops in that clearing
         Roost(chosen_clearing, executor, chosen_clearing.get_first_free_slot())

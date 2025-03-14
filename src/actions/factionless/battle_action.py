@@ -72,14 +72,14 @@ class BattleAction(Action):
     def perform(self, game_state, executor):
         # 1. Choose clearing to battle on and who to battle against
         clearing = executor.controller.send_game_message(
-            BattleClearingChoiceMessage(self._get_valid_battle_clearings(game_state, executor))).chosen_clearing
+            BattleClearingChoiceMessage(game_state, self.action_group, self._get_valid_battle_clearings(game_state, executor))).chosen_clearing
         target = executor.controller.send_game_message(BattleTargetChoiceMessage(
-            self._get_valid_battle_targets(clearing, executor, game_state))).chosen_target
+            game_state, self.action_group, self._get_valid_battle_targets(clearing, executor, game_state))).chosen_target
         # 2. battle
-        self.battle(clearing, target, executor)
+        self.battle(clearing, target, executor, game_state)
         self.times_used += 1
 
-    def battle(self, clearing: Clearing, defender: Faction, attacker: Faction):
+    def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
         battle_modifier = BattleModifier(attacker, defender, clearing)
 
         from cards.card import AmbushCard
@@ -90,9 +90,10 @@ class BattleAction(Action):
         if available_ambush_cards != []:
             # If they have multiple ambush cards choose one, otherwise use the only one
             ambush_response: AmbushResponse = defender.controller.send_game_message(
-                AmbushMessage(defender, attacker, clearing, False, False, available_ambush_cards))
+                AmbushMessage(game_state, self.action_group, defender, attacker, clearing, False, False, available_ambush_cards))
             if ambush_response.ambush_card is not None:
-                ambush_response.ambush_card._callback(battle_modifier)
+                ambush_response.ambush_card._callback(
+                    game_state, self.action_group, battle_modifier)
 
         if attacker.faction_id == Factions.VAGABOND.value:
             pass
@@ -106,7 +107,7 @@ class BattleAction(Action):
             if available_allies != []:
                 available_allies.append(None)
                 chosen_ally = attacker.controller.send_game_message(
-                    ChooseAllyMessage(available_allies)).chosen_ally
+                    ChooseAllyMessage(game_state, self.action_group, available_allies)).chosen_ally
                 attacker.battle_ally = chosen_ally
                 friendly_warrior_count = attacker.satchel.get_non_damaged_count(Items.SWORD) if chosen_ally is None else attacker.satchel.get_non_damaged_count(
                     Items.SWORD) + clearing.get_faction_warrior_count(chosen_ally.faction_id)
@@ -137,11 +138,11 @@ class BattleAction(Action):
             attacker_dmg += 1
 
         for callback in defender.battle_callbacks[BattleCallbackTimes.IN_BATTLE_ATTACKER]:
-            callback(battle_modifier)
+            callback(game_state, self.action_group, battle_modifier)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE_DEFENDER]:
-            callback(battle_modifier)
+            callback(game_state, self.action_group, battle_modifier)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE]:
-            callback(battle_modifier)
+            callback(game_state, self.action_group, battle_modifier)
 
         attacker_dmg += battle_modifier.attacker_damage_modifier
         defender_dmg += battle_modifier.defender_damage_modifier
@@ -149,9 +150,9 @@ class BattleAction(Action):
         defender_dmg = max(defender_dmg, 0)
 
         clearing.damage(victim=defender, attacker=attacker,
-                        amount=attacker_dmg)
+                        amount=attacker_dmg, action_group=self.action_group)
         clearing.damage(victim=attacker, attacker=defender,
-                        amount=defender_dmg)
+                        amount=defender_dmg, action_group=self.action_group)
         if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
             attacker.battle_ally = None
         set_print_colour(attacker.print_colour)

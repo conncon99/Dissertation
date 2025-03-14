@@ -111,7 +111,7 @@ class Controller(ABC):
 
     @abstractmethod
     def _handle_battle_clearing_choice(
-        self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse: ...
+        self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse: ...
 
     @abstractmethod
     def _handle_battle_target_choice(

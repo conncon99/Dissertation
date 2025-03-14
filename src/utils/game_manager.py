@@ -18,21 +18,40 @@ class GameManager:
         self._initialized = True
         self.settings = settings
         self.winner = None
+        self.done = False
         self.game_phase = GamePhase.BIRDSONG
         self.game_state = GameState()
         self.game_state.turn_limit = turn_limit
         self.turn_count = -1
         self.turn_limit = turn_limit
+        self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
+                                Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
+        self._initialize_game_state()
         self.create_map()
         self.setup_game()
-        self._initialize_game_state()
-        self.run_game()
+        # self.run_game()
+
+    def _initialize_game_state(self):
+        self.game_state.faction_list = self.settings.faction_list
+        self.game_state.turn_limit = self.turn_limit
+        self.game_state.craftable_items = self.craftable_items
+        self.game_state.marquise = self._get_faction_by_id(
+            Factions.MARQUISE_DE_CAT.value)
+        self.game_state.eyrie_dynasties = self._get_faction_by_id(
+            Factions.EYRIE_DYNASTY.value)
+        self.game_state.woodland_alliance = self._get_faction_by_id(
+            Factions.WOODLAND_ALLIANCE.value)
+        self.game_state.vagabond = self._get_faction_by_id(
+            Factions.VAGABOND.value)
 
     def create_map(self):
-        self.map = ClassicMap(self.settings)
+        self.map = ClassicMap(self.game_state)
+        self.game_state.board = self.map
         self.deck = Deck(self.map)
-        for faction in self.settings.faction_list:
-            faction.setup_faction(self.map, self.deck)
+        self.game_state.deck = self.deck
+        for faction in self.game_state.faction_list:
+            self.game_state.current_player = faction
+            faction.setup_faction(self.map, self.deck, self.game_state)
             for action_group in faction.actions[CallbackTimes.IN_DAYLIGHT]:
                 action_group.actions.append(ClaimDominanceAction())
 
@@ -58,11 +77,13 @@ class GameManager:
                     self.game_state.current_phase = self.game_phase
                     for action_group in faction.actions[time]:
                         if self.winner is not None:
+                            self.done = True
                             break
                         action_group.run_group(faction, self.game_state)
                         self._handle_wins(faction)
                     faction.used_spanning_actions.clear()
             if self.turn_count >= self.turn_limit:
+                self.done = True
                 original_print(
                     f"Turn count has reached {self.turn_limit}, cancelling game...")
                 return
@@ -99,21 +120,6 @@ class GameManager:
                 self.winner = faction
             elif faction.victory_points >= 30:
                 self.winner = faction
-
-    def _initialize_game_state(self):
-        assert self.map is not None
-        self.game_state.board = self.map
-        self.game_state.faction_list = self.settings.faction_list
-        self.game_state.deck = self.deck
-        self.game_state.turn_limit = self.turn_limit
-        self.game_state.marquise = self._get_faction_by_id(
-            Factions.MARQUISE_DE_CAT.value)
-        self.game_state.eyrie_dynasties = self._get_faction_by_id(
-            Factions.EYRIE_DYNASTY.value)
-        self.game_state.woodland_alliance = self._get_faction_by_id(
-            Factions.WOODLAND_ALLIANCE.value)
-        self.game_state.vagabond = self._get_faction_by_id(
-            Factions.VAGABOND.value)
 
     def _get_faction_by_id(self, faction_id: int) -> Faction:
         for faction in self.settings.faction_list:

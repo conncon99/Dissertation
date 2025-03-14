@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import List, TYPE_CHECKING
 from utils.root_types import GamePhase
 
@@ -9,6 +10,7 @@ if TYPE_CHECKING:
     from factions.woodland_alliance import WoodlandAlliance
     from factions.vagabond.vagabond import Vagabond
     from cards.deck import Deck
+    from utils.root_types import Items
 
 
 class GameState:
@@ -25,8 +27,9 @@ class GameState:
         self.turn_count: int = 0
         self.turn_limit: int = 300
         self.current_player: Faction = None
+        self.craftable_items: List[Items] = []
         self.current_phase: GamePhase = GamePhase.BIRDSONG
-        self.faction_list: List['Faction'] = []
+        self.faction_list: List[Faction] = []
         self.board: Map = None
         self.deck: Deck = None
         self.marquise: Marquise = None

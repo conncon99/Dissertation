@@ -41,59 +41,60 @@ class ActionGroupRegistry:
 
 class ActionIDs(Enum):
     # Cards
-    BETTER_BURROW_BANK = 1
-    CLAIM_DOMINANCE = 2
-    CODEBREAKERS = 3
-    DOMINANCE = 4
-    ROYAL_CLAIM = 5
-    STAND_AND_DELIVER = 6
-    TAX_COLLECTOR = 7
+    BETTER_BURROW_BANK = auto()
+    CLAIM_DOMINANCE = auto()
+    CODEBREAKERS = auto()
+    DOMINANCE = auto()
+    ROYAL_CLAIM = auto()
+    STAND_AND_DELIVER = auto()
+    TAX_COLLECTOR = auto()
 
     # Eyrie Dynasties
-    DECREE_BATTLE = 8
-    DECREE_BUILD = 9
-    DECREE_MOVE = 10
-    DECREE_RECRUIT = 11
-    EXTEND_DECREE = 12
-    REPLENISH_HAND = 13
-    ROOSTLESS = 14
-    SCORE_VP = 15
+    DECREE_BATTLE = auto()
+    DECREE_BUILD = auto()
+    DECREE_MOVE = auto()
+    DECREE_RECRUIT = auto()
+    EXTEND_DECREE = auto()
+    REPLENISH_HAND = auto()
+    ROOSTLESS = auto()
+    SCORE_VP = auto()
 
     # Factionless
-    BATTLE = 16
-    CRAFT = 17
-    DRAW_AND_DISCARD = 18
-    MOVE = 19
-    PLAY_DOMINANCE = 20
+    BATTLE = auto()
+    CRAFT = auto()
+    DRAW_AND_DISCARD = auto()
+    MOVE = auto()
+    MOVE_UNITS = auto()
+    PLAY_DOMINANCE = auto()
 
     # Marquise
-    MARCH = 21
-    MARQUISE_BUILD = 22
-    OVERWORK = 23
-    PLACE_WOOD = 24
-    MARQUISE_RECRUIT = 25
-    SPEND_BIRD_CARD = 26
+    MARCH = auto()
+    MARQUISE_BUILD = auto()
+    OVERWORK = auto()
+    PLACE_WOOD = auto()
+    MARQUISE_RECRUIT = auto()
+    SPEND_BIRD_CARD = auto()
 
     # Vagabond
-    AID = 27
-    EMPTY_SATCHEL = 28
-    EVENINGS_REST = 29
-    EXPLORE = 30
-    QUEST = 31
-    REFRESH = 32
-    REPAIR = 33
-    SLIP = 34
-    SPECIAL = 35
-    STRIKE = 36
-    VAGABOND_BATTLE = 37
-    VAGABOND_CRAFT = 38
-    VAGABOND_MOVE = 39
+    AID = auto()
+    EMPTY_SATCHEL = auto()
+    EVENINGS_REST = auto()
+    EXPLORE = auto()
+    QUEST = auto()
+    REFRESH = auto()
+    REPAIR = auto()
+    SLIP = auto()
+    SPECIAL = auto()
+    STRIKE = auto()
+    VAGABOND_BATTLE = auto()
+    VAGABOND_CRAFT = auto()
+    VAGABOND_MOVE = auto()
 
     # Woodland Alliance
-    ALLIANCE_RECRUIT = 40
-    MOBILIZE = 41
-    MODIFY_EVENING_ACTION = 42
-    ORGANIZE = 43
-    REVOLT = 44
-    SPREAD_SYMPATHY = 45
-    TRAIN = 46
+    ALLIANCE_RECRUIT = auto()
+    MOBILIZE = auto()
+    MODIFY_EVENING_ACTION = auto()
+    ORGANIZE = auto()
+    REVOLT = auto()
+    SPREAD_SYMPATHY = auto()
+    TRAIN = auto()

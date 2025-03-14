@@ -1,7 +1,7 @@
 import builtins
 
 VERBOSE = False
-LOG = True
+LOG = False
 
 
 RESET = "\033[0m"
@@ -12,8 +12,6 @@ original_print = builtins.print
 if LOG:
     with open("print.log", "w") as f:
         pass
-
-if LOG:
     log_file = open("print.log", "a")
 
 

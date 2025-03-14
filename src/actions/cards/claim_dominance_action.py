@@ -21,14 +21,14 @@ class ClaimDominanceAction(Action):
             d_card.suit == card.suit for card in executor.hand)]
 
         chosen_dominance = executor.controller.send_game_message(
-            ClaimDominanceSuitMessage(available_dominances)).chosen_dominance
+            ClaimDominanceSuitMessage(game_state, self.action_group, available_dominances)).chosen_dominance
 
         # 2. Expend card matching it
 
         available_cards = [
             card for card in executor.hand if card.suit == chosen_dominance.suit]
         chosen_discard = executor.controller.send_game_message(
-            ClaimDominanceCardMessage(available_cards)).chosen_discard
+            ClaimDominanceCardMessage(game_state, self.action_group, available_cards)).chosen_discard
 
         executor.discard_card(chosen_discard)
         executor.hand.append(chosen_dominance)

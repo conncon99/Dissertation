@@ -21,7 +21,7 @@ class DrawAndDiscardAction(Action):
         if len(executor.hand) > executor.hand_limit:
             discard_num = len(executor.hand) - executor.hand_limit
             discard_choices = executor.controller.send_game_message(
-                DiscardChoiceMessage(executor.hand, discard_num)).selected_cards
+                DiscardChoiceMessage(game_state, self.action_group, executor.hand, discard_num)).selected_cards
             for card in discard_choices:
                 executor.discard_card(card)
         print(f" - Hand: {executor.hand}")

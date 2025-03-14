@@ -1,25 +1,24 @@
 from __future__ import annotations
 from pieces.piece import Piece
-from board.clearing import Clearing
 from typing import TYPE_CHECKING
 from utils.root_types import Factions, EyrieLeaders
 from factions.vagabond.relationship_track import HOSTILE
 
 if TYPE_CHECKING:
     from factions.faction import Faction
+    from board.clearing import Clearing
 
 
 class Building(Piece):
     def __init__(self, clearing: Clearing, faction: Faction, slot_idx: int, name: str) -> None:
         self.slot_idx = slot_idx
         super().__init__(clearing, faction, name)
-        assert isinstance(self.space, Clearing)
         self.space.slots[slot_idx] = self
 
-    def damage(self, amount: int, attacker: Faction):
-        return super().damage(amount, attacker)
+    def damage(self, amount: int, attacker: Faction, action_group=None):
+        return super().damage(amount, attacker, action_group)
 
-    def destroy(self, attacker: Faction):
+    def destroy(self, attacker: Faction, action_group=None):
         if not attacker.dominance:
             if attacker.faction_id == Factions.VAGABOND.value and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:
                 print(f" - {attacker} gained 1 VP due to Infamy")

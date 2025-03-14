@@ -5,8 +5,8 @@ from utils.root_types import Suits
 
 class ClassicMap(Map):
 
-    def __init__(self, settings) -> None:
-        super().__init__(settings)
+    def __init__(self, game_state) -> None:
+        super().__init__(game_state)
         self.corner_clearings = [
             self.clearings[0], self.clearings[2], self.clearings[8], self.clearings[11]]
 
@@ -25,7 +25,7 @@ class ClassicMap(Map):
         self.create_new_clearing(11, Suits.RABBIT, 1, False)
 
     def create_forests(self) -> None:
-        self.forests = [Forest(i, self.settings) for i in range(7)]
+        self.forests = [Forest(i, self.game_state) for i in range(7)]
 
     def set_up_clearings(self) -> None:
         self.add_clearing_connections(self.clearings[0], [1, 3, 4])

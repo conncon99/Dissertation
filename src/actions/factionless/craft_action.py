@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, List
 from controllers.messages.game_messages import CraftMessage
 from cards.card import ItemCard
 from utils.root_types import Suits
-from utils.game_settings import CRAFTABLE_ITEMS
 from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
@@ -25,9 +24,9 @@ class CraftAction(Action):
         """If we are free to craft this turn and we hold a craftable card in our hand, this function returns True"""
         if self.times_used >= self.max_uses or len(executor.hand) == 0:
             return False
-        return any(self._can_craft(card, executor) for card in executor.hand)
+        return any(self._can_craft(card, executor, game_state) for card in executor.hand)
 
-    def _can_craft(self, card: 'Card', executor: 'Faction') -> bool:
+    def _can_craft(self, card: 'Card', executor: 'Faction', game_state) -> bool:
         if not card.is_craftable:
             return False
 
@@ -37,7 +36,7 @@ class CraftAction(Action):
 
         # # Can't craft if there is no item available
         if isinstance(card, ItemCard):
-            if card.item_bonus not in CRAFTABLE_ITEMS:
+            if card.item_bonus not in game_state.craftable_items:
                 return False
 
         # Needs necessary resources
@@ -62,10 +61,10 @@ class CraftAction(Action):
     def perform(self, game_state, executor) -> None:
         # 1. Get list of craftable cards
         crafting_options = [
-            card for card in executor.hand if self._can_craft(card, executor)]
+            card for card in executor.hand if self._can_craft(card, executor, game_state)]
         # 2. Send crafting message to choose card and get card response
         card: 'Card' = executor.controller.send_game_message(
-            CraftMessage(crafting_options)).chosen_card
+            CraftMessage(game_state, self.action_group, crafting_options)).chosen_card
         # 3. Craft card
         print(f" - '{executor}' Crafted '{card}'")
         card.owner = executor
@@ -74,9 +73,9 @@ class CraftAction(Action):
             executor.hand.remove(card)
             executor.active_cards.append(card)
             print(f" - Active Cards: {executor.active_cards}")
-            card.activate(game_state)
+            card.activate(game_state, self.action_group)
         else:
-            card.activate(game_state)
+            card.activate(game_state, self.action_group)
             executor.discard_card(card)
         self.post_craft_callback(executor, card)
         super().perform(game_state, executor)

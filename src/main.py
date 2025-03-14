@@ -1,17 +1,13 @@
 from utils.game_settings import GameSettings
 from utils.game_manager import GameManager
-from factions.marquise_de_cat import Marquise
-from factions.eyrie_dynasties import EyrieDynasties
-from factions.woodland_alliance import WoodlandAlliance
-from factions.vagabond.vagabond import Vagabond
-from controllers.random_controllers.marquise_random_controller import MarquiseRandomController
-from controllers.random_controllers.eyrie_random_controller import EyrieRandomController
-from controllers.random_controllers.alliance_random_controller import AllianceRandomController
-from controllers.random_controllers.vagabond_random_controller import VagabondRandomController
+from factions import *
+from controllers.random_controllers import *
+from controllers.nn_controllers.marquise_nn_controller import MarquiseNNController
 import gc
 import builtins
 from utils.colour_utils import colored_print, original_print
 from actions.action_group_registry import ActionGroupRegistry
+from stable_baselines3 import PPO
 
 builtins.print = colored_print
 
@@ -27,8 +23,26 @@ def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manage
     gc.collect()
 
 
-RUN_COUNT = 2
-TURN_LIMIT = 300
+RUN_COUNT = 10
+TURN_LIMIT = 100
+
+
+# env = RootMultiAgentEnv()
+
+# for i in range(RUN_COUNT):  # Play 50 full games before training
+#     original_print(f"Game {i}")
+#     env.reset()
+#     done = False
+#     rewards = []
+#     while not done:
+#         action = env.action_space.sample()  # Sample PPO action
+#         obs, reward, done, info = env.step(action)
+#         env.render()
+
+#     env.train_agents(reward)  # Train PPO in batches
+
+# env.controllers["marquise"].model.save("root_ppo_model")
+
 
 for i in range(RUN_COUNT):
     original_print(f"RUN {i}")

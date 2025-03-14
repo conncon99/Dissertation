@@ -55,13 +55,13 @@ class RevoltAction(Action):
         valid_clearings = self.get_valid_clearings(executor)
 
         clearing: Clearing = executor.controller.send_game_message(
-            RevoltClearingMessage(valid_clearings)).chosen_clearing
+            RevoltClearingMessage(game_state, self.action_group, valid_clearings)).chosen_clearing
 
         print(f" - Revolted on clearing {clearing.index}")
 
         valid_supporters = self.get_valid_supporters(executor, clearing)
 
-        chosen_discards: List[Card] = executor.controller.send_game_message(RevoltDiscardMessage(valid_supporters)
+        chosen_discards: List[Card] = executor.controller.send_game_message(RevoltDiscardMessage(game_state, self.action_group, valid_supporters)
                                                                             ).chosen_discards
 
         for card in chosen_discards:
@@ -72,7 +72,7 @@ class RevoltAction(Action):
         for faction in game_state.faction_list:
             if faction.faction_id == executor.faction_id:
                 continue
-            clearing.damage(faction, executor, 999)
+            clearing.damage(faction, executor, 999, self.action_group)
 
         set_print_colour(executor.print_colour)
 

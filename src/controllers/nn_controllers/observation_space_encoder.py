@@ -2,9 +2,8 @@ from __future__ import annotations
 from math import inf
 from typing import TYPE_CHECKING, List, Dict
 import numpy as np
-from controllers.messages.game_messages import GameMessages, GameMessage
+from controllers.messages.game_messages import GameMessages
 from utils.root_types import Factions, Suits, Items, EyrieLeaders, RECRUIT, MOVE, BUILD, BATTLE
-from pieces.factionless.buildings.ruin import Ruin
 from factions.vagabond.vagabond_characters import RangerCharacter, TinkerCharacter, ThiefCharacter, Characters
 from actions.action_group_registry import ActionGroupRegistry, ActionIDs
 from factions.vagabond.quests import *
@@ -18,20 +17,19 @@ if TYPE_CHECKING:
     from board.clearing import Clearing
     from board.forest import Forest
     from cards.card import Card
+    # from pieces.factionless.buildings.ruin import Ruin
 
 
 class ObservationSpace:
-    def __init__(self):
-        pass
 
-    def encode_game_state(self, game_state: GameState, message_type: GameMessages, action_group: ActionGroup):
+    @classmethod
+    def encode_game_state(cls, game_state: GameState, message_type: GameMessages, action_group: ActionGroup):
         observation_space = [
             #### GENERAL ####
             # Active faction id (who is using this)
             game_state.current_player.faction_id / 4,
             game_state.turn_count / game_state.turn_limit,  # Current Turn Count
-            game_state.current_player / 4,  # Current Player
-            game_state.current_phase / 3,  # Current Phase
+            game_state.current_phase.value / 3,  # Current Phase
             # Marquise de Cat Turn order
             game_state.faction_list.index(
                 game_state.marquise) / len(game_state.faction_list) - 1,
@@ -53,32 +51,32 @@ class ObservationSpace:
             game_state.vagabond.victory_points / 30,  # Vagabond Victory Points
 
             # Marquise Dominance Status
-            self._encode_dominance(game_state.marquise.dominance),
+            cls._encode_dominance(game_state.marquise.dominance),
             # Eyrie Dynasties Dominance Status
-            self._encode_dominance(game_state.eyrie_dynasties.dominance),
+            cls._encode_dominance(game_state.eyrie_dynasties.dominance),
             # Woodland Alliance Dominance Status
-            self._encode_dominance(game_state.woodland_alliance.dominance),
+            cls._encode_dominance(game_state.woodland_alliance.dominance),
             # Vagabond Coalition Status
-            self._encode_coalition(game_state.vagabond.dominance)
+            cls._encode_coalition(game_state.vagabond.dominance)
         ]
 
         # Marquise Crafted Items
         observation_space.extend(
-            self._encode_crafted_items(game_state.marquise.items))
+            cls._encode_crafted_items(game_state.marquise.items))
         # Eyrie Dynasties Crafted Items
-        observation_space.extend(self._encode_crafted_items(
+        observation_space.extend(cls._encode_crafted_items(
             game_state.eyrie_dynasties.items))
         # Woodland Alliance Crafted Items
-        observation_space.extend(self._encode_crafted_items(
+        observation_space.extend(cls._encode_crafted_items(
             game_state.woodland_alliance.items))
         # Vagabond Crafted Items
         observation_space.extend(
-            self._encode_crafted_items(game_state.vagabond.items))
+            cls._encode_crafted_items(game_state.vagabond.items))
 
         #### HANDS #####
 
         # One hot encoded hand (54 cards)
-        observation_space.extend(self.encode_hand(
+        observation_space.extend(cls._encode_hand(
             game_state.current_player.hand))
 
         # Marquise de Cat hand length
@@ -94,13 +92,13 @@ class ObservationSpace:
         observation_space.append(len(game_state.vagabond.hand) / 54.0)
 
         # One hot encoded active cards for each faction
-        observation_space.extend(self.encode_active_cards(
+        observation_space.extend(cls._encode_active_cards(
             game_state.marquise.active_cards))
-        observation_space.extend(self.encode_active_cards(
+        observation_space.extend(cls._encode_active_cards(
             game_state.eyrie_dynasties.active_cards))
-        observation_space.extend(self.encode_active_cards(
+        observation_space.extend(cls._encode_active_cards(
             game_state.woodland_alliance.active_cards))
-        observation_space.extend(self.encode_active_cards(
+        observation_space.extend(cls._encode_active_cards(
             game_state.vagabond.active_cards))
 
         #### BOARD ####
@@ -109,54 +107,72 @@ class ObservationSpace:
 
         for clearing in game_state.board.clearings:
             observation_space.extend(
-                self.encode_clearing(clearing, game_state))
+                cls._encode_clearing(clearing, game_state))
 
         # For each Forest
         for forest in game_state.board.forests:
-            observation_space.extend(self.encode_forest(forest))
+            observation_space.extend(cls._encode_forest(forest))
 
         #### MARQUISE SPECIFIC ####
-        observation_space.extend(self.encode_marquise_data(game_state))
+        observation_space.extend(cls._encode_marquise_data(game_state))
 
         #### EYRIE DYNASTIES SPECIFIC ####
-        observation_space.extend(self.encode_eyrie_data(game_state))
+        observation_space.extend(cls._encode_eyrie_data(game_state))
 
         #### WOODLAND ALLIANCE SPECIFIC ####
         observation_space.extend(
-            self.encode_woodland_alliance_data(game_state, game_state.current_player.faction_id))
+            cls._encode_woodland_alliance_data(game_state, game_state.current_player.faction_id))
 
         #### VAGABOND SPECIFIC ####
-        observation_space.extend(self.encode_vagabond_data(game_state))
+        observation_space.extend(cls._encode_vagabond_data(game_state))
 
         #### GameMessage ####
-        observation_space.append(self.encode_game_message(message_type))
+        observation_space.append(cls._encode_game_message(message_type))
 
         #### Action Groups ####
-        # Action Group ID
-        observation_space.append(
-            action_group.id / ActionGroupRegistry.get_registery_size())
-        # Is action group ordered
-        observation_space.append(1.0 if action_group.ordered else 0.0)
-        # Can action space be aborted
-        observation_space.append(1.0 if action_group.can_abort else 0.0)
-        # Max actions
-        observation_space.append(
-            1.0 if action_group.max_total_uses == inf else action_group.max_total_uses / 15.0)
-        # Remaining actions
-        observation_space.append(1.0 if action_group.max_total_uses ==
-                                 inf else action_group.total_uses / (action_group.max_total_uses + 1))
-        # one hot encoded available actions - all 0 if not ActionChoiceMessage
-        observation_space.extend(self.encode_action_list(action_group.actions))
-
+        if action_group:
+            # Action Group ID
+            observation_space.append(
+                action_group.id / ActionGroupRegistry.get_registery_size())
+            # Is action group ordered
+            observation_space.append(1.0 if action_group.ordered else 0.0)
+            # Can action space be aborted
+            observation_space.append(1.0 if action_group.can_abort else 0.0)
+            # Max actions
+            observation_space.append(
+                1.0 if action_group.max_total_uses == inf else action_group.max_total_uses / 15.0)
+            # Remaining actions
+            observation_space.append(1.0 if action_group.max_total_uses ==
+                                     inf else action_group.total_uses / (action_group.max_total_uses + 1))
+            # one hot encoded available actions - all 0 if not ActionChoiceMessage
+            observation_space.extend(
+                cls._encode_action_list(action_group.actions))
+        else:
+            # Action Group ID
+            observation_space.append(0.0)
+            # Is action group ordered
+            observation_space.append(0.0)
+            # Can action space be aborted
+            observation_space.append(0.0)
+            # Max actions
+            observation_space.append(0.0)
+            # Remaining actions
+            observation_space.append(0.0)
+            observation_space.extend(
+                cls._encode_action_list(None))
+        print(np.array(observation_space).shape)
         return np.array(observation_space)
 
-    def _encode_dominance(self, dominance: Suits) -> float:
+    @classmethod
+    def _encode_dominance(cls, dominance: Suits) -> float:
         return 0.0 if dominance is None else dominance.value / 4
 
-    def _encode_coalition(self, coalition_partner: Faction) -> float:
+    @classmethod
+    def _encode_coalition(cls, coalition_partner: Faction) -> float:
         return 0.0 if coalition_partner is None else coalition_partner.faction_id / 4
 
-    def _encode_crafted_items(self, crafted_items: List[Items]) -> List[float]:
+    @classmethod
+    def _encode_crafted_items(cls, crafted_items: List[Items]) -> List[float]:
         craftable_item_list = [Items.TEA, Items.HAMMER, Items.SWORD,
                                Items.BOOTS, Items.COINS, Items.BAG, Items.CROSSBOW]
         item_counts = {item: sum(
@@ -190,7 +206,8 @@ class ObservationSpace:
             1.0 if item_counts[Items.CROSSBOW] == 2 else 0.0,  # Crossbow-2
         ]
 
-    def encode_hand(self, hand: List[Card]) -> List[float]:
+    @classmethod
+    def _encode_hand(cls, hand: List[Card]) -> List[float]:
         return [
             1.0 if SWORD_MOUSE in hand else 0.0,
             1.0 if TRAVEL_GEAR_FOX in hand else 0.0,
@@ -252,7 +269,8 @@ class ObservationSpace:
             1.0 if ROYAL_CLAIM in hand else 0.0
         ]
 
-    def encode_active_cards(self, active_cards: List[Card]) -> List[float]:
+    @classmethod
+    def _encode_active_cards(cls, active_cards: List[Card]) -> List[float]:
         return [
             1.0 if STAND_AND_DELIVER in active_cards else 0.0,
             1.0 if STAND_AND_DELIVER_2 in active_cards else 0.0,
@@ -278,34 +296,35 @@ class ObservationSpace:
             1.0 if SCOUTING_PARTY_2 in active_cards else 0.0
         ]
 
-    def encode_clearing(self, clearing: Clearing, game_state: GameState) -> List[float]:
+    @classmethod
+    def _encode_clearing(cls, clearing: Clearing, game_state: GameState) -> List[float]:
         return [
             # Clearing faction ruler
-            clearing.get_owner() / 4,
+            clearing.get_owner() / 5 if clearing.get_owner() else 1.0,
             # Clearing suit
-            clearing.get_suit() / 3,
+            clearing.get_suit().value / 3,
             # Total clearing slots
             len(clearing.slots) / 3,
             # Available clearing slots
             sum(slot is None for slot in clearing.slots) / len(clearing.slots),
             # Marquise de cat warrior count (normalized via max faction warrior count)
-            clearing.units[Factions.MARQUISE_DE_CAT.value] /
+            len(clearing.units[Factions.MARQUISE_DE_CAT.value]) /
             game_state.marquise.max_warriors,
             # Eyrie Dynasties warrior count
-            clearing.units[Factions.EYRIE_DYNASTY.value] /
+            len(clearing.units[Factions.EYRIE_DYNASTY.value]) /
             game_state.eyrie_dynasties.max_warriors,
             # Woodland Alliance warrior count
-            clearing.units[Factions.WOODLAND_ALLIANCE.value] /
+            len(clearing.units[Factions.WOODLAND_ALLIANCE.value]) /
             game_state.woodland_alliance.max_warriors,
             # is vagabond pawn on this space?
-            clearing.units[Factions.VAGABOND.value],
+            len(clearing.units[Factions.VAGABOND.value]),
 
             # MARQUISE
             # Wood Count
             sum(1 for wood in game_state.marquise.wood if wood.space ==
                 clearing) / game_state.marquise.max_wood,
             # has Keep?
-            1.0 if game_state.marquise.keep.space == clearing else 0,
+            1.0 if game_state.marquise.keep and game_state.marquise.keep.space == clearing else 0.0,
 
             # Recruiter count
             sum(1 for recruiter in game_state.marquise.recruiters if recruiter.space ==
@@ -334,17 +353,19 @@ class ObservationSpace:
 
             # Vagabond
             # has Ruin
-            1.0 if any(isinstance(slot, Ruin)
+            1.0 if any(slot and slot.name == "Ruin"
                        for slot in clearing.slots) else 0.0
         ]
 
-    def encode_forest(self, forest: Forest) -> List[float]:
+    @classmethod
+    def _encode_forest(cls, forest: Forest) -> List[float]:
         return [
             # Is the vagabond pawn in this forest
-            forest.units[Factions.VAGABOND.value]
+            1.0 if forest.units[Factions.VAGABOND.value] else 0.0
         ]
 
-    def encode_marquise_data(self, game_state: GameState) -> List[float]:
+    @classmethod
+    def _encode_marquise_data(cls, game_state: GameState) -> List[float]:
         return [
             # number of sawmills
             len(game_state.marquise.sawmills) /
@@ -361,7 +382,8 @@ class ObservationSpace:
             len(game_state.marquise.units) / game_state.marquise.max_warriors
         ]
 
-    def encode_eyrie_data(self, game_state: GameState) -> List[float]:
+    @classmethod
+    def _encode_eyrie_data(cls, game_state: GameState) -> List[float]:
         eyrie_data = [
             # number of roosts
             len(game_state.eyrie_dynasties.roosts) /
@@ -372,7 +394,8 @@ class ObservationSpace:
             game_state.eyrie_dynasties.max_warriors,
 
             # Eyrie Leader ID
-            game_state.eyrie_dynasties.eyrie_leader.value / 3,
+            game_state.eyrie_dynasties.eyrie_leader.value /
+            4 if game_state.eyrie_dynasties.eyrie_leader else 0.0,
 
             # remaining leaders
             1.0 if EyrieLeaders.Despot in game_state.eyrie_dynasties.remaining_leaders else 0.0,
@@ -380,20 +403,22 @@ class ObservationSpace:
             1.0 if EyrieLeaders.Charismatic in game_state.eyrie_dynasties.remaining_leaders else 0.0,
             1.0 if EyrieLeaders.Builder in game_state.eyrie_dynasties.remaining_leaders else 0.0,
         ]
-        eyrie_data.extend(self._encode_decree(game_state, RECRUIT))
-        eyrie_data.extend(self._encode_decree(game_state, MOVE))
-        eyrie_data.extend(self._encode_decree(game_state, BATTLE))
-        eyrie_data.extend(self._encode_decree(game_state, BUILD))
+        eyrie_data.extend(cls._encode_decree(game_state, RECRUIT))
+        eyrie_data.extend(cls._encode_decree(game_state, MOVE))
+        eyrie_data.extend(cls._encode_decree(game_state, BATTLE))
+        eyrie_data.extend(cls._encode_decree(game_state, BUILD))
         return eyrie_data
 
-    def _encode_decree(self, game_state: GameState, decree_type: int) -> List[float]:
+    @classmethod
+    def _encode_decree(cls, game_state: GameState, decree_type: int) -> List[float]:
         decree_output = []
         for suit in Suits:
             decree_output.append(sum(
                 1.0 for card in game_state.eyrie_dynasties.decree_cards[decree_type] if card.suit == suit) / 56.0)  # Normalized by 56 for 54 cards + 2 royal viziers
         return decree_output
 
-    def encode_woodland_alliance_data(self, game_state: GameState, faction_id: int) -> List[float]:
+    @classmethod
+    def _encode_woodland_alliance_data(cls, game_state: GameState, faction_id: int) -> List[float]:
         return [
             # Number of bases
             game_state.woodland_alliance.get_base_count() / 3.0,
@@ -419,10 +444,11 @@ class ObservationSpace:
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.BIRD) / 54.0),
         ]
 
-    def encode_vagabond_data(self, game_state: GameState) -> List[float]:
+    @classmethod
+    def _encode_vagabond_data(cls, game_state: GameState) -> List[float]:
         vagabond_data = [
             # Vagabond Character
-            self._encode_vagabond_character(game_state.vagabond.character),
+            cls._encode_vagabond_character(game_state.vagabond.character),
             # Bag Track Count
             game_state.vagabond.active_bag_count / 3.0,
             # Tea Track Count
@@ -430,11 +456,14 @@ class ObservationSpace:
             # Coin track count
             game_state.vagabond.active_coin_count / 3.0,
             # Marquise De Cat relatonship status
-            game_state.vagabond.relationship_track[Factions.MARQUISE_DE_CAT.value] / 4.0,
+            game_state.vagabond.relationship_track.relationship_level[
+                Factions.MARQUISE_DE_CAT.value] / 4.0,
             # Eyrie Dynasties relationship status
-            game_state.vagabond.relationship_track[Factions.EYRIE_DYNASTY.value] / 4.0,
+            game_state.vagabond.relationship_track.relationship_level[
+                Factions.EYRIE_DYNASTY.value] / 4.0,
             # Woodland Alliance relationship status
-            game_state.vagabond.relationship_track[Factions.WOODLAND_ALLIANCE.value] / 4.0,
+            game_state.vagabond.relationship_track.relationship_level[
+                Factions.WOODLAND_ALLIANCE.value] / 4.0,
             # Completed Fox Quests number
             game_state.vagabond.completed_quests[Suits.FOX] / 5.0,
             # Completed Rabbit Quests number
@@ -461,20 +490,21 @@ class ObservationSpace:
             1.0 if REPAIR_A_SHED in game_state.vagabond.quest_cards else 0.0,
         ]
         # One hot encoded available satchel items
-        vagabond_data.extend(self._encode_satchel_list(
+        vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.available_items))
         # One hot encoded exhausted satchel items
-        vagabond_data.extend(self._encode_satchel_list(
+        vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.exhausted_items))
         # One hot encoded exhausted damaged satchel items
-        vagabond_data.extend(self._encode_satchel_list(
+        vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.exhausted_damaged_items))
         # One hot encoded damaged satchel items
-        vagabond_data.extend(self._encode_satchel_list(
+        vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.available_damaged_items))
         return vagabond_data
 
-    def _encode_satchel_list(item_list: Dict[Items, int]) -> List[float]:
+    @classmethod
+    def _encode_satchel_list(cls, item_list: Dict[Items, int]) -> List[float]:
         return [
             1.0 if item_list[Items.BOOTS] >= 1 else 0.0,
             1.0 if item_list[Items.BOOTS] >= 2 else 0.0,
@@ -514,7 +544,8 @@ class ObservationSpace:
         # 3 Hammers
         # 3 Tea, 3 Coins, 2 Crossbows, 1 Torch
 
-    def _encode_vagabond_character(self, character: Characters) -> List[float]:
+    @classmethod
+    def _encode_vagabond_character(cls, character: Characters) -> List[float]:
         if isinstance(character, ThiefCharacter):
             return 0.0
         elif isinstance(character, TinkerCharacter):
@@ -522,10 +553,15 @@ class ObservationSpace:
         else:
             return 1.0
 
-    def encode_game_message(message_type: GameMessages):
+    @classmethod
+    def _encode_game_message(cls, message_type: GameMessages):
         return message_type.value / len(GameMessages)
 
-    def encode_action_list(action_list: List[Action]) -> List[float]:
+    @classmethod
+    def _encode_action_list(cls, action_list: List[Action]) -> List[float]:
+        if action_list is None:
+            return [0.0 for i in range(len(ActionIDs))]
+
         actions_id_list = [action.id for action in action_list]
         encoded_list = []
         for actionID in ActionIDs:

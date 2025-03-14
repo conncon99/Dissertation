@@ -1,0 +1,4 @@
+from controllers.random_controllers.marquise_random_controller import MarquiseRandomController
+from controllers.random_controllers.eyrie_random_controller import EyrieRandomController
+from controllers.random_controllers.alliance_random_controller import AllianceRandomController
+from controllers.random_controllers.vagabond_random_controller import VagabondRandomController

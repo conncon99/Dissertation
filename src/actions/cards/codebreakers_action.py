@@ -22,7 +22,7 @@ class CodebreakersAction(Action):
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id]
 
         chosen_player: Faction = executor.controller.send_game_message(
-            CodebreakersMessage(available_players)).chosen_player
+            CodebreakersMessage(game_state, self.action_group, available_players)).chosen_player
         # TODO: Make interact with Neural networks
         print(f" - {chosen_player}'s Hand: {chosen_player.hand}")
 

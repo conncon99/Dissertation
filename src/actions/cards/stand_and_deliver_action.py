@@ -23,7 +23,7 @@ class StandAndDeliverAction(Action):
         available_players = [
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id and len(faction.hand) > 0]
         chosen_player: Faction = executor.controller.send_game_message(
-            StandAndDeliverMessage(available_players)).chosen_player
+            StandAndDeliverMessage(game_state, self.action_group, available_players)).chosen_player
 
         # 2. Take a random card from that player
         card = random.choice(chosen_player.hand)

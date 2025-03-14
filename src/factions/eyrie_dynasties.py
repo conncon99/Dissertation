@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from cards.card import Card
     from cards.deck import Deck
     from actions.action_handler import Action
+    from utils.game_state import GameState
 
 
 class EyrieDynasties(Faction):
@@ -60,9 +61,10 @@ class EyrieDynasties(Faction):
     def __repr__(self):
         return "Eyrie Dynasties"
 
-    def setup_faction(self, map: Map, deck: Deck):
+    def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
         print(f"Setting up {self}")
         self.deck = deck
+        self.game_state = game_state
 
         # 1. Place 1 Roost and 6 warriors in a corner clearing that is not occupied by another player, and if possible, is diagonally opposite from a starting corner
 
@@ -75,7 +77,7 @@ class EyrieDynasties(Faction):
         start_clearing_options = preferred_corner_clearings if preferred_corner_clearings else free_corner_clearings
 
         start_clearing = self.controller.send_game_message(
-            RoostSetupMessage(start_clearing_options)).chosen_clearing
+            RoostSetupMessage(game_state, None, start_clearing_options)).chosen_clearing
 
         roost = Roost(start_clearing, self,
                       start_clearing.get_first_free_slot())
@@ -88,7 +90,7 @@ class EyrieDynasties(Faction):
         # 2. Choose leader
 
         self.eyrie_leader = self.controller.send_game_message(
-            LeaderSetupMessage(self.remaining_leaders)).chosen_leader
+            LeaderSetupMessage(game_state, None, self.remaining_leaders)).chosen_leader
         self.remaining_leaders.remove(self.eyrie_leader)
         print(
             f"- Selected {self.eyrie_leader.name} as leader of the Eyrie Dynasties")
@@ -130,7 +132,7 @@ class EyrieDynasties(Faction):
         self.add_card_to_decree(ROYAL_VIZIER_1, self.eyrie_leader.vizier_1)
         self.add_card_to_decree(ROYAL_VIZIER_2, self.eyrie_leader.vizier_2)
 
-    def trigger_turmoil(self):
+    def trigger_turmoil(self, action_group):
         # 1. Humiliate - Lose 1 VP per bird card on Decree
         # 2. Purge - Discard Decree
         victory_points_removed = 0
@@ -153,7 +155,7 @@ class EyrieDynasties(Faction):
             self.remaining_leaders = [leader for leader in EyrieLeaders]
 
         self.eyrie_leader: EyrieLeaders = self.controller.send_game_message(
-            TurmoilLeaderMessage(self.remaining_leaders)).chosen_leader
+            TurmoilLeaderMessage(self.game_state, action_group, self.remaining_leaders)).chosen_leader
         print(
             f" - Chose {self.eyrie_leader.name.capitalize()} as new eyrie leader")
         self.assign_leader_viziers()

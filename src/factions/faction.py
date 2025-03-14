@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from pieces.pawn import Pawn
     from controllers.base_controllers.controller import Controller
     from cards.deck import Deck
+    from utils.game_state import GameState
 
 
 @dataclass
@@ -29,6 +30,7 @@ class Faction(ABC):
     hand_limit: int = 5
     deck: Deck = None
     print_colour: str = ""
+    game_state: GameState = None
 
     dominance: Optional[Suits] = None
     has_won: bool = False
@@ -52,7 +54,7 @@ class Faction(ABC):
     def get_crafting_resources(self) -> Dict[Suits, int]: ...
 
     @abstractmethod
-    def setup_faction(self, map, deck) -> None: ...
+    def setup_faction(self, map, deck, game_state) -> None: ...
 
     @abstractmethod
     def get_bonus_card_draws(self) -> int: ...

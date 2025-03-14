@@ -24,7 +24,7 @@ class SlipAction(Action):
         available_moves.extend(executor.vagabond_pawn.space.adjacent_forests)
         from_space = executor.vagabond_pawn.space
         to_space = executor.controller.send_game_message(
-            SlipMessage(available_moves)).chosen_space
+            SlipMessage(game_state, self.action_group, available_moves)).chosen_space
         from_space.units[executor.faction_id].remove(executor.vagabond_pawn)
         to_space.units[executor.faction_id].append(executor.vagabond_pawn)
         executor.vagabond_pawn.space = to_space

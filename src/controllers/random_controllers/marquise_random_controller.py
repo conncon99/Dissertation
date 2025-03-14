@@ -59,8 +59,8 @@ class MarquiseRandomController(MarquiseController):
     def _handle_claim_dominance_suit(self, msg: ClaimDominanceSuitMessage) -> ClaimDominanceSuitResponse:
         return ClaimDominanceSuitResponse(random.choice(msg.available_dominance_cards))
 
-    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingResponse:
-        return BattleClearingResponse(random.choice(msg.available_clearings))
+    def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
+        return BattleClearingChoiceResponse(random.choice(msg.available_clearings))
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
         return BattleUseCardResponse(random.choice([True, False]))
@@ -139,3 +139,5 @@ class MarquiseRandomController(MarquiseController):
 
     def _handle_field_hospital_choice(self, msg: FieldHospitalMessage) -> FieldHospitalResponse:
         return FieldHospitalResponse(random.choice(msg.available_cards))
+
+    def train(self, reward): ...

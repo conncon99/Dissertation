@@ -21,7 +21,7 @@ class ExtendDecreeAction(Action):
         decree_types = [RECRUIT, MOVE, BATTLE, BUILD]
 
         extend_decree_response_1: ExtendDecreeResponse1 = executor.controller.send_game_message(
-            ExtendDecreeMessage1(executor.hand, decree_types))
+            ExtendDecreeMessage1(game_state, self.action_group, executor.hand, decree_types))
         card1 = extend_decree_response_1.chosen_card
         decree_type = extend_decree_response_1.chosen_action
 
@@ -36,7 +36,7 @@ class ExtendDecreeAction(Action):
             decree_types.append(None)
 
             extend_decree_response_2: ExtendDecreeResponse2 = executor.controller.send_game_message(
-                ExtendDecreeMessage2(valid_cards, decree_types))
+                ExtendDecreeMessage2(game_state, self.action_group, valid_cards, decree_types))
             card2 = extend_decree_response_2.chosen_card
             decree_type = extend_decree_response_2.chosen_action
 

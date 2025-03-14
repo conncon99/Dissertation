@@ -32,13 +32,13 @@ class AidAction(Action):
 
         # 2. Choose player to aid
         chosen_faction: Faction = executor.controller.send_game_message(
-            AidFactionChoiceMessage(available_players)).chosen_faction
+            AidFactionChoiceMessage(game_state, self.action_group, available_players)).chosen_faction
 
         # 3. Choose and exhaust item
         available_items = [
             item for item, amount in executor.satchel.available_items.items() for _ in range(amount)]
         exhaust_item_response: AidExhaustItemChoiceResponse = executor.controller.send_game_message(
-            AidExhaustItemChoiceMessage(available_items, executor.active_bag_count, executor.active_coin_count, executor.active_tea_count))
+            AidExhaustItemChoiceMessage(game_state, self.action_group, available_items, executor.active_bag_count, executor.active_coin_count, executor.active_tea_count))
 
         executor.satchel.exhaust_item(
             exhaust_item_response.chosen_item, exhaust_item_response.use_item_track)
@@ -51,7 +51,7 @@ class AidAction(Action):
         # 5. Choose card to give to aided player
 
         chosen_card: Card = executor.controller.send_game_message(
-            AidCardChoiceMessage(available_cards)).chosen_card
+            AidCardChoiceMessage(game_state, self.action_group, available_cards)).chosen_card
 
         chosen_faction.hand.append(chosen_card)
         executor.hand.remove(chosen_card)
@@ -66,7 +66,7 @@ class AidAction(Action):
             available_items.extend(chosen_faction.items)
 
         taken_item: Items = executor.controller.send_game_message(
-            AidTakeItemChoiceMessage(available_items)).chosen_item
+            AidTakeItemChoiceMessage(game_state, self.action_group, available_items)).chosen_item
 
         # 7. Take item and add it to available items in satchel
 
