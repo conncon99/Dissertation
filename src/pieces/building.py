@@ -27,7 +27,6 @@ class Building(Piece):
             attacker.add_vp(1)
             if attacker.faction_id == Factions.EYRIE_DYNASTY.value and attacker.eyrie_leader == EyrieLeaders.Despot:
                 attacker.gained_despot_bonus = True
-        assert isinstance(self.space, Clearing)
         self.space.slots[self.slot_idx] = None
         if attacker:
             print(f" - {attacker} destroyed {self}")
