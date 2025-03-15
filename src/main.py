@@ -27,23 +27,6 @@ RUN_COUNT = 10
 TURN_LIMIT = 100
 
 
-# env = RootMultiAgentEnv()
-
-# for i in range(RUN_COUNT):  # Play 50 full games before training
-#     original_print(f"Game {i}")
-#     env.reset()
-#     done = False
-#     rewards = []
-#     while not done:
-#         action = env.action_space.sample()  # Sample PPO action
-#         obs, reward, done, info = env.step(action)
-#         env.render()
-
-#     env.train_agents(reward)  # Train PPO in batches
-
-# env.controllers["marquise"].model.save("root_ppo_model")
-
-
 for i in range(RUN_COUNT):
     original_print(f"RUN {i}")
     marquise = Marquise(MarquiseRandomController())
