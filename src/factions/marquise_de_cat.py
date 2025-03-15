@@ -127,6 +127,8 @@ class Marquise(Faction):
             return 1
         return 0
 
+    def
+
     def use_field_hospital(self, clearing: Clearing, units_destroyed: int, action_group):
         field_hospital_cards = [
             card for card in self.hand if card.suit == Suits.BIRD or card.suit == clearing.get_suit()]

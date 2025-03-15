@@ -31,6 +31,7 @@ class Faction(ABC):
     deck: Deck = None
     print_colour: str = ""
     game_state: GameState = None
+    completed_setup: bool = False
 
     dominance: Optional[Suits] = None
     has_won: bool = False

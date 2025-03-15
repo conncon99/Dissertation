@@ -10,6 +10,7 @@ from cards.deck import Deck
 from utils.game_state import GameState
 from utils.colour_utils import set_print_colour, RESET, original_print
 from actions.cards.claim_dominance_action import ClaimDominanceAction
+import itertools
 
 
 class GameManager:
@@ -154,7 +155,8 @@ class StepGameManager:
             Factions.WOODLAND_ALLIANCE.value)
         self.game_state.vagabond = self._get_faction_by_id(
             Factions.VAGABOND.value)
-        self.turn_list =
+        self.turn_list = itertools.cycle(self.settings.randomize_turn_order())
+        self.game_state.current_player = next(self.turn_list)
 
     def create_map(self):
         self.map = ClassicMap(self.game_state)
@@ -174,9 +176,17 @@ class StepGameManager:
         return None
 
     def step(self):
-        # Iterate through factions
+        if self.game_state.current_player.completed_setup:
+            pass
+        else:
+            pass
+
         # Check if they have completed setup
-        # If not do setup steps
-        # If so do action for specified game step
+        # If not, do setup steps
+        # If so, do action for specified game step
         # ActionChoiceMessages count as their own steps
+
+        # If faction has finished in an action group move on to the next action group
+        # If faction has finished in a Callback Time move on to the next callback time
+        # If action has finished their turn move on to the next faction
         pass
