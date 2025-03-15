@@ -62,8 +62,8 @@ class GameManager:
 
     def run_game(self):
         """Runs the game until completion"""
+        turn_order = self.settings.randomize_turn_order()
         while not self.winner:
-            turn_order = self.settings.randomize_turn_order()
             self.turn_count += 1
             self.game_state.turn_count = self.turn_count
             print(f"TURN {self.turn_count}")
