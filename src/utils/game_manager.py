@@ -15,7 +15,6 @@ from actions.cards.claim_dominance_action import ClaimDominanceAction
 class GameManager:
 
     def __init__(self, settings: GameSettings, turn_limit: int) -> None:
-        self._initialized = True
         self.settings = settings
         self.winner = None
         self.done = False
@@ -29,7 +28,6 @@ class GameManager:
         self._initialize_game_state()
         self.create_map()
         self.setup_game()
-        # self.run_game()
 
     def _initialize_game_state(self):
         self.game_state.faction_list = self.settings.faction_list
@@ -62,8 +60,8 @@ class GameManager:
 
     def run_game(self):
         """Runs the game until completion"""
+        turn_order = self.settings.randomize_turn_order()
         while not self.winner:
-            turn_order = self.settings.randomize_turn_order()
             self.turn_count += 1
             self.game_state.turn_count = self.turn_count
             print(f"TURN {self.turn_count}")
@@ -126,3 +124,59 @@ class GameManager:
             if faction.faction_id == faction_id:
                 return faction
         return None
+
+
+class StepGameManager:
+    def __init__(self, settings: GameSettings, turn_limit: int):
+        self.settings = settings
+        self.winner = None
+        self.done = False
+        self.game_phase = GamePhase.BIRDSONG
+        self.game_state = GameState()
+        self.game_state.turn_limit = turn_limit
+        self.turn_count = -1
+        self.turn_limit = turn_limit
+        self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
+                                Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
+
+        self._initialize_game_state()
+        self.create_map()
+
+    def _initialize_game_state(self):
+        self.game_state.faction_list = self.settings.faction_list
+        self.game_state.turn_limit = self.turn_limit
+        self.game_state.craftable_items = self.craftable_items
+        self.game_state.marquise = self._get_faction_by_id(
+            Factions.MARQUISE_DE_CAT.value)
+        self.game_state.eyrie_dynasties = self._get_faction_by_id(
+            Factions.EYRIE_DYNASTY.value)
+        self.game_state.woodland_alliance = self._get_faction_by_id(
+            Factions.WOODLAND_ALLIANCE.value)
+        self.game_state.vagabond = self._get_faction_by_id(
+            Factions.VAGABOND.value)
+        self.turn_list =
+
+    def create_map(self):
+        self.map = ClassicMap(self.game_state)
+        self.game_state.board = self.map
+        self.deck = Deck(self.map)
+        self.game_state.deck = self.deck
+        for faction in self.game_state.faction_list:
+            self.game_state.current_player = faction
+            faction.setup_faction(self.map, self.deck, self.game_state)
+            for action_group in faction.actions[CallbackTimes.IN_DAYLIGHT]:
+                action_group.actions.append(ClaimDominanceAction())
+
+    def _get_faction_by_id(self, faction_id: int) -> Faction:
+        for faction in self.settings.faction_list:
+            if faction.faction_id == faction_id:
+                return faction
+        return None
+
+    def step(self):
+        # Iterate through factions
+        # Check if they have completed setup
+        # If not do setup steps
+        # If so do action for specified game step
+        # ActionChoiceMessages count as their own steps
+        pass

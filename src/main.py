@@ -35,5 +35,6 @@ for i in range(RUN_COUNT):
     vagabond = Vagabond(VagabondRandomController())
     settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
     game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
+    game_manager.run_game()
     clean_up(marquise, eyrie, woodland_alliance,
              vagabond, settings, game_manager)
