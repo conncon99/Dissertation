@@ -18,20 +18,25 @@ from actions.action_group_registry import ActionGroupRegistry
 
 builtins.print = colored_print
 
-### TRAINING SETTINGS ###
+### **GPU CHECK & SETUP** ###
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+original_print(f"Using device: {DEVICE}")
+
+### **TRAINING SETTINGS** ###
 GENERATIONS = 200
 POPULATION_SIZE = 100
 TURN_LIMIT = 100
 RUN_COUNT = 10
 MUTATION_PROB = 0.2
-NUM_WORKERS = max(1, cpu_count() - 2)  # Use max CPU cores - 2
-GAMES_PER_INDIVIDUAL = 3
+GAMES_PER_INDIVIDUAL = 4  # Run 4 games per individual for more stable fitness
+# Use max CPU cores - 1 for multiprocessing
+NUM_WORKERS = max(1, cpu_count() - 1)
 
-# original_print(f"Using {NUM_WORKERS} CPU cores for parallel processing")
+original_print(f"Using {NUM_WORKERS} CPU cores for parallel processing")
 
-# Initialize Neural Networks for factions
+# Initialize Neural Networks for factions and move them to GPU
 models = {
-    "marquise": FactionNet(),
+    "marquise": FactionNet().to(DEVICE),
 }
 
 # Initialize DEAP Evolutionary Algorithm
@@ -51,7 +56,7 @@ toolbox.register("mutate", tools.mutGaussian, mu=0,
                  sigma=0.1, indpb=MUTATION_PROB)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
-### Matplotlib Setup for Live Graphing ###
+### **Matplotlib Setup for Live Graphing** ###
 
 
 def setup_plot():
@@ -74,9 +79,11 @@ def update_plot(ax, gen_x, avg_fitness_y, best_fitness_y, worst_fitness_y, std_d
     ax.legend()
     plt.pause(0.1)
 
+### **GPU-Optimized Weight Handling** ###
+
 
 def set_weights(model, weights):
-    """Load a flattened weight vector into a PyTorch model."""
+    """Load a flattened weight vector into a PyTorch model on GPU."""
     param_shapes = [p.shape for p in model.parameters()]
     param_sizes = [p.numel() for p in model.parameters()]
 
@@ -88,19 +95,21 @@ def set_weights(model, weights):
 
     with torch.no_grad():
         for param, w in zip(model.parameters(), weight_tensors):
-            param.copy_(torch.tensor(
-                w.reshape(param.shape), dtype=torch.float32))
+            param.copy_(torch.tensor(w.reshape(param.shape),
+                        dtype=torch.float32, device=DEVICE))
 
 
 def get_weights(model):
     """Flatten and return model weights as a 1D NumPy array."""
-    return np.concatenate([p.data.numpy().flatten() for p in model.parameters()])
+    return np.concatenate([p.data.cpu().numpy().flatten() for p in model.parameters()])
+
+### **Optimized Fitness Function: Average Over Multiple Games on GPU** ###
 
 
 def evaluate_fitness(individual):
     """Runs multiple games with the same weights and returns the average fitness."""
     faction = "marquise"
-    set_weights(models[faction], individual)
+    set_weights(models[faction], individual)  # Move weights to GPU
 
     total_vp = 0  # Total victory points
 
@@ -133,7 +142,7 @@ def parallel_evaluate(population):
 if __name__ == "__main__":
     fig, ax = setup_plot()
 
-    ### TRAINING LOOP ###
+    ### **TRAINING LOOP** ###
     for faction in models.keys():
         toolbox.register("evaluate", evaluate_fitness)
 
@@ -164,16 +173,6 @@ if __name__ == "__main__":
             original_print(
                 f"Avg: {avg_fitness:.2f} | Best: {best_fitness:.2f} | Worst: {worst_fitness:.2f} | Std Dev: {std_dev:.2f}")
 
-            # Update graph data
-            gen_x.append(gen)
-            avg_fitness_y.append(avg_fitness)
-            best_fitness_y.append(best_fitness)
-            worst_fitness_y.append(worst_fitness)
-            std_dev_y.append(std_dev)
-
-            update_plot(ax, gen_x, avg_fitness_y, best_fitness_y,
-                        worst_fitness_y, std_dev_y)
-
             # Select and mutate new population
             selected = toolbox.select(population, len(population))
             offspring = list(map(toolbox.clone, selected))
@@ -197,18 +196,3 @@ if __name__ == "__main__":
     original_print("Training complete. Running test games...")
     plt.ioff()
     plt.show()
-
-    ### TEST THE TRAINED MODELS ###
-    for i in range(RUN_COUNT):
-        original_print(f"RUN {i}")
-
-        marquise = Marquise(MarquiseNNController(models["marquise"]))
-        eyrie = EyrieDynasties(EyrieRandomController())
-        woodland_alliance = WoodlandAlliance(AllianceRandomController())
-        vagabond = Vagabond(VagabondRandomController())
-
-        settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
-        game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
-        game_manager.run_game()
-
-        gc.collect()
