@@ -7,7 +7,8 @@ import gc
 import builtins
 from utils.colour_utils import colored_print, original_print
 from actions.action_group_registry import ActionGroupRegistry
-from stable_baselines3 import PPO
+from environments.ppo_trainer import PPOTrainer
+
 
 builtins.print = colored_print
 
@@ -23,34 +24,20 @@ def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manage
     gc.collect()
 
 
-RUN_COUNT = 10
+RUN_COUNT = 1
 TURN_LIMIT = 100
 
-
-# env = RootMultiAgentEnv()
-
-# for i in range(RUN_COUNT):  # Play 50 full games before training
-#     original_print(f"Game {i}")
-#     env.reset()
-#     done = False
-#     rewards = []
-#     while not done:
-#         action = env.action_space.sample()  # Sample PPO action
-#         obs, reward, done, info = env.step(action)
-#         env.render()
-
-#     env.train_agents(reward)  # Train PPO in batches
-
-# env.controllers["marquise"].model.save("root_ppo_model")
-
-
+ppo_trainer = PPOTrainer()
 for i in range(RUN_COUNT):
     original_print(f"RUN {i}")
-    marquise = Marquise(MarquiseRandomController())
+    marquise = Marquise(MarquiseNNController(ppo_trainer))
     eyrie = EyrieDynasties(EyrieRandomController())
     woodland_alliance = WoodlandAlliance(AllianceRandomController())
     vagabond = Vagabond(VagabondRandomController())
     settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
     game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
+    game_manager.run_game()
+    ppo_trainer.store_final_reward(1)
+    ppo_trainer.train_ppo()
     clean_up(marquise, eyrie, woodland_alliance,
              vagabond, settings, game_manager)

@@ -10,6 +10,7 @@ from cards.deck import Deck
 from utils.game_state import GameState
 from utils.colour_utils import set_print_colour, RESET, original_print
 from actions.cards.claim_dominance_action import ClaimDominanceAction
+import itertools
 
 
 class GameManager:
@@ -29,7 +30,6 @@ class GameManager:
         self._initialize_game_state()
         self.create_map()
         self.setup_game()
-        # self.run_game()
 
     def _initialize_game_state(self):
         self.game_state.faction_list = self.settings.faction_list
@@ -59,16 +59,16 @@ class GameManager:
         self.deck.shuffle()
         for faction in self.settings.faction_list:
             faction.hand.extend(self.deck.draw(3))
+        self.turn_order = self.settings.randomize_turn_order()
+        self.turn_order_cycle = itertools.cycle(self.turn_order)
 
     def run_game(self):
         """Runs the game until completion"""
         while not self.winner:
-            turn_order = self.settings.randomize_turn_order()
             self.turn_count += 1
             self.game_state.turn_count = self.turn_count
             print(f"TURN {self.turn_count}")
-            for faction in turn_order:
-                set_print_colour(RESET)
+            for faction in self.turn_order:
                 self.game_state.current_player = faction
                 set_print_colour(faction.print_colour)
                 for time in CallbackTimes:
@@ -84,6 +84,7 @@ class GameManager:
                     faction.used_spanning_actions.clear()
             if self.turn_count >= self.turn_limit:
                 self.done = True
+                set_print_colour(RESET)
                 original_print(
                     f"Turn count has reached {self.turn_limit}, cancelling game...")
                 return
@@ -126,3 +127,9 @@ class GameManager:
             if faction.faction_id == faction_id:
                 return faction
         return None
+
+    def run_game_step(self):
+        self.game_state.turn_count += 1
+        self.game_state.current_player = next(self.turn_order_cycle)
+        set_print_colour(self.game_state.current_player.print_colour)
+        print(self.game_state.current_player)
