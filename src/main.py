@@ -1,48 +1,46 @@
 import random
+import numpy as np
+import torch
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+from multiprocessing import Pool, cpu_count
+from deap import tools, creator, base
 from utils.game_settings import GameSettings
 from utils.game_manager import GameManager
 from factions import *
 from controllers.random_controllers import *
 from controllers.nn_controllers.marquise_nn_controller import MarquiseNNController
+from controllers.nn_controllers.faction_net import FactionNet
 import gc
 import builtins
 from utils.colour_utils import colored_print, original_print
 from actions.action_group_registry import ActionGroupRegistry
-from controllers.nn_controllers.faction_net import FactionNet
-from deap import tools, creator, base
-import numpy as np
-import torch
 
 builtins.print = colored_print
 
-
 ### TRAINING SETTINGS ###
-
 GENERATIONS = 200
 POPULATION_SIZE = 100
 TURN_LIMIT = 100
 RUN_COUNT = 10
 MUTATION_PROB = 0.2
+NUM_WORKERS = max(1, cpu_count() - 2)  # Use max CPU cores - 2
+GAMES_PER_INDIVIDUAL = 3
 
-# Create NNs for all factions
+# original_print(f"Using {NUM_WORKERS} CPU cores for parallel processing")
 
+# Initialize Neural Networks for factions
 models = {
     "marquise": FactionNet(),
-    # "eyrie": FactionNet(),
-    # "woodland_alliance": FactionNet(),
-    # "vagabond": FactionNet()
 }
 
-# Initialize DEAP EA
-
+# Initialize DEAP Evolutionary Algorithm
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
-# Get correct weight size for the neural network
 weight_size = sum(p.numel() for p in models["marquise"].parameters())
 
-# Fix population initialization
 toolbox.register("attr_float", lambda: np.random.uniform(-1, 1, weight_size))
 toolbox.register("individual", tools.initIterate,
                  creator.Individual, toolbox.attr_float)
@@ -52,6 +50,29 @@ toolbox.register("population", tools.initRepeat, list,
 toolbox.register("mutate", tools.mutGaussian, mu=0,
                  sigma=0.1, indpb=MUTATION_PROB)
 toolbox.register("select", tools.selTournament, tournsize=3)
+
+### Matplotlib Setup for Live Graphing ###
+
+
+def setup_plot():
+    plt.ion()
+    fig, ax = plt.subplots()
+    return fig, ax
+
+
+def update_plot(ax, gen_x, avg_fitness_y, best_fitness_y, worst_fitness_y, std_dev_y):
+    """Update the fitness graph during training."""
+    ax.clear()
+    ax.plot(gen_x, avg_fitness_y, label="Average Fitness", color="blue")
+    ax.plot(gen_x, best_fitness_y, label="Best Fitness", color="green")
+    ax.plot(gen_x, worst_fitness_y, label="Worst Fitness", color="red")
+    ax.fill_between(gen_x, np.array(avg_fitness_y) - np.array(std_dev_y),
+                    np.array(avg_fitness_y) + np.array(std_dev_y), color='blue', alpha=0.2)
+    ax.set_xlabel("Generation")
+    ax.set_ylabel("Fitness Score (Victory Points)")
+    ax.set_title("Evolutionary Training Progress")
+    ax.legend()
+    plt.pause(0.1)
 
 
 def set_weights(model, weights):
@@ -63,8 +84,7 @@ def set_weights(model, weights):
         raise ValueError(
             f"Weight size mismatch! Expected {sum(param_sizes)}, got {len(weights)}")
 
-    weight_tensors = np.split(weights, np.cumsum(param_sizes)[
-                              :-1])  # Split weights correctly
+    weight_tensors = np.split(weights, np.cumsum(param_sizes)[:-1])
 
     with torch.no_grad():
         for param, w in zip(model.parameters(), weight_tensors):
@@ -73,41 +93,18 @@ def set_weights(model, weights):
 
 
 def get_weights(model):
-    """Flatten and return model weights as a 1D vector."""
+    """Flatten and return model weights as a 1D NumPy array."""
     return np.concatenate([p.data.numpy().flatten() for p in model.parameters()])
 
 
 def evaluate_fitness(individual):
-    """Runs a game with the given weights and returns fitness score (Victory Points)."""
-    faction = "marquise"  # Use a global variable to keep track of the current faction being trained
+    """Runs multiple games with the same weights and returns the average fitness."""
+    faction = "marquise"
     set_weights(models[faction], individual)
 
-    # Run a new game instance for evaluation
-    marquise = Marquise(MarquiseNNController(models["marquise"]))
-    eyrie = EyrieDynasties(EyrieRandomController())
-    woodland_alliance = WoodlandAlliance(AllianceRandomController())
-    vagabond = Vagabond(VagabondRandomController())
+    total_vp = 0  # Total victory points
 
-    settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
-    game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
-
-    game_manager.run_game()
-
-    # Return VP as fitness score
-    return game_manager.game_state.marquise.victory_points,
-
-
-### TRAINING LOOP ###
-for faction in models.keys():
-    toolbox.register("evaluate", evaluate_fitness)
-
-    # Initialize population
-    population = toolbox.population()
-
-    for gen in range(GENERATIONS):
-        original_print(f"[{faction.upper()}] Generation {gen + 1}")
-
-        # Setup fresh game with NN-controlled factions
+    for _ in range(GAMES_PER_INDIVIDUAL):
         marquise = Marquise(MarquiseNNController(models["marquise"]))
         eyrie = EyrieDynasties(EyrieRandomController())
         woodland_alliance = WoodlandAlliance(AllianceRandomController())
@@ -116,54 +113,102 @@ for faction in models.keys():
         settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
         game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
 
-        # Evaluate all individuals
-        fitnesses = list(map(toolbox.evaluate, population)
-                         )  # Now map() works correctly
-        for ind, fit in zip(population, fitnesses):
-            ind.fitness.values = fit
+        game_manager.run_game()
 
-        # Select and mutate new population
-        selected = toolbox.select(population, len(population))
-        offspring = list(map(toolbox.clone, selected))
+        total_vp += game_manager.game_state.marquise.victory_points
 
-        for mutant in offspring:
-            if random.random() < MUTATION_PROB:
-                toolbox.mutate(mutant)
-                del mutant.fitness.values  # Reset fitness
-
-        # Replace old population with offspring
-        population[:] = offspring
-
-        # Print best fitness
-        best_ind = tools.selBest(population, 1)[0]
-        original_print(
-            f"[{faction.upper()}] Best fitness: {best_ind.fitness.values[0]}")
-
-    # Load best model weights
-    set_weights(models[faction], best_ind)
-
-original_print("Training complete. Running test games...")
+    # Average victory points over multiple games
+    avg_vp = total_vp / GAMES_PER_INDIVIDUAL
+    return avg_vp,
 
 
-# def clean_up(marquise, eyrie, woodland_alliance, vagabond, settings, game_manager):
-#     del marquise
-#     del eyrie
-#     del woodland_alliance
-#     del vagabond
-#     del settings
-#     del game_manager
-#     ActionGroupRegistry.reset()
-#     gc.collect()
+def parallel_evaluate(population):
+    """Evaluate individuals in parallel using multiprocessing."""
+    with Pool(processes=NUM_WORKERS) as pool:
+        results = list(tqdm(pool.imap(toolbox.evaluate, population),
+                       total=len(population), desc="Evaluating"))
+    return results
 
 
-# for i in range(RUN_COUNT):
-#     original_print(f"RUN {i}")
-#     marquise = Marquise(MarquiseRandomController())
-#     eyrie = EyrieDynasties(EyrieRandomController())
-#     woodland_alliance = WoodlandAlliance(AllianceRandomController())
-#     vagabond = Vagabond(VagabondRandomController())
-#     settings = GameSettings([vagabond, marquise, eyrie, woodland_alliance])
-#     game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
-#     game_manager.run_game()
-#     # clean_up(marquise, eyrie, woodland_alliance,
-#     #          vagabond, settings, game_manager)
+if __name__ == "__main__":
+    fig, ax = setup_plot()
+
+    ### TRAINING LOOP ###
+    for faction in models.keys():
+        toolbox.register("evaluate", evaluate_fitness)
+
+        # Initialize population
+        population = toolbox.population()
+
+        gen_x = []
+        avg_fitness_y = []
+        best_fitness_y = []
+        worst_fitness_y = []
+        std_dev_y = []
+
+        for gen in range(GENERATIONS):
+            original_print(f"[{faction.upper()}] Generation {gen + 1}")
+
+            # Evaluate all individuals in parallel
+            fitnesses = parallel_evaluate(population)
+            for ind, fit in zip(population, fitnesses):
+                ind.fitness.values = fit
+
+            # Collect statistics
+            fitness_scores = [ind.fitness.values[0] for ind in population]
+            avg_fitness = np.mean(fitness_scores)
+            best_fitness = np.max(fitness_scores)
+            worst_fitness = np.min(fitness_scores)
+            std_dev = np.std(fitness_scores)
+
+            original_print(
+                f"Avg: {avg_fitness:.2f} | Best: {best_fitness:.2f} | Worst: {worst_fitness:.2f} | Std Dev: {std_dev:.2f}")
+
+            # Update graph data
+            gen_x.append(gen)
+            avg_fitness_y.append(avg_fitness)
+            best_fitness_y.append(best_fitness)
+            worst_fitness_y.append(worst_fitness)
+            std_dev_y.append(std_dev)
+
+            update_plot(ax, gen_x, avg_fitness_y, best_fitness_y,
+                        worst_fitness_y, std_dev_y)
+
+            # Select and mutate new population
+            selected = toolbox.select(population, len(population))
+            offspring = list(map(toolbox.clone, selected))
+
+            for mutant in offspring:
+                if random.random() < MUTATION_PROB:
+                    toolbox.mutate(mutant)
+                    del mutant.fitness.values
+
+            # Replace old population with offspring
+            population[:] = offspring
+
+            # Print best fitness
+            best_ind = tools.selBest(population, 1)[0]
+            original_print(
+                f"[{faction.upper()}] Best fitness: {best_ind.fitness.values[0]}")
+
+        # Load best model weights
+        set_weights(models[faction], best_ind)
+
+    original_print("Training complete. Running test games...")
+    plt.ioff()
+    plt.show()
+
+    ### TEST THE TRAINED MODELS ###
+    for i in range(RUN_COUNT):
+        original_print(f"RUN {i}")
+
+        marquise = Marquise(MarquiseNNController(models["marquise"]))
+        eyrie = EyrieDynasties(EyrieRandomController())
+        woodland_alliance = WoodlandAlliance(AllianceRandomController())
+        vagabond = Vagabond(VagabondRandomController())
+
+        settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
+        game_manager = GameManager(settings, turn_limit=TURN_LIMIT)
+        game_manager.run_game()
+
+        gc.collect()
