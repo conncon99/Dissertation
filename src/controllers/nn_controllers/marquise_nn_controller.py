@@ -8,11 +8,14 @@ from controllers.messages.game_messages import GameMessage
 import numpy as np
 from utils.root_types import Suits
 from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from controllers.nn_controllers.faction_net import FactionNet
+import torch
 
 
 class MarquiseNNController(MarquiseController):
 
-    def __init__(self, model):
+    def __init__(self, model: FactionNet):
         self.model = model
 
     def model_predict(self, msg: GameMessage):
@@ -20,9 +23,11 @@ class MarquiseNNController(MarquiseController):
             msg.game_state, msg.type, msg.action_group)
 
         # Query PPO to get a 54-length vector in range [0,1]
-        action, _ = self.model.predict(observation)
-
-        return action
+        observation_tensor = torch.tensor(
+            observation, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
+        with torch.no_grad():
+            action_probs = self.model(observation_tensor).numpy().flatten()
+        return action_probs
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
         return BattleUseCardResponse(decode_binary_choice(self.model_predict(msg)))

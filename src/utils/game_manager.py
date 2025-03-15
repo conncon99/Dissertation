@@ -14,7 +14,7 @@ from actions.cards.claim_dominance_action import ClaimDominanceAction
 
 class GameManager:
 
-    def __init__(self, settings: GameSettings, turn_limit: int) -> None:
+    def __init__(self, settings: GameSettings, turn_limit: int, training_mode=False) -> None:
         self._initialized = True
         self.settings = settings
         self.winner = None
@@ -84,8 +84,8 @@ class GameManager:
                     faction.used_spanning_actions.clear()
             if self.turn_count >= self.turn_limit:
                 self.done = True
-                original_print(
-                    f"Turn count has reached {self.turn_limit}, cancelling game...")
+                # original_print(
+                #     f"Turn count has reached {self.turn_limit}, cancelling game...")
                 return
         set_print_colour(self.winner.print_colour)
         print(f"{self.winner} has won")
