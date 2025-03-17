@@ -160,7 +160,6 @@ class ObservationSpace:
             observation_space.append(0.0)
             observation_space.extend(
                 cls._encode_action_list(None))
-        print(np.array(observation_space).shape)
         return np.array(observation_space)
 
     @classmethod
@@ -414,7 +413,8 @@ class ObservationSpace:
         decree_output = []
         for suit in Suits:
             decree_output.append(sum(
-                1.0 for card in game_state.eyrie_dynasties.decree_cards[decree_type] if card.suit == suit) / 56.0)  # Normalized by 56 for 54 cards + 2 royal viziers
+                # Normalized by 56 for 54 cards + 2 royal viziers
+                1.0 for card in game_state.eyrie_dynasties.decree_cards[decree_type] if card.suit == suit) / 56.0)
         return decree_output
 
     @classmethod

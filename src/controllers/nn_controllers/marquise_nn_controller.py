@@ -23,10 +23,11 @@ class MarquiseNNController(MarquiseController):
             msg.game_state, msg.type, msg.action_group)
 
         # Query PPO to get a 54-length vector in range [0,1]
-        observation_tensor = torch.tensor(
-            observation, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
-        with torch.no_grad():
-            action_probs = self.model(observation_tensor).numpy().flatten()
+        observation_tensor = torch.tensor(observation, dtype=torch.float32)
+        # observation_tensor = observation_tensor.to(
+        #     self.model.fc1.weight.device)
+        action_probs = self.model(
+            observation_tensor).detach().cpu().numpy().flatten()
         return action_probs
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
