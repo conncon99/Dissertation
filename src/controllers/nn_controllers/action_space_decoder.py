@@ -1,14 +1,11 @@
 import numpy as np
 
 
+# TODO: Rework so that
+
 def decode_single_selection(output, options):
     index = np.argmax(output[:len(options)])
     return options[index]
-
-
-def two_step_selection(output):
-    # TODO: Useful for things like _handle_movement, where the from and two clearings are picked first and then the number of units - maybe should split those up
-    pass
 
 
 def decode_multiple_selection(output, options, k):
@@ -21,5 +18,6 @@ def decode_binary_choice(output):
 
 
 def decode_numerical_selection(output, min_val, max_val):
+    # TODO: maybe return highest one hot encoded values from min to max (e.g index 2 is the highest meaning 3 items (start from 0))
     scaled_value = min_val + (max_val - min_val) * output[0]
     return round(scaled_value)

@@ -24,7 +24,8 @@ class MarquiseNNController(MarquiseController):
 
         # Query PPO to get a 54-length vector in range [0,1]
         observation_tensor = torch.tensor(
-            observation, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
+            # Add batch dimension
+            observation, dtype=torch.float32).unsqueeze(0)
         with torch.no_grad():
             action_probs = self.model(observation_tensor).numpy().flatten()
         return action_probs
