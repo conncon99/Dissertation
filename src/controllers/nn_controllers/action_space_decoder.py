@@ -1,23 +1,21 @@
 import numpy as np
 
 
-# TODO: Rework so that
-
 def decode_single_selection(output, options):
-    index = np.argmax(output[:len(options)])
-    return options[index]
+    return options[np.argmax(output[:len(options)])]
 
 
 def decode_multiple_selection(output, options, k):
+    # TODO: Remove
     indices = np.argsort(output[:len(options)])[-k:]
     return [options[i] for i in indices]
 
 
 def decode_binary_choice(output):
-    return output[0] > 0.5
+    # True if index 0 is max, False if index 1 is max
+    return np.argmax(output[:2]) == 0
 
 
 def decode_numerical_selection(output, min_val, max_val):
-    # TODO: maybe return highest one hot encoded values from min to max (e.g index 2 is the highest meaning 3 items (start from 0))
-    scaled_value = min_val + (max_val - min_val) * output[0]
-    return round(scaled_value)
+    # One hot encoded - index 0 = 0, index 1 = 1, etc
+    return np.argmax(output[min_val:max_val + 1])

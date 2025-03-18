@@ -107,12 +107,12 @@ class Clearing(Space):
             if len(self.tokens[victim.faction_id]) > 0:
                 targets.extend(self.tokens[victim.faction_id])
 
-            chosen_targets = victim.controller.send_game_message(
-                PieceTargetingMessage(self.game_state, action_group, attacker, victim, min(
-                    remaining_dmg, len(targets)), targets))
-            for target in chosen_targets.targets:
-                target.destroy(attacker, action_group)
+            while remaining_dmg > 0 and len(targets) > 0:
+                chosen_target = victim.controller.send_game_message(PieceTargetingMessage(
+                    self.game_state, action_group, attacker, victim, targets)).target
+                chosen_target.destroy(attacker, action_group)
                 remaining_dmg -= 1
+                targets.remove(chosen_target)
 
         set_print_colour(attacker.print_colour)
         print(

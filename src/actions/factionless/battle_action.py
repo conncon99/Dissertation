@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
 
 
-class BattleModifier():
+class BattleData():
     def __init__(self, attacker: Faction, defender: Faction, clearing: Clearing):
         self.attacker_damage_modifier = 0
         self.defender_damage_modifier = 0
@@ -80,7 +80,7 @@ class BattleAction(Action):
         self.times_used += 1
 
     def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
-        battle_modifier = BattleModifier(attacker, defender, clearing)
+        battle_modifier = BattleData(attacker, defender, clearing)
 
         from cards.card import AmbushCard
 

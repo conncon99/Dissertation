@@ -172,11 +172,10 @@ class CodebreakersMessage(GameMessage):
 
 
 class PieceTargetingMessage(GameMessage):
-    def __init__(self, game_state, action_group, friendly_faction, enemy_faction, remaining_dmg, targets) -> None:
+    def __init__(self, game_state, action_group, friendly_faction, enemy_faction, targets) -> None:
         super().__init__(game_state, GameMessages.PIECE_TARGETING_MESSAGE, action_group)
         self.friendly_faction = friendly_faction
         self.enemy_faction = enemy_faction
-        self.remaining_dmg = remaining_dmg
         self.targets = targets
 
 
@@ -199,10 +198,9 @@ class CraftMessage(GameMessage):
 
 
 class DiscardChoiceMessage(GameMessage):
-    def __init__(self, game_state, action_group, discard_options, num_to_discard) -> None:
+    def __init__(self, game_state, action_group, discard_options) -> None:
         super().__init__(game_state, GameMessages.DISCARD_CHOICE_MESSAGE, action_group)
         self.discard_options = discard_options
-        self.num_to_discard = num_to_discard
 
 
 class ActionChoiceMessage(GameMessage):
@@ -267,10 +265,9 @@ class MarquiseBuildingMessage(GameMessage):
 
 
 class WoodRemovalMessage(GameMessage):
-    def __init__(self, game_state, action_group, wood_list, cost):
+    def __init__(self, game_state, action_group, wood_list):
         super().__init__(game_state, GameMessages.WOOD_REMOVAL_MESSAGE, action_group)
         self.wood_list = wood_list
-        self.cost = cost
 
 
 class MarquiseBuildingSetupMessage(GameMessage):

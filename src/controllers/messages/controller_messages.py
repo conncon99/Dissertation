@@ -1,5 +1,6 @@
+from __future__ import annotations
 from enum import Enum, auto
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pieces.piece import Piece
 
@@ -138,9 +139,9 @@ class CodebreakersResponse(ControllerMessage):
 
 
 class PieceTargetingResponse(ControllerMessage):
-    def __init__(self, targets: List['Piece']) -> None:
+    def __init__(self, target: Piece) -> None:
         super().__init__(ControllerMessages.PIECE_TARGETING_RESPONSE)
-        self.targets = targets
+        self.target = target
 
 
 class MoveResponse(ControllerMessage):
@@ -168,9 +169,9 @@ class StandAndDeliverResponse(ControllerMessage):
 
 
 class DiscardChoiceResponse(ControllerMessage):
-    def __init__(self, selected_cards):
+    def __init__(self, selected_card):
         super().__init__(ControllerMessages.DISCARD_CHOICE_RESPONSE)
-        self.selected_cards = selected_cards
+        self.selected_card = selected_card
 
 
 class ActionChoiceResponse(ControllerMessage):
@@ -228,9 +229,9 @@ class MarquiseBuildingResponse(ControllerMessage):
 
 
 class WoodRemovalResponse(ControllerMessage):
-    def __init__(self, chosen_wood_tokens):
+    def __init__(self, chosen_wood_token):
         super().__init__(ControllerMessages.WOOD_REMOVAL_RESPONSE)
-        self.chosen_wood_tokens = chosen_wood_tokens
+        self.chosen_wood_token = chosen_wood_token
 
 
 class MarquiseBuildingSetupResponse(ControllerMessage):

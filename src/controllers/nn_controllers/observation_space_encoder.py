@@ -129,6 +129,18 @@ class ObservationSpace:
         #### GameMessage ####
         observation_space.append(cls._encode_game_message(message_type))
 
+        #### Battles ####
+        # Is In Battle
+        # observation_space.append(1.0 if game_state.battle_data else 0.0)
+        # Attacker Faction ID
+        # observation_space.append()
+        # Defender Faction ID
+        # Battle Clearing
+        # Attacker remaining damage
+        # Defender remaining damage
+        # Has Attacker Ambushed
+        # Has Defender Ambushed
+
         #### Action Groups ####
         if action_group:
             # Action Group ID
@@ -160,7 +172,6 @@ class ObservationSpace:
             observation_space.append(0.0)
             observation_space.extend(
                 cls._encode_action_list(None))
-        print(np.array(observation_space).shape)
         return np.array(observation_space)
 
     @classmethod

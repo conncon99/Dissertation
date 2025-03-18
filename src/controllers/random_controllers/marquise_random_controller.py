@@ -26,7 +26,7 @@ class MarquiseRandomController(MarquiseController):
         return super()._handle_battle_end(msg)
 
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
-        return PieceTargetingResponse(random.sample(msg.targets, msg.remaining_dmg))
+        return PieceTargetingResponse(random.choice(msg.targets))
 
     def _handle_movement(self, msg: MoveMessage) -> MoveResponse:
         move_choice_idx = random.randint(0, len(msg.available_moves) - 1)
@@ -75,7 +75,7 @@ class MarquiseRandomController(MarquiseController):
         return BattleTargetResponse(random.choice(msg.battle_target_list))
 
     def _handle_discard_choice(self, msg: DiscardChoiceMessage) -> DiscardChoiceResponse:
-        return DiscardChoiceResponse(random.sample(msg.discard_options, msg.num_to_discard))
+        return DiscardChoiceResponse(random.choice(msg.discard_options))
 
     def _handle_triggerer_outrage_message(self, msg: TriggererOutrageMessage) -> TriggererOutrageResponse:
         return TriggererOutrageResponse(random.choice(msg.valid_cards))
@@ -119,7 +119,7 @@ class MarquiseRandomController(MarquiseController):
         return MarquiseBuildingResponse(clearing, building_type)
 
     def _handle_wood_removal_choice(self, msg: WoodRemovalMessage) -> WoodRemovalResponse:
-        return WoodRemovalResponse(random.sample(msg.wood_list, msg.cost))
+        return WoodRemovalResponse(random.choice(msg.wood_list))
 
     def _handle_marquise_building_setup_choice(self, msg: MarquiseBuildingSetupMessage) -> MarquiseBuildingSetupResponse:
         available_clearings: List[Clearing] = msg.available_clearings

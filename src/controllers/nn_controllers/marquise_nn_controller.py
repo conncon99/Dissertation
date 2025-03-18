@@ -9,13 +9,13 @@ import numpy as np
 from utils.root_types import Suits
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from controllers.nn_controllers.faction_net import FactionNet
+    from controllers.nn_controllers.faction_net import FactionNet, DQNAgent
 import torch
 
 
 class MarquiseNNController(MarquiseController):
 
-    def __init__(self, model: FactionNet):
+    def __init__(self, model: DQNAgent):
         self.model = model
 
     def model_predict(self, msg: GameMessage):
@@ -27,7 +27,8 @@ class MarquiseNNController(MarquiseController):
             # Add batch dimension
             observation, dtype=torch.float32).unsqueeze(0)
         with torch.no_grad():
-            action_probs = self.model(observation_tensor).numpy().flatten()
+            action_probs = self.model.act(
+                observation_tensor)
         return action_probs
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
@@ -55,7 +56,7 @@ class MarquiseNNController(MarquiseController):
         raise NotImplementedError
 
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
-        return PieceTargetingResponse(decode_multiple_selection(self.model_predict(msg), msg.targets, msg.remaining_dmg))
+        return PieceTargetingResponse(decode_single_selection(self.model_predict(msg), msg.targets))
 
     def _handle_better_burrow_bank(self, msg: BetterBurrowBankMessage) -> BetterBurrowBankResponse:
         return BetterBurrowBankResponse(decode_single_selection(self.model_predict(msg), msg.available_players))
@@ -88,7 +89,7 @@ class MarquiseNNController(MarquiseController):
         return BattleTargetResponse(decode_single_selection(self.model_predict(msg), msg.battle_target_list))
 
     def _handle_discard_choice(self, msg: DiscardChoiceMessage) -> DiscardChoiceResponse:
-        return DiscardChoiceResponse(decode_multiple_selection(self.model_predict(msg), msg.discard_options, msg.num_to_discard))
+        return DiscardChoiceResponse(decode_single_selection(self.model_predict(msg), msg.discard_options))
 
     def _handle_triggerer_outrage_message(self, msg: TriggererOutrageMessage) -> TriggererOutrageResponse:
         return TriggererOutrageResponse(decode_single_selection(self.model_predict(msg), msg.valid_cards))
@@ -143,7 +144,7 @@ class MarquiseNNController(MarquiseController):
         return MarquiseBuildingResponse(clearing, building_type)
 
     def _handle_wood_removal_choice(self, msg: WoodRemovalMessage) -> WoodRemovalResponse:
-        return WoodRemovalResponse(decode_multiple_selection(self.model_predict(msg), msg.wood_list, msg.cost))
+        return WoodRemovalResponse(decode_single_selection(self.model_predict(msg), msg.wood_list))
 
     def _handle_marquise_building_setup_choice(self, msg: MarquiseBuildingSetupMessage) -> MarquiseBuildingSetupResponse:
         available_clearings = msg.available_clearings

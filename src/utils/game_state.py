@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
     from cards.deck import Deck
     from utils.root_types import Items
+    from actions.factionless.battle_action import BattleData
 
 
 class GameState:
@@ -36,3 +37,4 @@ class GameState:
         self.eyrie_dynasties: EyrieDynasties = None
         self.woodland_alliance: WoodlandAlliance = None
         self.vagabond: Vagabond = None
+        self.battle_data: BattleData = None

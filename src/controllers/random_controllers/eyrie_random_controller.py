@@ -26,7 +26,7 @@ class EyrieRandomController(EyrieDynastiesController):
         return super()._handle_battle_end(msg)
 
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
-        return PieceTargetingResponse(random.sample(msg.targets, msg.remaining_dmg))
+        return PieceTargetingResponse(random.choice(msg.targets))
 
     def _handle_movement(self, msg: MoveMessage) -> MoveResponse:
         move_choice_idx = random.randint(0, len(msg.available_moves) - 1)
@@ -75,7 +75,7 @@ class EyrieRandomController(EyrieDynastiesController):
         return BattleTargetResponse(random.choice(msg.battle_target_list))
 
     def _handle_discard_choice(self, msg: DiscardChoiceMessage) -> DiscardChoiceResponse:
-        return DiscardChoiceResponse(random.sample(msg.discard_options, msg.num_to_discard))
+        return DiscardChoiceResponse(random.choice(msg.discard_options))
 
     def _handle_triggerer_outrage_message(self, msg: TriggererOutrageMessage) -> TriggererOutrageResponse:
         return TriggererOutrageResponse(random.choice(msg.valid_cards))

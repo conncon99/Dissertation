@@ -21,8 +21,5 @@ class Wood(Token):
         faction.wood.append(self)
 
     def destroy(self, attacker, action_group=None):
-        self.remove_wood()
-        return super().destroy(attacker)
-
-    def remove_wood(self):
         self.faction.wood.remove(self)
+        return super().destroy(attacker)

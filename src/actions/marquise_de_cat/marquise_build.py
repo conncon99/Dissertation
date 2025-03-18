@@ -86,9 +86,9 @@ class MarquiseBuild(Action):
             cost = self._get_workshop_cost(executor)
             executor.add_vp(executor.workshop_track[len(
                 executor.workshops)][1])
-        chosen_wood_tokens = executor.controller.send_game_message(
-            WoodRemovalMessage(game_state, self.action_group, executor.wood, cost)).chosen_wood_tokens
-        for wood in chosen_wood_tokens:
+        for _ in range(cost):
+            wood = executor.controller.send_game_message(
+                WoodRemovalMessage(game_state, self.action_group, executor.wood)).chosen_wood_token
             wood.destroy(None, self.action_group)
 
         # 5. Build the building
