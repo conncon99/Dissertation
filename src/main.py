@@ -27,7 +27,7 @@ marquise_net = DQNAgent()
 if __name__ == "__main__":
     for i in range(RUN_COUNT):
         original_print(f"RUN: {i}")
-        marquise = Marquise(MarquiseRandomController())
+        marquise = Marquise(MarquiseNNController(marquise_net))
         eyrie = EyrieDynasties(EyrieRandomController())
         woodland_alliance = WoodlandAlliance(AllianceRandomController())
         vagabond = Vagabond(VagabondRandomController())
