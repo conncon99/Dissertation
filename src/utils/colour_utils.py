@@ -1,7 +1,7 @@
 import builtins
 
 VERBOSE = False
-LOG = True
+LOG = False
 
 
 RESET = "\033[0m"
@@ -16,6 +16,7 @@ if LOG:
 
 
 def colored_print(*args, **kwargs):
+    global current_colour, log_file
     if VERBOSE:
         # Prepend the colour code to all arguments
         colored_args = [f"{current_colour}{arg}{RESET}" for arg in args]
@@ -30,3 +31,17 @@ def colored_print(*args, **kwargs):
 def set_print_colour(colour):
     global current_colour
     current_colour = colour
+
+
+def set_log(val):
+    global LOG, log_file
+    LOG = val
+    if LOG:
+        # Reset the log file
+        with open("print.log", "w") as f:
+            pass
+        log_file = open("print.log", "a")
+    else:
+        if log_file:
+            log_file.close()
+            log_file = None

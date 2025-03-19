@@ -566,7 +566,7 @@ class ObservationSpace:
 
     @classmethod
     def _encode_game_message(cls, message_type: GameMessages):
-        return message_type.value / len(GameMessages)
+        return message_type.value / len(GameMessages) if message_type else 0.0
 
     @classmethod
     def _encode_action_list(cls, action_list: List[Action]) -> List[float]:
