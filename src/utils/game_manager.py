@@ -10,6 +10,8 @@ from cards.deck import Deck
 from utils.game_state import GameState
 from utils.colour_utils import set_print_colour, RESET, original_print
 from actions.cards.claim_dominance_action import ClaimDominanceAction
+from controllers.nn_controllers.marquise_nn_controller import MarquiseNNController
+from controllers.nn_controllers.observation_space_encoder import ObservationSpace
 
 
 class GameManager:
@@ -81,13 +83,24 @@ class GameManager:
                             break
                         action_group.run_group(faction, self.game_state)
                         self._handle_wins(faction)
+                        if self.winner is not None:
+                            break
                     faction.used_spanning_actions.clear()
             if self.turn_count >= self.turn_limit:
                 self.done = True
-                # original_print(
-                #     f"Turn count has reached {self.turn_limit}, cancelling game...")
-                return
+                original_print(
+                    f"Turn count has reached {self.turn_limit}, cancelling game...")
+                if isinstance(self.game_state.marquise.controller, MarquiseNNController):
+                    controller = self.game_state.marquise.controller
+                    controller.model.remember(
+                        controller.prev_state, controller.prev_action, 0.0, ObservationSpace.encode_game_state(self.game_state, None, None), controller.prev_mask, True)
+                return 5
         set_print_colour(self.winner.print_colour)
+        if isinstance(self.game_state.marquise.controller, MarquiseNNController):
+            controller = self.game_state.marquise.controller
+            controller.model.remember(
+                controller.prev_state, controller.prev_action, 100 if self.winner == self.game_state.marquise else -10, ObservationSpace.encode_game_state(self.game_state, None, None), controller.prev_mask, True)
+        original_print(f"{self.winner} has won!")
         print(f"{self.winner} has won")
 
         for faction in self.settings.faction_list:
@@ -96,6 +109,7 @@ class GameManager:
                     print(
                         f"{faction} has won through a coalition with {self.winner}")
                     break
+        return self.winner.faction_id
 
     def get_game_phase(self) -> GamePhase:
         """Gets the current game phase"""

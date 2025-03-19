@@ -30,8 +30,6 @@ class OrganizeAction(Action):
         Sympathy(chosen_unit.space, executor)
         print(
             f" - Replaced warrior on clearing {chosen_unit.space.index} with a Sympathy token")
-        print(len(executor.units))
         chosen_unit.destroy(None, self.action_group)
-        print(len(executor.units))
 
         return super().perform(game_state, executor)

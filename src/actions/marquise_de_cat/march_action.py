@@ -8,6 +8,7 @@ from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
     from factions.marquise_de_cat import Marquise
+    from utils.game_state import GameState
 
 
 class MarchAction(MoveAction):
@@ -16,7 +17,7 @@ class MarchAction(MoveAction):
         super().__init__("March", None)
         self.id = ActionIDs.MARCH
 
-    def perform(self, game_state, executor: Marquise):
+    def perform(self, game_state: GameState, executor: Marquise):
         valid_moves = self.get_all_possible_moves(game_state, executor)
         march_response_1: March1Response = executor.controller.send_game_message(
             March1Message(game_state, self.action_group, valid_moves))
