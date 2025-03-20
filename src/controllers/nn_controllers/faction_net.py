@@ -15,11 +15,11 @@ from collections import deque
 class DQN(nn.Module):
     def __init__(self, state_size=663, action_size=54):
         super(DQN, self).__init__()
-        self.fc1 = nn.Linear(state_size, 1024)
-        self.fc2 = nn.Linear(1024, 1024)
-        self.fc3 = nn.Linear(1024, 2048)
-        self.fc4 = nn.Linear(2048, 1024)
-        self.fc5 = nn.Linear(1024, action_size)
+        self.fc1 = nn.Linear(state_size, 2048)
+        self.fc2 = nn.Linear(2048, 2048)
+        self.fc3 = nn.Linear(2048, 2048)
+        self.fc4 = nn.Linear(2048, 2048)
+        self.fc5 = nn.Linear(2048, action_size)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
