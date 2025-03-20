@@ -16,9 +16,9 @@ builtins.print = colored_print
 
 ### **TRAINING SETTINGS** ###
 TURN_LIMIT = 100
-RUN_COUNT = 10_000
+RUN_COUNT = 100_000
 SAVE_EVERY = 500  # Save every 500 runs
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 CHECKPOINT_FILE = "saved_models/marquise_nn.pth"
 
 # Create directory for saved models if it doesn't exist
