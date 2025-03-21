@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pieces.token import Token
+from pieces.piece_with_id import PieceWithID
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

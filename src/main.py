@@ -4,7 +4,10 @@ import numpy as np
 import torch
 from utils.game_settings import GameSettings
 from utils.game_manager import GameManager
-from factions import *
+from factions.marquise_de_cat import Marquise
+from factions.eyrie_dynasties import EyrieDynasties
+from factions.woodland_alliance import WoodlandAlliance
+from factions.vagabond.vagabond import Vagabond
 from controllers.random_controllers import *
 from controllers.nn_controllers.marquise_nn_controller import MarquiseNNController
 from controllers.nn_controllers.faction_net import DQNAgent
@@ -16,7 +19,7 @@ builtins.print = colored_print
 
 ### **TRAINING SETTINGS** ###
 TURN_LIMIT = 100
-RUN_COUNT = 100_000
+RUN_COUNT = 5
 SAVE_EVERY = 500  # Save every 500 runs
 BATCH_SIZE = 64
 CHECKPOINT_FILE = "saved_models/marquise_nn.pth"
@@ -25,9 +28,9 @@ CHECKPOINT_FILE = "saved_models/marquise_nn.pth"
 os.makedirs("saved_models", exist_ok=True)
 
 ### **Initialize Marquise NN (DQNAgent)** ###
-marquise_net = DQNAgent(663, 54)
+marquise_net = DQNAgent(747, 56)
 
-### **Load Checkpoint if Exists** ###
+# ### **Load Checkpoint if Exists** ###
 if os.path.exists(CHECKPOINT_FILE):
     marquise_net.model.load_state_dict(torch.load(CHECKPOINT_FILE))
     marquise_net.model.train()
@@ -44,6 +47,7 @@ if __name__ == "__main__":
 
         # Initialize factions
         marquise = Marquise(MarquiseNNController(marquise_net))
+        # marquise = Marquise(MarquiseRandomController())
         eyrie = EyrieDynasties(EyrieRandomController())
         woodland_alliance = WoodlandAlliance(AllianceRandomController())
         vagabond = Vagabond(VagabondRandomController())
@@ -57,9 +61,7 @@ if __name__ == "__main__":
         winners[winner] += 1
 
         # Train Marquise NN
-        for _ in range(math.ceil(len(marquise_net.memory) / (BATCH_SIZE * 2))):
-            marquise_net.replay(min(BATCH_SIZE, len(marquise_net.memory)))
-        marquise_net.memory.clear()
+        marquise_net.learn()
 
         # Save Model Every 500 Runs
         if (i + 1) % SAVE_EVERY == 0:
@@ -76,6 +78,7 @@ if __name__ == "__main__":
     ### **Final Test Run With Logging Enabled** ###
     set_log(True)
     marquise = Marquise(MarquiseNNController(marquise_net))
+    # marquise = Marquise(MarquiseRandomController())
     eyrie = EyrieDynasties(EyrieRandomController())
     woodland_alliance = WoodlandAlliance(AllianceRandomController())
     vagabond = Vagabond(VagabondRandomController())

@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pieces.token import Token
+from pieces.piece_with_id import PieceWithID
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -7,7 +8,7 @@ if TYPE_CHECKING:
     from board.clearing import Clearing
 
 
-class Sympathy(Token):
+class Sympathy(Token, PieceWithID):
     def __init__(self, clearing: Clearing, faction: WoodlandAlliance):
         super().__init__(clearing, faction, "Sympathy Token")
         faction.sympathy.append(self)

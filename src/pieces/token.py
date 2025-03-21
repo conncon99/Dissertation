@@ -3,16 +3,18 @@ from pieces.piece import Piece
 from typing import TYPE_CHECKING
 from utils.root_types import EyrieLeaders, Factions
 from factions.vagabond.relationship_track import HOSTILE
+from pieces.piece_with_id import PieceWithID
 
 if TYPE_CHECKING:
     from factions.faction import Faction
     from board.clearing import Clearing
 
 
-class Token(Piece):
+class Token(Piece, PieceWithID):
 
     def __init__(self, clearing: Clearing, faction: Faction, name: str) -> None:
         super().__init__(clearing, faction, name)
+        PieceWithID.__init__(self, name)
         clearing.tokens[faction.faction_id].append(self)
 
     def damage(self, amount: int, attacker: Faction, action_group=None):
@@ -20,7 +22,6 @@ class Token(Piece):
 
     def destroy(self, attacker: Faction, action_group=None):
         if attacker and not attacker.dominance:
-
             if attacker.faction_id == Factions.VAGABOND.value and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:
                 print(f" - {attacker} gained 1 VP due to Infamy")
                 attacker.add_vp(1)
@@ -31,3 +32,4 @@ class Token(Piece):
         self.space.tokens[self.faction.faction_id].remove(self)
         if attacker:
             print(f" - {attacker} destroyed {self}")
+        PieceWithID.destroy(self)

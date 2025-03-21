@@ -7,6 +7,7 @@ from utils.root_types import Factions, Suits, Items, EyrieLeaders, RECRUIT, MOVE
 from factions.vagabond.vagabond_characters import RangerCharacter, TinkerCharacter, ThiefCharacter, Characters
 from actions.action_group_registry import ActionGroupRegistry, ActionIDs
 from factions.vagabond.quests import *
+from pieces.piece_with_id import PieceWithID
 from cards.cards import *
 
 
@@ -331,9 +332,24 @@ class ObservationSpace:
             len(clearing.units[Factions.VAGABOND.value]),
 
             # MARQUISE
-            # Wood Count
-            sum(1 for wood in game_state.marquise.wood if wood.space ==
-                clearing) / game_state.marquise.max_wood,
+            # Wood one hot encoded
+            1.0 if PieceWithID.get_by_id("Wood Token", 0) and PieceWithID.get_by_id(
+                "Wood Token", 0).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 1) and PieceWithID.get_by_id(
+                "Wood Token", 1).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 2) and PieceWithID.get_by_id(
+                "Wood Token", 2).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 3) and PieceWithID.get_by_id(
+                "Wood Token", 3).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 4) and PieceWithID.get_by_id(
+                "Wood Token", 4).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 5) and PieceWithID.get_by_id(
+                "Wood Token", 5).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 6) and PieceWithID.get_by_id(
+                "Wood Token", 6).space == clearing else 0.0,
+            1.0 if PieceWithID.get_by_id("Wood Token", 7) and PieceWithID.get_by_id(
+                "Wood Token", 7).space == clearing else 0.0,
+
             # has Keep?
             1.0 if game_state.marquise.keep and game_state.marquise.keep.space == clearing else 0.0,
 
