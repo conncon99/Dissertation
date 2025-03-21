@@ -1,7 +1,5 @@
 from __future__ import annotations
 from actions.action_handler import Action
-from factions.faction import Faction
-from utils.game_state import GameState
 from typing import List, Tuple, TYPE_CHECKING
 from controllers.messages.game_messages import MoveMessage
 from utils.root_types import Factions, Items
@@ -11,6 +9,8 @@ from actions.action_group_registry import ActionIDs
 if TYPE_CHECKING:
     from board.clearing import Clearing
     from pieces.pawn import Pawn
+    from factions.faction import Faction
+    from utils.game_state import GameState
 
 
 class MoveAction(Action):

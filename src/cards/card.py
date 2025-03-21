@@ -3,17 +3,11 @@ from controllers.messages.game_messages import AmbushMessage
 from utils.root_types import Suits, Items, Factions, EyrieLeaders
 from typing import TYPE_CHECKING, Optional
 from utils.callback_handler import CallbackTimes, BattleCallbackTimes
-from actions.cards.dominance_action import DominanceAction
+from actions.cards import *
 from actions.factionless.battle_action import BattleAction, BattleData
 from actions.factionless.move_action import MoveAction
-from actions.cards.better_burrow_bank_action import BetterBurrowBankAction
 from controllers.messages.game_messages import BattleUseCardMessage
 from controllers.messages.controller_messages import AmbushResponse
-from actions.cards.stand_and_deliver_action import StandAndDeliverAction
-from actions.cards.tax_collector_action import TaxCollectorAction
-from actions.cards.codebreakers_action import CodebreakersAction
-from actions.cards.royal_claim_action import RoyalClaimAction
-from actions.vagabond.vagabond_move_action import VagabondMoveAction
 
 if TYPE_CHECKING:
     from factions.faction import Faction
@@ -141,6 +135,7 @@ class CobblerCard(Card):
 
     def activate(self, game_state, action_group):
         if self.owner.faction_id == Factions.VAGABOND.value:
+            from actions.vagabond.vagabond_move_action import VagabondMoveAction
             self.action = VagabondMoveAction(cobbler_move=True, max_uses=1)
         else:
             self.action = MoveAction(max_uses=1)

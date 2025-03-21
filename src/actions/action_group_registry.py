@@ -39,8 +39,8 @@ class ActionGroupRegistry:
         return len(cls._instance._id_registry)
 
 
-class ActionIDs(Enum):
-    # Cards
+class ActionIDs(Enum):  # 41
+    # Cards - 7
     BETTER_BURROW_BANK = auto()
     CLAIM_DOMINANCE = auto()
     CODEBREAKERS = auto()
@@ -49,7 +49,7 @@ class ActionIDs(Enum):
     STAND_AND_DELIVER = auto()
     TAX_COLLECTOR = auto()
 
-    # Eyrie Dynasties
+    # Eyrie Dynasties - 8
     DECREE_BATTLE = auto()
     DECREE_BUILD = auto()
     DECREE_MOVE = auto()
@@ -59,7 +59,7 @@ class ActionIDs(Enum):
     ROOSTLESS = auto()
     SCORE_VP = auto()
 
-    # Factionless
+    # Factionless - 6
     BATTLE = auto()
     CRAFT = auto()
     DRAW_AND_DISCARD = auto()
@@ -67,7 +67,7 @@ class ActionIDs(Enum):
     MOVE_UNITS = auto()
     PLAY_DOMINANCE = auto()
 
-    # Marquise
+    # Marquise - 6
     MARCH = auto()
     MARQUISE_BUILD = auto()
     OVERWORK = auto()
@@ -75,7 +75,7 @@ class ActionIDs(Enum):
     MARQUISE_RECRUIT = auto()
     SPEND_BIRD_CARD = auto()
 
-    # Vagabond
+    # Vagabond - 13
     AID = auto()
     EMPTY_SATCHEL = auto()
     EVENINGS_REST = auto()
@@ -90,7 +90,7 @@ class ActionIDs(Enum):
     VAGABOND_CRAFT = auto()
     VAGABOND_MOVE = auto()
 
-    # Woodland Alliance
+    # Woodland Alliance - 7
     ALLIANCE_RECRUIT = auto()
     MOBILIZE = auto()
     MODIFY_EVENING_ACTION = auto()

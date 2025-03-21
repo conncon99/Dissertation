@@ -7,9 +7,9 @@ from controllers.nn_controllers.action_space_decoder import *
 from controllers.messages.game_messages import GameMessage
 import numpy as np
 from utils.root_types import Suits
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
-    from controllers.nn_controllers.faction_net import FactionNet, DQNAgent
+    from controllers.nn_controllers.faction_net import DQNAgent
     from utils.game_state import GameState
 import torch
 import copy
@@ -23,8 +23,9 @@ class MarquiseNNController(MarquiseController):
         self.prev_action = None
         self.prev_mask = None
         self.prev_marquise = None
+        self.masks = Masker(self.model.action_size)
 
-    def model_predict(self, msg: GameMessage, mask: int):
+    def model_predict(self, msg: GameMessage, mask: List[bool]):
         observation = ObservationSpace.encode_game_state(
             msg.game_state, msg.type, msg.action_group)
 
@@ -53,39 +54,53 @@ class MarquiseNNController(MarquiseController):
         return -100
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
-        return BattleUseCardResponse(decode_binary_choice(self.model_predict(msg, 2)))
+        return BattleUseCardResponse(decode_binary_choice(self.model_predict(msg, self.masks.binary_mask())))
 
     def _handle_ambushes(self, msg: AmbushMessage) -> AmbushResponse:
-        return AmbushResponse(decode_single_selection(self.model_predict(msg, len(msg.available_ambush_cards)), msg.available_ambush_cards))
+        return AmbushResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.available_ambush_cards, allow_none=True))))
 
     def _handle_tax_collector(self, msg: TaxCollectorMessage) -> TaxCollectorResponse:
-        return TaxCollectorResponse(decode_single_selection(self.model_predict(msg, len(msg.available_units)), msg.available_units))
+        return TaxCollectorResponse(decode_warrior_output(self.model_predict(msg, self.masks.warrior_mask(msg.available_units))))
 
     def _handle_stand_and_deliver(self, msg: StandAndDeliverMessage) -> StandAndDeliverResponse:
-        return StandAndDeliverResponse(decode_single_selection(self.model_predict(msg, len(msg.available_players)), msg.available_players))
+        return StandAndDeliverResponse(decode_faction_output(self.model_predict(msg, self.masks.faction_mask(msg.available_players, msg.game_state)), msg.game_state))
 
     def _handle_claim_dominance_suit(self, msg: ClaimDominanceSuitMessage) -> ClaimDominanceSuitResponse:
-        return ClaimDominanceSuitResponse(decode_single_selection(self.model_predict(msg, len(msg.available_dominance_cards)), msg.available_dominance_cards))
+        return ClaimDominanceSuitResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.available_dominance_cards))))
 
     def _handle_claim_dominance_card(self, msg: ClaimDominanceCardMessage) -> ClaimDominanceCardResponse:
-        return ClaimDominanceCardResponse(decode_single_selection(self.model_predict(msg, len(msg.available_discard_cards)), msg.available_discard_cards))
+        return ClaimDominanceCardResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.available_discard_cards))))
 
     def _handle_codebreakers(self, msg: CodebreakersMessage) -> CodebreakersResponse:
-        return CodebreakersResponse(decode_single_selection(self.model_predict(msg, len(msg.available_players)), msg.available_players))
+        return CodebreakersResponse(decode_faction_output(self.model_predict(msg, self.masks.faction_mask(msg.available_players, msg.game_state)), msg.game_state))
 
     def _handle_battle_end(self, msg):
         raise NotImplementedError
 
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
-        return PieceTargetingResponse(decode_single_selection(self.model_predict(msg, len(msg.targets)), msg.targets))
+        return PieceTargetingResponse(decode_piece_output(self.model_predict(msg, self.masks.piece_mask(msg.targets)), msg.game_state))
 
     def _handle_better_burrow_bank(self, msg: BetterBurrowBankMessage) -> BetterBurrowBankResponse:
-        return BetterBurrowBankResponse(decode_single_selection(self.model_predict(msg, len(msg.available_players)), msg.available_players))
+        return BetterBurrowBankResponse(decode_faction_output(self.model_predict(msg, self.masks.faction_mask(msg.available_players, msg.game_state)), msg.game_state))
 
     def _handle_movement(self, msg: MoveMessage) -> MoveResponse:
-        move_choice_idx = decode_numerical_selection(
-            self.model_predict(msg, len(msg.available_moves)))
-        from_clearing, to_clearing, all_units = msg.available_moves[move_choice_idx]
+
+        from_clearings = [move[0] for move in msg.available_moves]
+
+        from_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
+
+        to_clearings = [move[1]
+                        for move in msg.available_moves if move[0] == from_clearing]
+
+        to_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)
+
+        for movement in msg.available_moves:
+            if movement[0] == from_clearing and movement[1] == to_clearing:
+                all_units = movement[2]
+                break
+
         if len(all_units) == 1:
             units = all_units
         else:
@@ -95,33 +110,45 @@ class MarquiseNNController(MarquiseController):
         return MoveResponse(from_clearing, to_clearing, units)
 
     def _handle_crafting(self, msg: CraftMessage) -> CraftResponse:
-        return CraftResponse(decode_single_selection(self.model_predict(msg, len(msg.crafting_options)), msg.crafting_options))
+        return CraftResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.crafting_options))))
 
     def _handle_dominance_choice(self, msg: ChooseDominanceMessage) -> ChooseDominanceResponse:
-        return ChooseDominanceResponse(decode_single_selection(self.model_predict(msg, len(msg.available_cards)), msg.available_cards))
+        return ChooseDominanceResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.available_cards))))
 
     def _handle_action_choice(self, msg: ActionChoiceMessage) -> ActionChoiceResponse:
-        return ActionChoiceResponse(decode_single_selection(self.model_predict(msg, len(msg.available_actions)), msg.available_actions))
+        return ActionChoiceResponse(decode_action_output(self.model_predict(msg, self.masks.action_mask(msg.available_actions)), self.model.action_size, msg.action_group))
 
     def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
-        return BattleClearingChoiceResponse(decode_single_selection(self.model_predict(msg, len(msg.available_clearings)), msg.available_clearings))
+        return BattleClearingChoiceResponse(decode_clearing_output(self.model_predict(msg, self.masks.clearing_mask(msg.available_clearings, msg.game_state)), msg.game_state))
 
     def _handle_battle_target_choice(self, msg: BattleTargetChoiceMessage) -> BattleTargetResponse:
-        return BattleTargetResponse(decode_single_selection(self.model_predict(msg, len(msg.battle_target_list)), msg.battle_target_list))
+        return BattleTargetResponse(decode_faction_output(self.model_predict(msg, self.masks.faction_mask(msg.battle_target_list, msg.game_state)), msg.game_state))
 
     def _handle_discard_choice(self, msg: DiscardChoiceMessage) -> DiscardChoiceResponse:
-        return DiscardChoiceResponse(decode_single_selection(self.model_predict(msg, len(msg.discard_options)), msg.discard_options))
+        return DiscardChoiceResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.discard_options))))
 
     def _handle_triggerer_outrage_message(self, msg: TriggererOutrageMessage) -> TriggererOutrageResponse:
-        return TriggererOutrageResponse(decode_single_selection(self.model_predict(msg, len(msg.valid_cards)), msg.valid_cards))
+        return TriggererOutrageResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.valid_cards))))
 
     def _handle_keep_clearing_choice(self, msg: KeepClearingMessage) -> KeepClearingResponse:
-        return KeepClearingResponse(decode_single_selection(self.model_predict(msg, len(msg.available_clearings)), msg.available_clearings))
+        return KeepClearingResponse(decode_clearing_output(self.model_predict(msg, self.masks.clearing_mask(msg.available_clearings, msg.game_state)), msg.game_state))
 
     def _handle_march_1_choice(self, msg: March1Message) -> March1Response:
-        move_choice_idx = decode_numerical_selection(
-            self.model_predict(msg, len(msg.available_moves)))
-        from_clearing, to_clearing, all_units = msg.available_moves[move_choice_idx]
+        from_clearings = [move[0] for move in msg.available_moves]
+
+        from_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
+
+        to_clearings = [move[1]
+                        for move in msg.available_moves if move[0] == from_clearing]
+
+        to_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)
+
+        for movement in msg.available_moves:
+            if movement[0] == from_clearing and movement[1] == to_clearing:
+                all_units = movement[2]
+                break
         if len(all_units) == 1:
             units = all_units
         else:
@@ -137,9 +164,23 @@ class MarquiseNNController(MarquiseController):
             print(" - Not performing second march movement")
             return March2Response(None, None, None)
         msg.type = GameMessages.MARCH_2_MESSAGE
-        move_choice_idx = decode_numerical_selection(
-            self.model_predict(msg, len(msg.available_moves)))
-        from_clearing, to_clearing, all_units = msg.available_moves[move_choice_idx]
+
+        from_clearings = [move[0] for move in msg.available_moves]
+
+        from_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
+
+        to_clearings = [move[1]
+                        for move in msg.available_moves if move[0] == from_clearing]
+
+        to_clearing = decode_clearing_output(self.model_predict(
+            msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)
+
+        for movement in msg.available_moves:
+            if movement[0] == from_clearing and movement[1] == to_clearing:
+                all_units = movement[2]
+                break
+
         if len(all_units) == 1:
             units = all_units
         else:
@@ -149,25 +190,26 @@ class MarquiseNNController(MarquiseController):
         return March2Response(from_clearing, to_clearing, units)
 
     def _handle_overwork_choice(self, msg: OverworkMessage) -> OverworkResponse:
-        chosen_clearing = decode_single_selection(
-            self.model_predict(msg, len(msg.available_clearings)), msg.available_clearings)
+        chosen_clearing = decode_clearing_output(
+            self.model_predict(msg, self.masks.clearing_mask(msg.available_clearings, msg.game_state)), msg.game_state)
         msg.type = GameMessages.OVERWORK_DISCARD_MESSAGE
         card_list = [card for card in msg.hand if card.suit ==
                      Suits.BIRD or card.suit == chosen_clearing.get_suit()]
-        chosen_discard = decode_single_selection(
-            self.model_predict(msg, len(card_list)), card_list)
+        chosen_discard = decode_card_output(
+            self.model_predict(msg, self.masks.card_mask(card_list)))
         return OverworkResponse(chosen_discard, chosen_clearing)
 
     def _handle_marquise_building_choice(self, msg: MarquiseBuildingMessage) -> MarquiseBuildingResponse:
-        clearing = decode_single_selection(
-            self.model_predict(msg, len(list(msg.clearing_building_options))), list(msg.clearing_building_options))
+        clearing = decode_clearing_output(
+            self.model_predict(msg, self.masks.clearing_mask(list(msg.clearing_building_options), msg.game_state)), msg.game_state)
         msg.type = GameMessages.MARQUISE_BUILDING_TYPE_MESSAGE
-        building_type = decode_single_selection(
-            self.model_predict(msg, len(msg.clearing_building_options[clearing])), msg.clearing_building_options[clearing])
+
+        building_type = decode_marquise_building_types(
+            self.model_predict(msg, self.masks.marquise_building_type_mask(msg.clearing_building_options[clearing])))
         return MarquiseBuildingResponse(clearing, building_type)
 
     def _handle_wood_removal_choice(self, msg: WoodRemovalMessage) -> WoodRemovalResponse:
-        return WoodRemovalResponse(decode_single_selection(self.model_predict(msg, len(msg.wood_list)), msg.wood_list))
+        return WoodRemovalResponse(decode_wood_output(self.model_predict(msg, self.masks.wood_mask(msg.wood_list)), msg.game_state))
 
     def _handle_marquise_building_setup_choice(self, msg: MarquiseBuildingSetupMessage) -> MarquiseBuildingSetupResponse:
         available_clearings = msg.available_clearings
@@ -177,8 +219,8 @@ class MarquiseNNController(MarquiseController):
         building_clearings = []  # Sawmill, Recruiter, Workshop
         for message in [GameMessages.MARQUISE_SETUP_SAWMILL_MESSAGE, GameMessages.MARQUISE_SETUP_RECRUITER_MESSAGE, GameMessages.MARQUISE_SETUP_WORKSHOP_MESSAGE]:
             msg.type = message
-            building_clearing = decode_single_selection(
-                self.model_predict(msg, len(available_clearings)), available_clearings)
+            building_clearing = decode_clearing_output(
+                self.model_predict(msg, self.masks.clearing_mask(msg.available_clearings, msg.game_state)), msg.game_state)
             clearings_to_slots[building_clearing] -= 1
             if clearings_to_slots[building_clearing] <= 0:
                 available_clearings.remove(building_clearing)
@@ -186,7 +228,7 @@ class MarquiseNNController(MarquiseController):
         return MarquiseBuildingSetupResponse(sawmill_clearing=building_clearings[0], recruiter_clearing=building_clearings[1], workshop_clearing=building_clearings[2])
 
     def _handle_marquise_spend_bird_card_choice(self, msg: MarquiseSpendBirdCardMessage) -> MarquiseSpendBirdCardResponse:
-        return MarquiseSpendBirdCardResponse(decode_single_selection(self.model_predict(msg, len(msg.bird_cards)), msg.bird_cards))
+        return MarquiseSpendBirdCardResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.bird_cards))))
 
     def _handle_field_hospital_choice(self, msg: FieldHospitalMessage) -> FieldHospitalResponse:
-        return FieldHospitalResponse(decode_single_selection(self.model_predict(msg, len(msg.available_cards)), msg.available_cards))
+        return FieldHospitalResponse(decode_card_output(self.model_predict(msg, self.masks.card_mask(msg.available_cards, allow_none=True))))

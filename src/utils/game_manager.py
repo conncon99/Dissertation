@@ -12,6 +12,8 @@ from utils.colour_utils import set_print_colour, RESET, original_print
 from actions.cards.claim_dominance_action import ClaimDominanceAction
 from controllers.nn_controllers.marquise_nn_controller import MarquiseNNController
 from controllers.nn_controllers.observation_space_encoder import ObservationSpace
+from actions.action_group_registry import ActionGroupRegistry
+from pieces.piece_with_id import PieceWithID
 
 
 class GameManager:
@@ -94,6 +96,7 @@ class GameManager:
                     controller = self.game_state.marquise.controller
                     controller.model.remember(
                         controller.prev_state, controller.prev_action, 0.0, ObservationSpace.encode_game_state(self.game_state, None, None), controller.prev_mask, True)
+                self.reset_ids()
                 return 5
         set_print_colour(self.winner.print_colour)
         if isinstance(self.game_state.marquise.controller, MarquiseNNController):
@@ -109,6 +112,7 @@ class GameManager:
                     print(
                         f"{faction} has won through a coalition with {self.winner}")
                     break
+        self.reset_ids()
         return self.winner.faction_id
 
     def get_game_phase(self) -> GamePhase:
@@ -140,3 +144,7 @@ class GameManager:
             if faction.faction_id == faction_id:
                 return faction
         return None
+
+    def reset_ids(self):
+        PieceWithID.reset_ids()
+        ActionGroupRegistry.reset()

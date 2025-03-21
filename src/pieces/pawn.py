@@ -3,16 +3,17 @@ from pieces.piece import Piece
 from typing import TYPE_CHECKING
 from utils.root_types import Factions
 from factions.vagabond.relationship_track import HOSTILE
+from pieces.piece_with_id import PieceWithID
 
 if TYPE_CHECKING:
     from factions.faction import Faction
     from board.space import Space
-    from factions.vagabond.vagabond import Vagabond
 
 
-class Pawn(Piece):
+class Pawn(Piece, PieceWithID):
     def __init__(self, space: Space, faction: Faction) -> None:
-        super().__init__(space, faction, f"{faction} pawn")
+        super().__init__(space, faction, f"{faction} Pawn")
+        PieceWithID.__init__(self, self.name)
         self.space.units[faction.faction_id].append(self)
         self.faction.units.append(self)
 
@@ -20,6 +21,7 @@ class Pawn(Piece):
         return super().damage(amount, attacker, action_group)
 
     def destroy(self, attacker: Faction, action_group=None):
+        PieceWithID.destroy(self)
         if attacker and attacker.faction_id == Factions.VAGABOND.value:
             if attacker.relationship_track.relationship_level[self.faction.faction_id] != HOSTILE:
                 attacker.relationship_track.relationship_level[self.faction.faction_id] = HOSTILE

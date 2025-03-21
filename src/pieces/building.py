@@ -3,16 +3,18 @@ from pieces.piece import Piece
 from typing import TYPE_CHECKING
 from utils.root_types import Factions, EyrieLeaders
 from factions.vagabond.relationship_track import HOSTILE
+from pieces.piece_with_id import PieceWithID
 
 if TYPE_CHECKING:
     from factions.faction import Faction
     from board.clearing import Clearing
 
 
-class Building(Piece):
+class Building(Piece, PieceWithID):
     def __init__(self, clearing: Clearing, faction: Faction, slot_idx: int, name: str) -> None:
         self.slot_idx = slot_idx
         super().__init__(clearing, faction, name)
+        PieceWithID.__init__(self, self.name)
         self.space.slots[slot_idx] = self
 
     def damage(self, amount: int, attacker: Faction, action_group=None):
@@ -30,3 +32,4 @@ class Building(Piece):
         self.space.slots[self.slot_idx] = None
         if attacker:
             print(f" - {attacker} destroyed {self}")
+        PieceWithID.destroy(self)
