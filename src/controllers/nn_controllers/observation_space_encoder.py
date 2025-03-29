@@ -8,6 +8,7 @@ from factions.vagabond.vagabond_characters import RangerCharacter, TinkerCharact
 from actions.action_group_registry import ActionGroupRegistry, ActionIDs
 from factions.vagabond.quests import *
 from pieces.piece_with_id import PieceWithID
+from pieces.piece_with_id import PieceWithID
 from cards.cards import *
 
 
@@ -325,7 +326,6 @@ class ObservationSpace:
 
             # MARQUISE
             # Wood one hot encoded
-<<<<<<< HEAD
             1.0 if PieceWithID.get_by_id("Wood Token", 0) and PieceWithID.get_by_id(
                 "Wood Token", 0).space == clearing else 0.0,
             1.0 if PieceWithID.get_by_id("Wood Token", 1) and PieceWithID.get_by_id(
@@ -342,10 +342,6 @@ class ObservationSpace:
                 "Wood Token", 6).space == clearing else 0.0,
             1.0 if PieceWithID.get_by_id("Wood Token", 7) and PieceWithID.get_by_id(
                 "Wood Token", 7).space == clearing else 0.0,
-=======
-            sum(1 for wood in game_state.marquise.wood if wood.space ==
-                clearing) / game_state.marquise.max_wood,
->>>>>>> b9bcef2b02f13d59210f72b51dc790f5c6a7854a
 
             # has Keep?
             1.0 if game_state.marquise.keep and game_state.marquise.keep.space == clearing else 0.0,
@@ -641,6 +637,7 @@ class ObservationSpace:
 
     @classmethod
     def _encode_game_message(cls, message_type: GameMessages):
+        return message_type.value / len(GameMessages) if message_type else 0.0
         return message_type.value / len(GameMessages) if message_type else 0.0
 
     @classmethod
