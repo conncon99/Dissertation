@@ -4,3 +4,4 @@ print.log
 tempCodeRunnerFile.py
 replacement_script.py
 .saved_models/
+*.pth
