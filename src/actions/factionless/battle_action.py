@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, List
 from utils.callback_handler import BattleCallbackTimes
 from utils.colour_utils import set_print_colour
 from actions.action_group_registry import ActionIDs
+from controllers.nn_controllers.battle_data import BattleData
 
 if TYPE_CHECKING:
     from utils.game_state import GameState
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
 
 
-class BattleData():
+class BattleModifiers():
     def __init__(self, attacker: Faction, defender: Faction, clearing: Clearing):
         self.attacker_damage_modifier = 0
         self.defender_damage_modifier = 0
@@ -80,15 +81,17 @@ class BattleAction(Action):
         self.times_used += 1
 
     def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
-        battle_modifier = BattleData(attacker, defender, clearing)
+        battle_modifier = BattleModifiers(attacker, defender, clearing)
 
         from cards.card import AmbushCard
 
         available_ambush_cards = [
             card for card in defender.hand if isinstance(card, AmbushCard) and (card.suit == clearing.get_suit() or card.suit == Suits.BIRD)]
-
+        ambush_response = None
         if available_ambush_cards != []:
             # If they have multiple ambush cards choose one, otherwise use the only one
+            game_state.battle_data = BattleData(
+                attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id)
             ambush_response: AmbushResponse = defender.controller.send_game_message(
                 AmbushMessage(game_state, self.action_group, defender, attacker, clearing, False, False, available_ambush_cards))
             if ambush_response.ambush_card is not None:
@@ -106,6 +109,8 @@ class BattleAction(Action):
 
             if available_allies != []:
                 available_allies.append(None)
+                game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id ==
+                                                    game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None)
                 chosen_ally = attacker.controller.send_game_message(
                     ChooseAllyMessage(game_state, self.action_group, available_allies)).chosen_ally
                 attacker.battle_ally = chosen_ally
@@ -134,15 +139,24 @@ class BattleAction(Action):
         else:
             attacker_dmg = min(max(roll1, roll2), friendly_warrior_count)
             defender_dmg = min(min(roll1, roll2), enemy_warrior_count)
+
+        game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id,
+                                            ambush_response and ambush_response.ambush_card is not None, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         if attacker.faction_id == Factions.EYRIE_DYNASTY.value and attacker.eyrie_leader == EyrieLeaders.Commander:
             attacker_dmg += 1
 
         for callback in defender.battle_callbacks[BattleCallbackTimes.IN_BATTLE_ATTACKER]:
             callback(game_state, self.action_group, battle_modifier)
+            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
+                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE_DEFENDER]:
             callback(game_state, self.action_group, battle_modifier)
+            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
+                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE]:
             callback(game_state, self.action_group, battle_modifier)
+            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
+                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
 
         attacker_dmg += battle_modifier.attacker_damage_modifier
         defender_dmg += battle_modifier.defender_damage_modifier
@@ -156,3 +170,4 @@ class BattleAction(Action):
         if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
             attacker.battle_ally = None
         set_print_colour(attacker.print_colour)
+        game_state.battle_data = None

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from factions.vagabond.vagabond import Vagabond
     from cards.deck import Deck
     from utils.root_types import Items
-    from actions.factionless.battle_action import BattleData
+    from controllers.nn_controllers.battle_data import BattleData
 
 
 class GameState:

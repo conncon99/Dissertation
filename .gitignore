@@ -3,3 +3,5 @@ print.log
 .vscode/
 tempCodeRunnerFile.py
 replacement_script.py
+.saved_models/
+*.pth

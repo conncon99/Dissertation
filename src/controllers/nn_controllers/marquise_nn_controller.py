@@ -7,7 +7,9 @@ from controllers.nn_controllers.action_space_decoder import *
 from controllers.messages.game_messages import GameMessage
 import numpy as np
 from utils.root_types import Suits
+from utils.colour_utils import original_print
 from typing import TYPE_CHECKING, List
+from controllers.nn_controllers.reward_helper import RewardHelper
 if TYPE_CHECKING:
     from controllers.nn_controllers.faction_net import DQNAgent
     from utils.game_state import GameState
@@ -24,6 +26,7 @@ class MarquiseNNController(MarquiseController):
         self.prev_mask = None
         self.prev_marquise = None
         self.masks = Masker(self.model.action_size)
+        self.reward_helper = RewardHelper()
 
     def model_predict(self, msg: GameMessage, mask: List[bool]):
         observation = ObservationSpace.encode_game_state(
@@ -38,20 +41,12 @@ class MarquiseNNController(MarquiseController):
                 observation_tensor, mask)
         if self.prev_state is not None:
             self.model.remember(self.prev_state, self.prev_action,
-                                self.calculate_reward(msg.game_state), observation, self.prev_mask, False)
+                                self.reward_helper.calculate_reward(msg.game_state), observation, False)
         self.prev_state = observation
         self.prev_action = action
         self.prev_mask = mask
         self.prev_marquise = copy.copy(msg.game_state.marquise)
         return action
-
-    def calculate_reward(self, state: GameState):
-        # Gets difference in vp and provides a penalty for taking a turn
-        TURN_PENALTY = 0.1
-        if state.marquise.dominance is None:
-            delta_points = state.marquise.victory_points - self.prev_marquise.victory_points
-            return delta_points - TURN_PENALTY
-        return -100
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
         return BattleUseCardResponse(decode_binary_choice(self.model_predict(msg, self.masks.binary_mask())))
