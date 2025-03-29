@@ -33,7 +33,6 @@ class GameManager:
         self._initialize_game_state()
         self.create_map()
         self.setup_game()
-        # self.run_game()
 
     def _initialize_game_state(self):
         self.game_state.faction_list = self.settings.faction_list
@@ -95,14 +94,14 @@ class GameManager:
                 if isinstance(self.game_state.marquise.controller, MarquiseNNController):
                     controller = self.game_state.marquise.controller
                     controller.model.remember(
-                        controller.prev_state, controller.prev_action, 0.0, ObservationSpace.encode_game_state(self.game_state, None, None), controller.prev_mask, True)
+                        controller.prev_state, controller.prev_action, -1, ObservationSpace.encode_game_state(self.game_state, None, None), True)
                 self.reset_ids()
                 return 5
         set_print_colour(self.winner.print_colour)
         if isinstance(self.game_state.marquise.controller, MarquiseNNController):
             controller = self.game_state.marquise.controller
             controller.model.remember(
-                controller.prev_state, controller.prev_action, 100 if self.winner == self.game_state.marquise else -10, ObservationSpace.encode_game_state(self.game_state, None, None), controller.prev_mask, True)
+                controller.prev_state, controller.prev_action, 10 if self.winner.faction_id == self.game_state.marquise.faction_id else -1, ObservationSpace.encode_game_state(self.game_state, None, None), True)
         original_print(f"{self.winner} has won!")
         print(f"{self.winner} has won")
 

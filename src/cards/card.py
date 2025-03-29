@@ -4,7 +4,7 @@ from utils.root_types import Suits, Items, Factions, EyrieLeaders
 from typing import TYPE_CHECKING, Optional
 from utils.callback_handler import CallbackTimes, BattleCallbackTimes
 from actions.cards import *
-from actions.factionless.battle_action import BattleAction, BattleData
+from actions.factionless.battle_action import BattleAction, BattleModifiers
 from actions.factionless.move_action import MoveAction
 from controllers.messages.game_messages import BattleUseCardMessage
 from controllers.messages.controller_messages import AmbushResponse
@@ -149,7 +149,7 @@ class SappersCard(Card):
         self.make_craftable(mouse_count=1)
         self.make_battle_modifier(BattleCallbackTimes.IN_BATTLE_DEFENDER)
 
-    def _callback(self, game_state, action_group, battle_modifier: BattleData):
+    def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
 
         use_card: bool = self.owner.controller.send_game_message(
             BattleUseCardMessage(game_state, action_group, self)).use_card
@@ -171,7 +171,7 @@ class BrutalTacticsCard(Card):
         self.make_craftable(mouse_count=1)
         self.make_battle_modifier(BattleCallbackTimes.IN_BATTLE_ATTACKER)
 
-    def _callback(self, game_state, action_group, battle_modifier: BattleData):
+    def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
 
         use_card: bool = self.owner.controller.send_game_message(
             BattleUseCardMessage(game_state, action_group, self)).use_card
@@ -190,7 +190,7 @@ class ArmorersCard(Card):
         self.make_craftable(fox_count=1)
         self.make_battle_modifier(BattleCallbackTimes.IN_BATTLE)
 
-    def _callback(self, game_state, action_group, battle_modifier: BattleData):
+    def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
 
         use_card: bool = self.owner.controller.send_game_message(
             BattleUseCardMessage(game_state, action_group, self)).use_card
@@ -215,7 +215,7 @@ class AmbushCard(Card):
         super().__init__(suit, name, False, description)
         self.make_battle_modifier(BattleCallbackTimes.BATTLE_START_DEFENDER)
 
-    def _callback(self, game_state, action_group, battle_modifer: BattleData) -> None:
+    def _callback(self, game_state, action_group, battle_modifer: BattleModifiers) -> None:
 
         from cards.cards import SCOUTING_PARTY, SCOUTING_PARTY_2
         if SCOUTING_PARTY in battle_modifer.attacker.active_cards or SCOUTING_PARTY_2 in battle_modifer.attacker.active_cards:

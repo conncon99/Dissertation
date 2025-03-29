@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from board.clearing import Clearing
     from board.forest import Forest
     from cards.card import Card
+    from controllers.nn_controllers.battle_data import BattleData
     # from pieces.factionless.buildings.ruin import Ruin
 
 
@@ -131,16 +132,7 @@ class ObservationSpace:
         observation_space.append(cls._encode_game_message(message_type))
 
         #### Battles ####
-        # Is In Battle
-        # observation_space.append(1.0 if game_state.battle_data else 0.0)
-        # Attacker Faction ID
-        # observation_space.append()
-        # Defender Faction ID
-        # Battle Clearing
-        # Attacker remaining damage
-        # Defender remaining damage
-        # Has Attacker Ambushed
-        # Has Defender Ambushed
+        observation_space.extend(cls._encode_battle(game_state))
 
         #### Action Groups ####
         if action_group:
@@ -333,22 +325,8 @@ class ObservationSpace:
 
             # MARQUISE
             # Wood one hot encoded
-            1.0 if PieceWithID.get_by_id("Wood Token", 0) and PieceWithID.get_by_id(
-                "Wood Token", 0).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 1) and PieceWithID.get_by_id(
-                "Wood Token", 1).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 2) and PieceWithID.get_by_id(
-                "Wood Token", 2).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 3) and PieceWithID.get_by_id(
-                "Wood Token", 3).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 4) and PieceWithID.get_by_id(
-                "Wood Token", 4).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 5) and PieceWithID.get_by_id(
-                "Wood Token", 5).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 6) and PieceWithID.get_by_id(
-                "Wood Token", 6).space == clearing else 0.0,
-            1.0 if PieceWithID.get_by_id("Wood Token", 7) and PieceWithID.get_by_id(
-                "Wood Token", 7).space == clearing else 0.0,
+            sum(1 for wood in game_state.marquise.wood if wood.space ==
+                clearing) / game_state.marquise.max_wood,
 
             # has Keep?
             1.0 if game_state.marquise.keep and game_state.marquise.keep.space == clearing else 0.0,
@@ -392,8 +370,13 @@ class ObservationSpace:
         ]
 
     @classmethod
+    def _encode_id_clearing(cls, piece_type: str, id: int, game_state: GameState) -> float:
+        piece = PieceWithID.get_by_id(piece_type, id)
+        return 0 if piece is None else (piece.space.index + 1) / len(game_state.board.clearings) + 1
+
+    @classmethod
     def _encode_marquise_data(cls, game_state: GameState) -> List[float]:
-        return [
+        marquise_data = [
             # number of sawmills
             len(game_state.marquise.sawmills) /
             game_state.marquise.max_sawmills,
@@ -406,8 +389,34 @@ class ObservationSpace:
             # number of wood tokens
             len(game_state.marquise.wood) / game_state.marquise.max_wood,
             # number of units
-            len(game_state.marquise.units) / game_state.marquise.max_warriors
-        ]
+            len(game_state.marquise.units) / game_state.marquise.max_warriors]
+
+        # 8 Wood Token Clearings
+        for i in range(game_state.marquise.max_wood):
+            marquise_data.append(cls._encode_id_clearing(
+                "Wood Token", i, game_state))
+
+        # 6 Sawmills
+        for i in range(game_state.marquise.max_sawmills):
+            marquise_data.append(
+                cls._encode_id_clearing("Sawmill", i, game_state))
+
+        # 6 Workshops
+        for i in range(game_state.marquise.max_workshops):
+            marquise_data.append(
+                cls._encode_id_clearing("Workshop", i, game_state))
+
+        # 6 Recruiters
+        for i in range(game_state.marquise.max_recruiters):
+            marquise_data.append(
+                cls._encode_id_clearing("Recruiter", i, game_state))
+
+        # 25 Warriors
+        for i in range(game_state.marquise.max_warriors):
+            marquise_data.append(cls._encode_id_clearing(
+                "Marquise de Cat Pawn", i, game_state))
+
+        return marquise_data
 
     @classmethod
     def _encode_eyrie_data(cls, game_state: GameState) -> List[float]:
@@ -434,6 +443,17 @@ class ObservationSpace:
         eyrie_data.extend(cls._encode_decree(game_state, MOVE))
         eyrie_data.extend(cls._encode_decree(game_state, BATTLE))
         eyrie_data.extend(cls._encode_decree(game_state, BUILD))
+
+        # 7 Roosts
+        for i in range(game_state.eyrie_dynasties.max_roosts):
+            eyrie_data.append(
+                cls._encode_id_clearing("Roost", i, game_state))
+
+        # 20 Warriors
+        for i in range(game_state.eyrie_dynasties.max_warriors):
+            eyrie_data.append(cls._encode_id_clearing(
+                "Eyrie Dynasties Pawn", i, game_state))
+
         return eyrie_data
 
     @classmethod
@@ -441,12 +461,13 @@ class ObservationSpace:
         decree_output = []
         for suit in Suits:
             decree_output.append(sum(
-                1.0 for card in game_state.eyrie_dynasties.decree_cards[decree_type] if card.suit == suit) / 56.0)  # Normalized by 56 for 54 cards + 2 royal viziers
+                # Normalized by 56 for 54 cards + 2 royal viziers
+                1.0 for card in game_state.eyrie_dynasties.decree_cards[decree_type] if card.suit == suit) / 56.0)
         return decree_output
 
     @classmethod
     def _encode_woodland_alliance_data(cls, game_state: GameState, faction_id: int) -> List[float]:
-        return [
+        alliance_data = [
             # Number of bases
             game_state.woodland_alliance.get_base_count() / 3.0,
             # Number of supporters
@@ -470,6 +491,25 @@ class ObservationSpace:
             0.0 if faction_id != Factions.WOODLAND_ALLIANCE.value else (sum(
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.BIRD) / 54.0),
         ]
+
+        # 10 Sympathy
+        for i in range(game_state.woodland_alliance.max_sympathy):
+            alliance_data.append(
+                cls._encode_id_clearing("Sympathy Token", i, game_state))
+
+        alliance_data.append(
+            cls._encode_id_clearing("Alliance Fox Base", i, game_state))
+        alliance_data.append(
+            cls._encode_id_clearing("Alliance Rabbit Base", i, game_state))
+        alliance_data.append(
+            cls._encode_id_clearing("Alliance Mouse Base", i, game_state))
+
+        # 10 Warriors
+        for i in range(game_state.woodland_alliance.max_warriors):
+            alliance_data.append(cls._encode_id_clearing(
+                "Woodland Alliance Pawn", i, game_state))
+
+        return alliance_data
 
     @classmethod
     def _encode_vagabond_data(cls, game_state: GameState) -> List[float]:
@@ -594,3 +634,23 @@ class ObservationSpace:
         for actionID in ActionIDs:
             encoded_list.append(1.0 if actionID in actions_id_list else 0.0)
         return encoded_list
+
+    @classmethod
+    def _encode_battle(cls, game_state: GameState):
+        if game_state.battle_data is None:
+            return [0.0] * 9
+        return [
+            game_state.battle_data.attacker.faction_id /
+            len(game_state.faction_list),
+            game_state.battle_data.defender.faction_id /
+            len(game_state.faction_list),
+            0.0 if game_state.battle_data.been_ambushed is None else (
+                1.0 if game_state.battle_data.been_ambushed else 0.5),
+            1.0 if game_state.battle_data.used_ambush else 0.5,
+            game_state.battle_data.attacker_roll / 3,
+            game_state.battle_data.defender_roll / 3,
+            (game_state.battle_data.battle_clearing.index + 1) /
+            (len(game_state.board.clearings) + 1),
+            game_state.battle_data.attacker_damage_modifier,
+            game_state.battle_data.defender_damage_modifier
+        ]
