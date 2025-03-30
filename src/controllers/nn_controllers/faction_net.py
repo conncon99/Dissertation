@@ -38,9 +38,9 @@ class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
-        self.icm = ICM(self.state_size, self.action_size).cuda()
-        self.icm_optimizer = optim.Adam(self.icm.parameters())
-        self.intrinsic_scale = 0.01
+        # self.icm = ICM(self.state_size, self.action_size).cuda()
+        # self.icm_optimizer = optim.Adam(self.icm.parameters())
+        # self.intrinsic_scale = 0.01
         self.mem_size = 100_000
         self.mem_cntr = 0
         self.gamma = 0.95  # Discount factor
@@ -72,35 +72,41 @@ class DQNAgent:
         plt.savefig("dqn_loss.png")
         plt.close()
 
-    def plot_icm_loss(self):
-        plt.figure(figsize=(10, 5))
-        plt.plot(icm_loss_history)
-        plt.xlabel("Episode")
-        plt.ylabel("ICM Loss")
-        plt.title("Intrinsic Curiosity Module Loss Over Time")
-        plt.savefig("icm_loss.png")
-        plt.close()
+    # def plot_icm_loss(self):
+    #     plt.figure(figsize=(10, 5))
+    #     plt.plot(icm_loss_history)
+    #     plt.xlabel("Episode")
+    #     plt.ylabel("ICM Loss")
+    #     plt.title("Intrinsic Curiosity Module Loss Over Time")
+    #     plt.savefig("icm_loss.png")
+    #     plt.close()
 
     def plot_total_reward(self):
+        # plt.figure(figsize=(10, 5))
+        # plt.plot(total_reward_history, label='Total Reward', color='blue')
+        # plt.plot(extrinsic_reward_history,
+        #          label='Extrinsic Reward', color='green')
+        # plt.plot(intrinsic_reward_history,
+        #          label='Intrinsic Reward', color='red')
+        # plt.xlabel("Episode")
+        # plt.ylabel("Reward")
+        # plt.title("Total, Extrinsic, and Intrinsic Rewards Over Time")
+        # plt.legend()
+        # plt.savefig("total_reward_combined.png")
+        # plt.close()
         plt.figure(figsize=(10, 5))
-        plt.plot(total_reward_history, label='Total Reward', color='blue')
-        plt.plot(extrinsic_reward_history,
-                 label='Extrinsic Reward', color='green')
-        plt.plot(intrinsic_reward_history,
-                 label='Intrinsic Reward', color='red')
         plt.xlabel("Episode")
         plt.ylabel("Reward")
-        plt.title("Total, Extrinsic, and Intrinsic Rewards Over Time")
-        plt.legend()
+        plt.plot(extrinsic_reward_history)
         plt.savefig("total_reward_combined.png")
         plt.close()
 
     def save_graphs(self):
         self.plot_dqn_loss()
-        self.plot_icm_loss()
+        # self.plot_icm_loss()
         self.plot_total_reward()
-        self.plot_icm_loss()
-        self.plot_total_reward()
+        # self.plot_icm_loss()
+        # self.plot_total_reward()
 
     def remember(self, state, action, reward, state_, done):
         index = self.mem_cntr % self.mem_size
@@ -155,20 +161,20 @@ class DQNAgent:
 
         # Compute Intrinsic Reward
 
-        intrinsic_rewards = self.intrinsic_reward(
-            state_batch, new_state_batch, action_batch).detach()
-        total_rewards = reward_batch + self.intrinsic_scale * intrinsic_rewards
-        total_rewards = total_rewards.detach()
+        # intrinsic_rewards = self.intrinsic_reward(
+        #     state_batch, new_state_batch, action_batch).detach()
+        # total_rewards = reward_batch + self.intrinsic_scale * intrinsic_rewards
+        # total_rewards = total_rewards.detach()
 
-        # ICM Loss Calculation
-        inverse_loss, forward_loss = self.icm.compute_loss(
-            state_batch, new_state_batch, action_batch)
-        icm_loss = inverse_loss + forward_loss
+        # # ICM Loss Calculation
+        # inverse_loss, forward_loss = self.icm.compute_loss(
+        #     state_batch, new_state_batch, action_batch)
+        # icm_loss = inverse_loss + forward_loss
 
-        # Update ICM Network
-        self.icm_optimizer.zero_grad()
-        icm_loss.backward()
-        self.icm_optimizer.step()
+        # # Update ICM Network
+        # self.icm_optimizer.zero_grad()
+        # icm_loss.backward()
+        # self.icm_optimizer.step()
 
         # Q-Learning Loss Calculation
 
@@ -179,8 +185,9 @@ class DQNAgent:
 
         with torch.no_grad():
             max_next_q_values = self.target_net(new_state_batch).max(1)[0]
-            q_target = total_rewards + self.gamma * \
-                max_next_q_values * (1 - terminal_batch.float())
+            q_target = reward_batch + self.gamma * \
+                max_next_q_values * \
+                (1 - terminal_batch.float())  # replace with total rewards if using icm
 
         loss = self.policy_net.loss(q_eval, q_target).to(self.device)
         loss.backward()
@@ -190,13 +197,14 @@ class DQNAgent:
             self.epsilon_decay if self.epsilon > self.epsilon_min else self.epsilon_min
 
         loss_history.append(loss.item())
-        icm_loss_history.append(icm_loss.item())
-        total_reward_history.append(total_rewards.sum().item())
+        # icm_loss_history.append(icm_loss.item())
+        # total_reward_history.append(total_rewards.sum().item())
         extrinsic_reward_history.append(reward_batch.detach().sum().item())
-        intrinsic_reward_history.append(
-            intrinsic_rewards.sum().item() * self.intrinsic_scale)
-        original_print(
-            f"DQN Loss: {loss.item()}, ICM Loss: {icm_loss.item()}")
+        # intrinsic_reward_history.append(
+        #     intrinsic_rewards.sum().item() * self.intrinsic_scale)
+        # original_print(
+        #     f"DQN Loss: {loss.item()}, ICM Loss: {icm_loss.item()}")
+        original_print(f"DQN Loss: {loss.item()}")
 
         if len(loss_history) % 100 == 0:
             self.save_graphs()

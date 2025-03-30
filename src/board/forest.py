@@ -10,3 +10,6 @@ class Forest(Space):
         super().__init__(index, settings)
         self.adjacent_clearings = adjacent_clearings
         self.adjacent_forests = adjacent_forests
+
+    def __repr__(self):
+        return f"Forest {self.index}"

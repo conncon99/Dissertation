@@ -40,12 +40,14 @@ class AllianceBase(Building):
         # If no bases are left, discard supporters down to 5
         if all(base is None for base in self.faction.bases.values()):
             print(f" - No bases remaining, discarding supporters down to 5")
-            if self.faction.supporters != []:
-                chosen_discards = self.faction.controller.send_game_message(AllianceNoBaseMessage(
-                    self.faction.game_state, action_group, self.faction.supporters, abs(5-len(self.faction.supporters)))).chosen_cards
+            num_to_discard = abs(5 - len(self.faction.supporters))
+            for i in range(num_to_discard):
+                if self.faction.supporters == []:
+                    break
+                chosen_discard = self.faction.controller.send_game_message(AllianceNoBaseMessage(
+                    self.faction.game_state, action_group, self.faction.supporters)).chosen_card
+                self.faction.discard_card(chosen_discard)
+                self.faction.supporters.remove(chosen_discard)
 
-                for card in chosen_discards:
-                    self.faction.discard_card(card)
-                    self.faction.supporters.remove(card)
         set_print_colour(attacker.print_colour)
         return super().destroy(attacker, action_group)

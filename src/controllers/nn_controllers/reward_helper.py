@@ -17,7 +17,7 @@ class RewardHelper:
         self.prev_warriors = 0
         self.prev_actives = 0
         self.prev_clearings_ruled = 0
-        self.turn_penalty = 0.01
+        self.turn_penalty = 0.1
 
     def calculate_reward(self, game_state: GameState):
         if game_state.marquise.dominance is None:
@@ -46,4 +46,4 @@ class RewardHelper:
         for clearing in game_state.board.clearings:
             if clearing.get_owner() == Factions.MARQUISE_DE_CAT.value and clearing.get_suit() == game_state.marquise.dominance:
                 total += 1
-        return total
+        return total / 2

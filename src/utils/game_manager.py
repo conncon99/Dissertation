@@ -38,6 +38,7 @@ class GameManager:
         self.game_state.faction_list = self.settings.faction_list
         self.game_state.turn_limit = self.turn_limit
         self.game_state.craftable_items = self.craftable_items
+        self.game_state.use_manual_rolling = self.settings.use_manual_rolling
         self.game_state.marquise = self._get_faction_by_id(
             Factions.MARQUISE_DE_CAT.value)
         self.game_state.eyrie_dynasties = self._get_faction_by_id(
@@ -50,7 +51,7 @@ class GameManager:
     def create_map(self):
         self.map = ClassicMap(self.game_state)
         self.game_state.board = self.map
-        self.deck = Deck(self.map)
+        self.deck = Deck(self.map, self.settings.use_manual_card_draw)
         self.game_state.deck = self.deck
         for faction in self.game_state.faction_list:
             self.game_state.current_player = faction

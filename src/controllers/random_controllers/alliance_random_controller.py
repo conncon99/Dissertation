@@ -83,8 +83,7 @@ class AllianceRandomController(AllianceController):
     # Woodland Alliance Controller
 
     def _handle_no_bases_message(self, msg: AllianceNoBaseMessage) -> AllianceNoBaseResponse:
-        random.shuffle(msg.supporters)
-        return AllianceNoBaseResponse(msg.supporters[:msg.num_to_discard])
+        return AllianceNoBaseResponse(random.choice(msg.supporters))
 
     def _handle_mobilize_message(self, msg: MobilizeMessage) -> MobilizeResponse:
         return MobilizeResponse(random.choice(msg.available_cards))
@@ -96,13 +95,13 @@ class AllianceRandomController(AllianceController):
         return RevoltClearingResponse(random.choice(msg.available_clearings))
 
     def _handle_revolt_discard_message(self, msg: RevoltDiscardMessage) -> RevoltDiscardResponse:
-        return RevoltDiscardResponse(random.sample(msg.valid_supporters, msg.num_to_discard))
+        return RevoltDiscardResponse(random.choice(msg.valid_supporters))
 
     def _handle_spread_sympathy_clearing_message(self, msg: SpreadSympathyClearingMessage) -> SpreadSympathyClearingResponse:
         return SpreadSympathyClearingResponse(random.choice(msg.available_clearings))
 
     def _handle_spread_sympathy_discard_message(self, msg: SpreadSympathyDiscardMessage) -> SpreadSympathyDiscardResponse:
-        return SpreadSympathyDiscardResponse(random.sample(msg.available_supporters, msg.num_to_discard))
+        return SpreadSympathyDiscardResponse(random.choice(msg.available_supporters))
 
     def _handle_alliance_recruit_message(self, msg: AllianceRecruitMessage) -> AllianceRecruitResponse:
         return AllianceRecruitResponse(random.choice(msg.available_clearings))

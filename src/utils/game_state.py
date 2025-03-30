@@ -38,3 +38,5 @@ class GameState:
         self.woodland_alliance: WoodlandAlliance = None
         self.vagabond: Vagabond = None
         self.battle_data: BattleData = None
+        self.use_manual_rolling = False
+        self.use_manual_card_draw = False

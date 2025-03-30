@@ -347,10 +347,9 @@ class TurmoilLeaderMessage(GameMessage):
 # region Woodland Alliance Messages
 
 class AllianceNoBaseMessage(GameMessage):
-    def __init__(self, game_state, action_group, supporters, num_to_discard):
+    def __init__(self, game_state, action_group, supporters):
         super().__init__(game_state, GameMessages.ALLIANCE_NO_BASE_MESSAGE, action_group)
         self.supporters = supporters
-        self.num_to_discard = num_to_discard
 
 
 class MobilizeMessage(GameMessage):
@@ -375,7 +374,6 @@ class RevoltDiscardMessage(GameMessage):
     def __init__(self, game_state, action_group, valid_supporters):
         super().__init__(game_state, GameMessages.REVOLT_DISCARD_MESSAGE, action_group)
         self.valid_supporters = valid_supporters
-        self.num_to_discard = 2
 
 
 class SpreadSympathyClearingMessage(GameMessage):
@@ -385,10 +383,9 @@ class SpreadSympathyClearingMessage(GameMessage):
 
 
 class SpreadSympathyDiscardMessage(GameMessage):
-    def __init__(self, game_state, action_group, available_supporters, num_to_discard):
+    def __init__(self, game_state, action_group, available_supporters):
         super().__init__(game_state, GameMessages.SPREAD_SYMPATHY_DISCARD_MESSAGE, action_group)
         self.available_supporters = available_supporters
-        self.num_to_discard = num_to_discard
 
 
 class AllianceRecruitMessage(GameMessage):

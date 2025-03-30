@@ -140,6 +140,10 @@ class BattleAction(Action):
             attacker_dmg = min(max(roll1, roll2), friendly_warrior_count)
             defender_dmg = min(min(roll1, roll2), enemy_warrior_count)
 
+        if game_state.use_manual_rolling:
+            attacker_dmg = int(input("Enter Attacker Damage: "))
+            defender_dmg = int(input("Enter Defender Damage: "))
+
         game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id,
                                             ambush_response and ambush_response.ambush_card is not None, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         if attacker.faction_id == Factions.EYRIE_DYNASTY.value and attacker.eyrie_leader == EyrieLeaders.Commander:

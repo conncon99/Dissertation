@@ -28,13 +28,16 @@ class Clearing(Space):
         self.tokens: Dict[int, List[Token]] = {
             faction.faction_id: [] for faction in self.game_state.faction_list}
 
+    def __repr__(self):
+        return f"Clearing {self.index}"
+
     def get_owner(self):
         """Gets the faction id with the largest number of pieces in a clearing"""
         piece_count = {
             faction.faction_id: 0 for faction in self.game_state.faction_list}
         # Counts warriors
         for faction_id in piece_count.keys():
-            piece_count[faction_id] += len([self.units[faction_id]])
+            piece_count[faction_id] += len(self.units[faction_id])
         # Counts Buildings
         for slot in self.slots:
             if slot and slot.faction:

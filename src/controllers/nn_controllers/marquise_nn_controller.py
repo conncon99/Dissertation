@@ -80,13 +80,13 @@ class MarquiseNNController(MarquiseController):
 
     def _handle_movement(self, msg: MoveMessage) -> MoveResponse:
 
-        from_clearings = [move[0] for move in msg.available_moves]
+        from_clearings = list(set([move[0] for move in msg.available_moves]))
 
         from_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
 
-        to_clearings = [move[1]
-                        for move in msg.available_moves if move[0] == from_clearing]
+        to_clearings = list(set([move[1]
+                                 for move in msg.available_moves if move[0] == from_clearing]))
 
         to_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)
@@ -129,13 +129,13 @@ class MarquiseNNController(MarquiseController):
         return KeepClearingResponse(decode_clearing_output(self.model_predict(msg, self.masks.clearing_mask(msg.available_clearings, msg.game_state)), msg.game_state))
 
     def _handle_march_1_choice(self, msg: March1Message) -> March1Response:
-        from_clearings = [move[0] for move in msg.available_moves]
+        from_clearings = list(set([move[0] for move in msg.available_moves]))
 
         from_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
 
-        to_clearings = [move[1]
-                        for move in msg.available_moves if move[0] == from_clearing]
+        to_clearings = list(set([move[1]
+                                 for move in msg.available_moves if move[0] == from_clearing]))
 
         to_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)
@@ -160,13 +160,13 @@ class MarquiseNNController(MarquiseController):
             return March2Response(None, None, None)
         msg.type = GameMessages.MARCH_2_MESSAGE
 
-        from_clearings = [move[0] for move in msg.available_moves]
+        from_clearings = list(set([move[0] for move in msg.available_moves]))
 
         from_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(from_clearings, msg.game_state)), msg.game_state)
 
-        to_clearings = [move[1]
-                        for move in msg.available_moves if move[0] == from_clearing]
+        to_clearings = list(set([move[1]
+                                 for move in msg.available_moves if move[0] == from_clearing]))
 
         to_clearing = decode_clearing_output(self.model_predict(
             msg, self.masks.clearing_mask(to_clearings, msg.game_state)), msg.game_state)

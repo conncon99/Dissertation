@@ -35,12 +35,12 @@ if TYPE_CHECKING:
 
 
 class Vagabond(Faction):
-    def __init__(self, controller):
+    def __init__(self, controller, use_manual_card_draw=False):
         super().__init__(faction_id=4, reach_value=5, max_warriors=0,
                          controller=controller, print_colour="\033[38;5;250m")
 
         self.satchel = Satchel(self)
-        self.quest_deck = QuestDeck()
+        self.quest_deck = QuestDeck(use_manual_card_draw)
         self.quest_cards: List[QuestCard] = []
         self.character: VagabondCharacter = None
         self.relationship_track = RelationshipTrack(self)

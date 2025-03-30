@@ -313,9 +313,9 @@ class TurmoilLeaderResponse(ControllerMessage):
 
 
 class AllianceNoBaseResponse(ControllerMessage):
-    def __init__(self, chosen_cards):
+    def __init__(self, chosen_card):
         super().__init__(ControllerMessages.ALLIANCE_NO_BASE_RESPONSE)
-        self.chosen_cards = chosen_cards
+        self.chosen_card = chosen_card
 
 
 class MobilizeResponse(ControllerMessage):
@@ -337,9 +337,9 @@ class RevoltClearingResponse(ControllerMessage):
 
 
 class RevoltDiscardResponse(ControllerMessage):
-    def __init__(self, chosen_discards):
+    def __init__(self, chosen_discard):
         super().__init__(ControllerMessages.REVOLT_DISCARD_RESPONSE)
-        self.chosen_discards = chosen_discards
+        self.chosen_discard = chosen_discard
 
 
 class SpreadSympathyClearingResponse(ControllerMessage):
@@ -349,9 +349,9 @@ class SpreadSympathyClearingResponse(ControllerMessage):
 
 
 class SpreadSympathyDiscardResponse(ControllerMessage):
-    def __init__(self, chosen_discards):
+    def __init__(self, chosen_discard):
         super().__init__(ControllerMessages.SPREAD_SYMPATHY_DISCARD_RESPONSE)
-        self.chosen_discards = chosen_discards
+        self.chosen_discard = chosen_discard
 
 
 class AllianceRecruitResponse(ControllerMessage):

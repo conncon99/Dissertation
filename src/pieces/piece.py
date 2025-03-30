@@ -6,7 +6,12 @@ if TYPE_CHECKING:
     from board.space import Space
 
 
-class Piece(ABC):
+class PieceMeta(type):
+    def __repr__(cls):
+        return f"{cls.__name__}"
+
+
+class Piece(metaclass=PieceMeta):
 
     def __init__(self, space: 'Space', faction: 'Faction', name: str) -> None:
         self.space = space

@@ -17,6 +17,9 @@ class Pawn(Piece, PieceWithID):
         self.space.units[faction.faction_id].append(self)
         self.faction.units.append(self)
 
+    def __repr__(self):
+        return f"{self.faction} Pawn {self.id}"
+
     def damage(self, amount: int, attacker: Faction, action_group=None):
         return super().damage(amount, attacker, action_group)
 

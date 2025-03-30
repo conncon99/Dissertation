@@ -34,6 +34,9 @@ class Action(ABC):
         self.id = -1
         self.action_group: ActionGroup = None
 
+    def __repr__(self):
+        return self.name
+
     @abstractmethod
     def can_perform(self, executor: Faction, game_state: Optional[GameState] = None) -> bool:
         if self.group_spanning and self in executor.used_spanning_actions.keys():

@@ -59,14 +59,12 @@ class RevoltAction(Action):
 
         print(f" - Revolted on clearing {clearing.index}")
 
-        valid_supporters = self.get_valid_supporters(executor, clearing)
-
-        chosen_discards: List[Card] = executor.controller.send_game_message(RevoltDiscardMessage(game_state, self.action_group, valid_supporters)
-                                                                            ).chosen_discards
-
-        for card in chosen_discards:
-            executor.discard_card(card)
-            executor.supporters.remove(card)
+        for i in range(2):
+            valid_supporters = self.get_valid_supporters(executor, clearing)
+            chosen_discard = executor.controller.send_game_message(RevoltDiscardMessage(
+                game_state, self.action_group, valid_supporters)).chosen_discard
+            executor.discard_card(chosen_discard)
+            executor.supporters.remove(chosen_discard)
 
             # 2. Remove all enemy pieces there
         for faction in game_state.faction_list:

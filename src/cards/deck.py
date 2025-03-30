@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 
 class Deck:
 
-    def __init__(self, map: Map) -> None:
+    def __init__(self, map: Map, use_manual_card_draw=False) -> None:
+        self.use_manual_card_draw = use_manual_card_draw
         self.deck = [
             # Item Cards
             SWORD_MOUSE,
@@ -93,7 +94,17 @@ class Deck:
             elif not self.deck and not self.discard:
                 print(f" - Deck and Discard are empty, no card drawn")
                 return drawn_cards
-            drawn_cards.append(self.deck.pop(0))
+            if self.use_manual_card_draw:
+                print("Choose remaining card from deck:")
+                self.deck_mapping = {i: card for i,
+                                     card in enumerate(self.deck)}
+                print(self.deck_mapping)
+                str_index = input("Enter the card you want: ")
+                while not str_index.isnumeric() or str_index.isnumeric() and (int(str_index) < 0 or int(str_index) >= len(self.deck)):
+                    str_index = input("Enter the card you want: ")
+                drawn_cards.append(self.deck.pop(int(str_index)))
+            else:
+                drawn_cards.append(self.deck.pop(0))
         return drawn_cards
 
     def replenish_deck(self):

@@ -42,7 +42,8 @@ REPAIR_A_SHED = QuestCard("Repair a Shed", Suits.FOX,
 
 
 class QuestDeck():
-    def __init__(self):
+    def __init__(self, use_manual_card_draw):
+        self.use_manual_card_draw = use_manual_card_draw
         self.quests = [RABBIT_ERRAND, FOX_ERRAND, MOUSE_ESCORT, RABBIT_EXPEL_BANDITS,
                        MOUSE_EXPEL_BANDITS, RABBIT_FEND_BEAR, MOUSE_FEND_BEAR, FUNDRAISING, RABBIT_SPEECH, FOX_SPEECH, MOUSE_GUARD_DUTY, RABBIT_GUARD_DUTY, FOX_LOGISTICS_HELP, MOUSE_LOGISTICS_HELP, REPAIR_A_SHED]
         shuffle(self.quests)
@@ -50,5 +51,15 @@ class QuestDeck():
     def draw(self, amount: int):
         drawn_cards = []
         while len(drawn_cards) < amount and len(self.quests) > 0:
-            drawn_cards.append(self.quests.pop(0))
+            if self.use_manual_card_draw:
+                print("Choose remaining quest from deck:")
+                self.deck_mapping = {i: card for i,
+                                     card in enumerate(self.quests)}
+                print(self.deck_mapping)
+                str_index = input("Enter the quest you want: ")
+                while not str_index.isnumeric() or str_index.isnumeric() and (int(str_index) < 0 or int(str_index) >= len(self.quests)):
+                    str_index = input("Enter the quest you want: ")
+                drawn_cards.append(self.quests.pop(int(str_index)))
+            else:
+                drawn_cards.append(self.quests.pop(0))
         return drawn_cards

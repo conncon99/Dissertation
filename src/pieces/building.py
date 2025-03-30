@@ -17,6 +17,9 @@ class Building(Piece, PieceWithID):
         PieceWithID.__init__(self, self.name)
         self.space.slots[slot_idx] = self
 
+    def __repr__(self):
+        return f"{self.name} {self.id}"
+
     def damage(self, amount: int, attacker: Faction, action_group=None):
         return super().damage(amount, attacker, action_group)
 
