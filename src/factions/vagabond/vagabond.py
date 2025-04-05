@@ -84,13 +84,13 @@ class Vagabond(Faction):
         self.game_state = game_state
 
         # 1. Choose Character
-        self.character: VagabondCharacter = self.controller.send_game_message(
-            ChooseCharacterMessage(game_state, None, [character for character in Characters])).chosen_character.value
+        response = yield ChooseCharacterMessage(game_state, None, [character for character in Characters])
+        self.character: VagabondCharacter = response.chosen_character.value
         print(f" - Chosen {self.character} as Character")
 
         # 2. Place Pawn in forest
-        VagabondPawn(self.controller.send_game_message(
-            VagabondPlacementMessage(game_state, None, map.forests)).chosen_forest, self)
+        response = yield VagabondPlacementMessage(game_state, None, map.forests)
+        VagabondPawn(response.chosen_forest, self)
 
         print(
             f" - Placed Vagabond Pawn in Forest {self.vagabond_pawn.space.index}")
@@ -105,7 +105,6 @@ class Vagabond(Faction):
         print(f" - Starting Items: {self.character.starting_items}")
 
         print(f"- Finished {self} Set Up\n")
-        return super().setup_faction(map, deck, game_state)
 
     def get_allied_warriors_in_clearing(self, clearing: Clearing) -> List[Faction]:
         available_allies = []

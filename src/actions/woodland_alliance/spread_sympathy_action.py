@@ -66,8 +66,8 @@ class SpreadSympathyAction(Action):
 
         available_clearings = self.get_valid_clearings(executor, game_state)
 
-        chosen_clearing = executor.controller.send_game_message(
-            SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)
+        chosen_clearing = response.chosen_clearing
 
         print(f" - Spread sympathy to clearing {chosen_clearing.index}")
 
@@ -78,8 +78,8 @@ class SpreadSympathyAction(Action):
         for i in range(num_to_discard):
             valid_supporters = self.get_available_supporters(
                 executor, chosen_clearing)
-            discard_choice = executor.controller.send_game_message(SpreadSympathyDiscardMessage(
-                game_state, self.action_group, valid_supporters)).chosen_discard
+            response = yield SpreadSympathyDiscardMessage(game_state, self.action_group, valid_supporters)
+            discard_choice = response.chosen_discard
             executor.discard_card(discard_choice)
             executor.supporters.remove(discard_choice)
 

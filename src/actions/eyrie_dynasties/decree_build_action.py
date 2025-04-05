@@ -37,8 +37,8 @@ class DecreeBuildAction(Action):
             return
 
         # Choose clearing
-        chosen_clearing = executor.controller.send_game_message(
-            DecreeBuildMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield DecreeBuildMessage(game_state, self.action_group, available_clearings)
+        chosen_clearing = response.chosen_clearing
         Roost(chosen_clearing, executor, chosen_clearing.get_first_free_slot())
 
         return super().perform(game_state, executor)

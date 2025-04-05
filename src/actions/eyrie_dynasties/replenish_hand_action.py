@@ -15,6 +15,7 @@ class ReplenishHandAction(Action):
 
     def can_perform(self, executor, game_state=None):
         return len(executor.hand) == 0 and super().can_perform(executor, game_state)
+        yield
 
     def perform(self, game_state, executor: EyrieDynasties):
         executor.hand.extend(executor.deck.draw(1))

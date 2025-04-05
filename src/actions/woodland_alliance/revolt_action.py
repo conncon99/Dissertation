@@ -53,16 +53,15 @@ class RevoltAction(Action):
     def perform(self, game_state: GameState, executor: WoodlandAlliance):
         # 1. Choose a valid clearing and discard two matching supporters
         valid_clearings = self.get_valid_clearings(executor)
-
-        clearing: Clearing = executor.controller.send_game_message(
-            RevoltClearingMessage(game_state, self.action_group, valid_clearings)).chosen_clearing
+        response = yield RevoltClearingMessage(game_state, self.action_group, valid_clearings)
+        clearing: Clearing = response.chosen_clearing
 
         print(f" - Revolted on clearing {clearing.index}")
 
         for i in range(2):
             valid_supporters = self.get_valid_supporters(executor, clearing)
-            chosen_discard = executor.controller.send_game_message(RevoltDiscardMessage(
-                game_state, self.action_group, valid_supporters)).chosen_discard
+            response = yield RevoltDiscardMessage(game_state, self.action_group, valid_supporters)
+            chosen_discard = response.chosen_discard
             executor.discard_card(chosen_discard)
             executor.supporters.remove(chosen_discard)
 

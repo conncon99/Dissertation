@@ -44,8 +44,8 @@ class DecreeRecruitAction(Action):
             executor.trigger_turmoil(self.action_group)
             return
 
-        roost_clearing: Clearing = executor.controller.send_game_message(
-            DecreeRecruitClearingMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield DecreeRecruitClearingMessage(game_state, self.action_group, available_clearings)
+        roost_clearing: Clearing = response.chosen_clearing
         Pawn(roost_clearing, executor)
 
         if executor.eyrie_leader == EyrieLeaders.Charismatic:

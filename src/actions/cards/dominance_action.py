@@ -28,3 +28,4 @@ class DominanceAction(Action):
                     f" - {executor} has achieved {executor.dominance.name.capitalize()} Dominance and won")
                 executor.has_won = True
         return super().perform(game_state, executor)
+        yield

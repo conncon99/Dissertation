@@ -17,8 +17,8 @@ class MobilizeAction(Action):
         return len(executor.hand) > 0 and super().can_perform(executor, game_state) and ((len(executor.supporters) < 5 and executor.get_base_count() == 0) or executor.get_base_count() > 0)
 
     def perform(self, game_state, executor: WoodlandAlliance):
-        chosen_card = executor.controller.send_game_message(
-            MobilizeMessage(game_state, self.action_group, executor.hand)).chosen_card
+        response = yield MobilizeMessage(game_state, self.action_group, executor.hand)
+        chosen_card = response.chosen_card
         executor.hand.remove(chosen_card)
         executor.add_supporter(chosen_card)
         print(f" - Added '{chosen_card}' to Supporters")

@@ -35,3 +35,4 @@ class ExploreAction(Action):
             f" - Added {ruin.item.name.capitalize()} to satchel and gained 1 Victory Point")
         ruin.destroy(None)
         return super().perform(game_state, executor)
+        yield

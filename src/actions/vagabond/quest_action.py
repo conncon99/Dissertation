@@ -25,8 +25,8 @@ class QuestAction(Action):
 
         # Choose Quest
 
-        chosen_quest = executor.controller.send_game_message(
-            ChooseQuestMessage(game_state, self.action_group, available_quests)).chosen_quest
+        response = yield ChooseQuestMessage(game_state, self.action_group, available_quests)
+        chosen_quest = response.chosen_quest
 
         print(
             f" - completed quest: '{chosen_quest}' in Clearing {executor.vagabond_pawn.space.index}")
@@ -34,12 +34,12 @@ class QuestAction(Action):
         item1, item2 = chosen_quest.items
         use_item_track_1, use_item_track_2 = False, False
         if self._get_track_item_count(executor, item1) > 0:
-            use_item_track_1 = executor.controller.send_game_message(QuestUseItemTrackMessage(
-                game_state, self.action_group, executor.satchel.available_items[item1], self._get_track_item_count(executor, item1))).use_item_track
+            response = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item1], self._get_track_item_count(executor, item1))
+            use_item_track_1 = response.use_item_track
         executor.satchel.exhaust_item(item1, use_item_track_1)
         if self._get_track_item_count(executor, item2) > 0:
-            use_item_track_2 = executor.controller.send_game_message(QuestUseItemTrackMessage(
-                game_state, self.action_group, executor.satchel.available_items[item2], self._get_track_item_count(executor, item2))).use_item_track
+            response = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item2], self._get_track_item_count(executor, item2))
+            use_item_track_2 = response.use_item_track
         executor.satchel.exhaust_item(item2, use_item_track_2)
 
         executor.completed_quests[chosen_quest.suit] += 1
@@ -48,8 +48,8 @@ class QuestAction(Action):
         executor.quest_cards.extend(new_quest_card)
 
         # Choose Reward
-        take_vp_reward = executor.controller.send_game_message(
-            ChooseQuestRewardMessage(game_state, self.action_group)).take_vp_reward
+        response = yield ChooseQuestRewardMessage(game_state, self.action_group)
+        take_vp_reward = response.take_vp_reward
 
         if take_vp_reward:
             executor.add_vp(executor.completed_quests[chosen_quest.suit])

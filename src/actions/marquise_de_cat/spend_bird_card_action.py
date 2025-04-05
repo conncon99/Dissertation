@@ -21,8 +21,8 @@ class SpendBirdCardAction(Action):
     def perform(self, game_state, executor):
         bird_card_options = [
             card for card in executor.hand if card.suit == Suits.BIRD]
-        chosen_card = executor.controller.send_game_message(
-            MarquiseSpendBirdCardMessage(game_state, self.action_group, bird_card_options)).chosen_card
+        response = yield MarquiseSpendBirdCardMessage(game_state, self.action_group, bird_card_options)
+        chosen_card = response.chosen_card
         executor.discard_card(chosen_card)
         executor.actions[CallbackTimes.IN_DAYLIGHT][1].modify_max_uses(1)
         return super().perform(game_state, executor)

@@ -31,8 +31,8 @@ class PlayDominanceAction(Action):
             card for card in executor.hand if card in DOMINANCE_CARDS]
 
         if len(available_dominance_cards) > 1:
-            chosen_card: DominanceCard = executor.controller.send_game_message(
-                ChooseDominanceMessage(game_state, self.action_group, available_dominance_cards)).chosen_card
+            response = yield ChooseDominanceMessage(game_state, self.action_group, available_dominance_cards)
+            chosen_card: DominanceCard = response.chosen_card
         else:
             chosen_card: DominanceCard = available_dominance_cards[0]
 
@@ -51,8 +51,8 @@ class PlayDominanceAction(Action):
             if len(lowest_scoring_factions) == 1:
                 chosen_faction: Faction = lowest_scoring_factions[0]
             else:
-                chosen_faction: Faction = executor.controller.send_game_message(
-                    CoalitionChoiceMessage(game_state, self.action_group, lowest_scoring_factions)).chosen_faction
+                response = yield CoalitionChoiceMessage(game_state, self.action_group, lowest_scoring_factions)
+                chosen_faction: Faction = response.chosen_faction
             executor.dominance = chosen_faction
             # If the faction is hostile, move their relationship to indifferent
             if executor.relationship_track.relationship_level[chosen_faction.faction_id] == HOSTILE:
@@ -62,6 +62,7 @@ class PlayDominanceAction(Action):
             print(
                 f" - {executor} has activated {chosen_card} to form a coalition with {chosen_faction}")
         return super().perform(game_state, executor)
+        yield
 
     def _get_lowest_scoring_factions(self, game_state: GameState, executor: Faction):
         lowest_score = 999

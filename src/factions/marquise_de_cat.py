@@ -73,18 +73,21 @@ class Marquise(Faction):
             crafting_resources[workshop.get_suit()] += 1
         return crafting_resources
 
-    def setup_faction(self, map: Map, deck: Deck, game_state: GameState) -> None:
+    def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
         print(f"Setting Up {self}")
 
         self.deck = deck
         self.game_state = game_state
+
         # Place Keep in corner clearing
         free_corner_clearings = [
             clearing for clearing in map.corner_clearings if all(slot is None or slot.faction.faction_id == self.faction_id for slot in clearing.slots) and all(token_list == [] for token_list in clearing.tokens.values())]
-        keep_clearing: Clearing = self.controller.send_game_message(
-            KeepClearingMessage(game_state, None, free_corner_clearings)).keep_clearing
+
+        response = yield KeepClearingMessage(game_state, None, free_corner_clearings)
+        keep_clearing: Clearing = response.keep_clearing
         self.keep = Keep(keep_clearing, self)
         print(f"- Placed Keep in clearing {keep_clearing.index}")
+
         # Place warrior in each clearing except the diagonally opposite corner from the keep
         for clearing in map.clearings:
             if ((keep_clearing.index == 0 and clearing.index == 11) or
@@ -101,8 +104,8 @@ class Marquise(Faction):
         if keep_clearing.has_free_slots():
             available_clearings.append(keep_clearing)
 
-        setup_response: MarquiseBuildingSetupResponse = self.controller.send_game_message(
-            MarquiseBuildingSetupMessage(game_state, None, available_clearings))
+        setup_response: MarquiseBuildingSetupResponse = yield MarquiseBuildingSetupMessage(
+            game_state, None, available_clearings)
 
         sawmill = Sawmill(setup_response.sawmill_clearing, self,
                           setup_response.sawmill_clearing.get_first_free_slot())
@@ -119,6 +122,8 @@ class Marquise(Faction):
             f"- Placed Workshop in clearing {workshop.space.index} at slot {workshop.slot_idx}")
 
         print(f"- Finished {self} Set Up\n")
+        return
+        yield
 
     def get_bonus_card_draws(self):
         if len(self.recruiters) >= 5:
@@ -133,8 +138,12 @@ class Marquise(Faction):
         if field_hospital_cards != []:
             # send game message to allow marquise to use field hospital
             field_hospital_cards.append(None)
-            chosen_card = self.controller.send_game_message(
-                FieldHospitalMessage(self.game_state, action_group, field_hospital_cards)).chosen_card
+
+            message = FieldHospitalMessage(
+                self.game_state, action_group, field_hospital_cards)
+
+            chosen_card = yield message.chosen_card
+
             if chosen_card is not None:
                 print(
                     f" - Using Field Hospital to save {units_destroyed} units on clearing {clearing.index}")

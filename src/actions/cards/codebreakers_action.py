@@ -21,8 +21,8 @@ class CodebreakersAction(Action):
         available_players = [
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id]
 
-        chosen_player: Faction = executor.controller.send_game_message(
-            CodebreakersMessage(game_state, self.action_group, available_players)).chosen_player
+        response = yield CodebreakersMessage(game_state, self.action_group, available_players)
+        chosen_player: Faction = response.chosen_player
         # TODO: Make interact with Neural networks
         print(f" - {chosen_player}'s Hand: {chosen_player.hand}")
 

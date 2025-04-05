@@ -34,8 +34,8 @@ class DecreeBattleAction(BattleAction):
             executor.trigger_turmoil(self.action_group)
             return
 
-        clearing = executor.controller.send_game_message(
-            BattleClearingChoiceMessage(game_state, self.action_group, valid_clearings)).chosen_clearing
+        response = yield BattleClearingChoiceMessage(game_state, self.action_group, valid_clearings)
+        clearing = response.chosen_clearing
 
         valid_targets = self._get_valid_battle_targets(
             clearing, executor, game_state)
@@ -46,8 +46,8 @@ class DecreeBattleAction(BattleAction):
             executor.trigger_turmoil(self.action_group)
             return
 
-        target = executor.controller.send_game_message(
-            BattleTargetChoiceMessage(game_state, self.action_group, valid_targets)).chosen_target
+        response = yield BattleTargetChoiceMessage(game_state, self.action_group, valid_targets)
+        target = response.chosen_target
 
         # 2. battle
         self.battle(clearing, target, executor)

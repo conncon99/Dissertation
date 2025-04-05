@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, TYPE_CHECKING, Optional, Callable
+from typing import Dict, List, TYPE_CHECKING, Optional, Callable, Generator, Any
 
 from utils.root_types import Suits, Items
 from utils.callback_handler import CallbackTimes, BattleCallbackTimes
@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from controllers.base_controllers.controller import Controller
     from cards.deck import Deck
     from utils.game_state import GameState
+    from controllers.messages.game_messages import GameMessage
 
 
 @dataclass
@@ -54,7 +55,8 @@ class Faction(ABC):
     def get_crafting_resources(self) -> Dict[Suits, int]: ...
 
     @abstractmethod
-    def setup_faction(self, map, deck, game_state) -> None: ...
+    def setup_faction(
+        self, map, deck, game_state) -> Generator[GameMessage, Any, None]: ...
 
     @abstractmethod
     def get_bonus_card_draws(self) -> int: ...

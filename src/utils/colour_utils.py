@@ -1,6 +1,6 @@
 import builtins
 
-VERBOSE = False
+VERBOSE = True
 LOG = False
 
 

@@ -20,3 +20,4 @@ class PlaceWood(Action):
             if len(executor.wood) < executor.max_wood:
                 sawmill.add_wood()
         return super().perform(game_state, executor)
+        yield

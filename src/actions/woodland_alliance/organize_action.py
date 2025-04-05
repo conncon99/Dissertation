@@ -24,8 +24,8 @@ class OrganizeAction(Action):
         return [unit for unit in executor.units if unit not in sympathetic_clearings]
 
     def perform(self, game_state, executor: WoodlandAlliance):
-        chosen_unit: Pawn = executor.controller.send_game_message(
-            OrganizeMessage(game_state, self.action_group, self.get_replaceable_units(executor))).chosen_unit
+        response = yield OrganizeMessage(game_state, self.action_group, self.get_replaceable_units(executor))
+        chosen_unit: Pawn = response.chosen_unit
 
         Sympathy(chosen_unit.space, executor)
         print(

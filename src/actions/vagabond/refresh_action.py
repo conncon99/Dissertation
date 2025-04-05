@@ -27,8 +27,7 @@ class RefreshAction(Action):
                 item for item, amount in executor.satchel.exhausted_damaged_items.items() for _ in range(amount)]
             exhausted_available_items = [
                 item for item, amount in executor.satchel.exhausted_items.items() for _ in range(amount)]
-            refresh_response: RefreshItemResponse = executor.controller.send_game_message(
-                RefreshItemMessage(game_state, self.action_group, exhausted_damaged_items, exhausted_available_items, remaining_refreshes))
+            refresh_response: RefreshItemResponse = yield RefreshItemMessage(game_state, self.action_group, exhausted_damaged_items, exhausted_available_items, remaining_refreshes)
             executor.satchel.refresh_item(
                 refresh_response.chosen_item, refresh_response.is_damaged)
 

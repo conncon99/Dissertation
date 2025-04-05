@@ -20,6 +20,7 @@ class VagabondCraft(CraftAction):
 
     def perform(self, game_state, executor: Vagabond):
         super().perform(game_state, executor)
+        yield
 
     def post_craft_callback(self, executor: Vagabond, card: Card):
         card_cost = sum(card.crafting_recipe.values())

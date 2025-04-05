@@ -25,8 +25,8 @@ class TrainAction(Action):
     def perform(self, game_state, executor: WoodlandAlliance):
 
         available_cards = self.get_available_cards_for_suits(executor)
-        chosen_card = executor.controller.send_game_message(
-            TrainMessage(game_state, self.action_group, available_cards)).chosen_card
+        response = yield TrainMessage(game_state, self.action_group, available_cards)
+        chosen_card = response.chosen_card
 
         executor.discard_card(chosen_card)
         executor.officers += 1

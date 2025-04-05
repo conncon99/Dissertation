@@ -26,8 +26,8 @@ class StrikeAction(Action):
         available_factions = [faction for faction in game_state.faction_list if faction.faction_id !=
                               executor.faction_id and executor.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) > 0]
         # Choose Faction to target
-        chosen_faction = executor.controller.send_game_message(
-            StrikeFactionChoiceMessage(game_state, self.action_group, available_factions)).chosen_faction
+        response = yield StrikeFactionChoiceMessage(game_state, self.action_group, available_factions)
+        chosen_faction = response.chosen_faction
         print(
             f" - Targeting {chosen_faction} with strike on Clearing {executor.vagabond_pawn.space.index}")
 
@@ -41,8 +41,8 @@ class StrikeAction(Action):
             for token in executor.vagabond_pawn.space.tokens[chosen_faction.faction_id]:
                 available_targets.append(token)
 
-            chosen_piece = executor.controller.send_game_message(
-                StrikePieceTargetingMessage(game_state, self.action_group, available_targets)).chosen_piece
+            response = yield StrikePieceTargetingMessage(game_state, self.action_group, available_targets)
+            chosen_piece = response.chosen_piece
             print(
                 f" - Destroying Token/Building on Clearing {executor.vagabond_pawn.space.index}")
             chosen_piece.destroy(executor, self.action_group)

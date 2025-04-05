@@ -24,3 +24,4 @@ class EveningRestAction(Action):
             if executor.satchel.available_damaged_items[item] > 0:
                 executor.satchel.repair_item(item, False)
         return super().perform(game_state, executor)
+        yield

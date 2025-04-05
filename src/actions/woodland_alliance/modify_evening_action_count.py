@@ -19,3 +19,4 @@ class ModifyEveningActionCount(Action):
     def perform(self, game_state, executor: WoodlandAlliance):
         executor.actions[CallbackTimes.IN_EVENING][1].max_total_uses = executor.officers
         return super().perform(game_state, executor)
+        yield

@@ -20,8 +20,8 @@ class TaxCollectorAction(Action):
     def perform(self, game_state, executor):
         # 1. Choose warrior to remove
 
-        chosen_unit: Pawn = executor.controller.send_game_message(
-            TaxCollectorMessage(game_state, self.action_group, executor.units)).chosen_unit
+        response = yield TaxCollectorMessage(game_state, self.action_group, executor.units)
+        chosen_unit: Pawn = response.chosen_unit
         print(
             f" - {executor} removed its own warrior on clearing {chosen_unit.space.index}")
         chosen_unit.destroy(None, self.action_group)

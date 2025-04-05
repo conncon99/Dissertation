@@ -23,7 +23,7 @@ class AllianceRecruitAction(Action):
     def perform(self, game_state, executor: WoodlandAlliance):
         available_clearings = [
             base.space for base in executor.bases.values() if base is not None and not any(isinstance(token, Keep) for token in base.space.tokens[Factions.MARQUISE_DE_CAT.value])]
-        clearing: Clearing = executor.controller.send_game_message(
-            AllianceRecruitMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield AllianceRecruitMessage(game_state, self.action_group, available_clearings)
+        clearing: Clearing = response.chosen_clearing
         Pawn(clearing, executor)
         return super().perform(game_state, executor)

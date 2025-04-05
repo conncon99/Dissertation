@@ -35,8 +35,8 @@ class VagabondMoveAction(Action):
         available_clearings = self._generate_clearing_costs(
             executor, game_state, self.cobbler_move)
 
-        chosen_clearing: Clearing = executor.controller.send_game_message(
-            VagabondMoveMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield VagabondMoveMessage(game_state, self.action_group, available_clearings)
+        chosen_clearing: Clearing = response.chosen_clearing
         clearing_cost = available_clearings[chosen_clearing]
 
         from_space = executor.vagabond_pawn.space
@@ -53,8 +53,7 @@ class VagabondMoveAction(Action):
         if available_allies != []:
             available_allies.append(None)
 
-            ally_movement_response: AllyMovementResponse = executor.controller.send_game_message(
-                AllyMovementMessage(game_state, self.action_group, available_allies, from_space))
+            ally_movement_response: AllyMovementResponse = yield AllyMovementMessage(game_state, self.action_group, available_allies, from_space)
             if ally_movement_response.chosen_ally is not None:
                 print(
                     f" - {executor} is bringing along {len(ally_movement_response.chosen_units)} allied warriors from {ally_movement_response.chosen_ally}")

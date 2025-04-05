@@ -28,3 +28,4 @@ class RoyalClaimAction(Action):
                 action_group.actions.remove(self)
 
         return super().perform(game_state, executor)
+        yield

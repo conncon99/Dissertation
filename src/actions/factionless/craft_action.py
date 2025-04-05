@@ -58,13 +58,13 @@ class CraftAction(Action):
 
         return True
 
-    def perform(self, game_state, executor) -> None:
+    def perform(self, game_state, executor):
         # 1. Get list of craftable cards
         crafting_options = [
             card for card in executor.hand if self._can_craft(card, executor, game_state)]
         # 2. Send crafting message to choose card and get card response
-        card: 'Card' = executor.controller.send_game_message(
-            CraftMessage(game_state, self.action_group, crafting_options)).chosen_card
+        response = yield CraftMessage(game_state, self.action_group, crafting_options)
+        card: 'Card' = response.chosen_card
         # 3. Craft card
         print(f" - '{executor}' Crafted '{card}'")
         card.owner = executor

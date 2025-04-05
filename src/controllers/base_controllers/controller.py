@@ -10,7 +10,7 @@ class Controller(ABC):
     # Should then be able to view the action space for that decision and act accordingly
 
     def __init__(self) -> None:
-        pass
+        self.pending_action = None
 
     def send_game_message(self, msg: GameMessage) -> ControllerMessage:
         match msg.type:
@@ -51,6 +51,9 @@ class Controller(ABC):
             case GameMessages.TRIGGERER_OUTRAGE_MESSAGE:
                 return self._handle_triggerer_outrage_message(msg)
         return self._handle_faction_messages(msg)
+
+    def inject_action(self, action):
+        self.pending_action = action
 
     @abstractmethod
     def _handle_faction_messages(

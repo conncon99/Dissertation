@@ -19,8 +19,7 @@ class MarchAction(MoveAction):
 
     def perform(self, game_state: GameState, executor: Marquise):
         valid_moves = self.get_all_possible_moves(game_state, executor)
-        march_response_1: March1Response = executor.controller.send_game_message(
-            March1Message(game_state, self.action_group, valid_moves))
+        march_response_1: March1Response = yield March1Message(game_state, self.action_group, valid_moves)
         from_clearing, to_clearing, units = march_response_1.move
         unit_count = len(units)
         self.move(from_clearing, to_clearing, units, executor, game_state)
@@ -28,8 +27,7 @@ class MarchAction(MoveAction):
             f" - Marching from clearing {from_clearing.index} to clearing {to_clearing.index} with {unit_count} units")
         valid_moves = self.get_all_possible_moves(game_state, executor)
         if valid_moves:
-            march_response_2: March2Response = executor.controller.send_game_message(
-                March2Message(game_state, self.action_group, valid_moves))
+            march_response_2: March2Response = yield March2Message(game_state, self.action_group, valid_moves)
             from_clearing, to_clearing, units = march_response_2.move
             if from_clearing is not None:
                 unit_count = len(units)

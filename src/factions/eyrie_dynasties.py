@@ -75,9 +75,8 @@ class EyrieDynasties(Faction):
             clearing) not in free_corner_clearings]
 
         start_clearing_options = preferred_corner_clearings if preferred_corner_clearings else free_corner_clearings
-
-        start_clearing = self.controller.send_game_message(
-            RoostSetupMessage(game_state, None, start_clearing_options)).chosen_clearing
+        response = yield RoostSetupMessage(game_state, None, start_clearing_options)
+        start_clearing = response.chosen_clearing
 
         roost = Roost(start_clearing, self,
                       start_clearing.get_first_free_slot())
@@ -88,9 +87,8 @@ class EyrieDynasties(Faction):
             f"- Placed a {roost} and 6 warriors in clearing {start_clearing.index}")
 
         # 2. Choose leader
-
-        self.eyrie_leader = self.controller.send_game_message(
-            LeaderSetupMessage(game_state, None, self.remaining_leaders)).chosen_leader
+        response = yield LeaderSetupMessage(game_state, None, self.remaining_leaders)
+        self.eyrie_leader = response.chosen_leader
         self.remaining_leaders.remove(self.eyrie_leader)
         print(
             f"- Selected {self.eyrie_leader.name} as leader of the Eyrie Dynasties")
@@ -100,6 +98,8 @@ class EyrieDynasties(Faction):
         self.assign_leader_viziers()
 
         print(f"- Finished {self} Set Up\n")
+        return
+        yield
 
     def get_crafting_resources(self):
         crafting_resources = {suit: 0 for suit in Suits}

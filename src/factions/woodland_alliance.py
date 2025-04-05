@@ -64,6 +64,8 @@ class WoodlandAlliance(Faction):
         self.supporters.extend(self.deck.draw(3))
         print(f"- Added 3 Supporters")
         print(f"- Finished {self} Set Up\n")
+        yield
+        return
 
     def get_crafting_resources(self):
         crafting_resources = {suit: 0 for suit in Suits}

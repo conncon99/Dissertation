@@ -19,3 +19,4 @@ class RecruitAction(Action):
         for recruiter in executor.recruiters:
             recruiter.recruit()
         return super().perform(game_state, executor)
+        yield

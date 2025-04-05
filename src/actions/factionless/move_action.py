@@ -57,8 +57,8 @@ class MoveAction(Action):
         # 1. Get all possible moves
         valid_moves = self.get_all_possible_moves(game_state, executor)
         # 2. Make a choice of which move to make and who to move
-        from_clearing, to_clearing, units = executor.controller.send_game_message(
-            MoveMessage(game_state, self.action_group, valid_moves)).move
+        response = yield MoveMessage(game_state, self.action_group, valid_moves)
+        from_clearing, to_clearing, units = response.move
         # 3. Execute move
         print(
             f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {len(units)} units")
