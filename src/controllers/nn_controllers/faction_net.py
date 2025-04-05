@@ -46,7 +46,7 @@ class DQNAgent:
         self.gamma = 0.95  # Discount factor
         self.epsilon = 1.0  # Exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.999
+        self.epsilon_decay = 0.995
         self.batch_size = 64
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
@@ -69,6 +69,7 @@ class DQNAgent:
         plt.xlabel("Episode")
         plt.ylabel("DQN Loss")
         plt.title("DQN Loss Over Time")
+        plt.yscale('log')
         plt.savefig("dqn_loss.png")
         plt.close()
 
@@ -181,7 +182,7 @@ class DQNAgent:
         q_eval = self.policy_net.forward(
             state_batch)[batch_index, action_batch]
         q_next = self.policy_net.forward(new_state_batch)
-        q_next[terminal_batch] = 0.0
+        # q_next[terminal_batch] = 0.0
 
         with torch.no_grad():
             max_next_q_values = self.target_net(new_state_batch).max(1)[0]

@@ -79,7 +79,7 @@ if __name__ == "__main__":
         for i in range(RUN_COUNT):
             original_print(f"RUN: {i+1}")
 
-            # Initialize factions0
+            # Initialize factions
             marquise = Marquise(MarquiseNNController(marquise_net))
             # marquise = Marquise(MarquisePlayerController())
             # marquise = Marquise(MarquiseRandomController())
@@ -113,6 +113,10 @@ if __name__ == "__main__":
                 torch.save(marquise_net.policy_net.state_dict(),
                            CHECKPOINT_FILE)
                 original_print(f"💾 Model checkpoint saved at {i+1} runs.")
+
+            if (i + 1) % 5000 == 0:
+                marquise_net.epsilon = 1.0
+
     except KeyboardInterrupt:
         pass
     finally:
