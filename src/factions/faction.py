@@ -29,6 +29,7 @@ class Faction(ABC):
     active_cards: List[Card] = field(default_factory=list)
     units: List[Pawn] = field(default_factory=list)
     hand_limit: int = 5
+    setup_order: int = -1
     deck: Deck = None
     print_colour: str = ""
     game_state: GameState = None

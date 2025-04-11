@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class EyrieDynasties(Faction):
 
     def __init__(self, controller):
-        super().__init__(faction_id=2, reach_value=7,
+        super().__init__(faction_id=2, reach_value=7, setup_order=1,
                          max_warriors=20, controller=controller, print_colour="\033[38;5;19m")
         self.max_roosts: int = 7
         # Number of roosts, VP reward
@@ -99,7 +99,6 @@ class EyrieDynasties(Faction):
 
         print(f"- Finished {self} Set Up\n")
         return
-        yield
 
     def get_crafting_resources(self):
         crafting_resources = {suit: 0 for suit in Suits}
@@ -154,8 +153,8 @@ class EyrieDynasties(Faction):
         if not self.remaining_leaders:
             self.remaining_leaders = [leader for leader in EyrieLeaders]
 
-        self.eyrie_leader: EyrieLeaders = self.controller.send_game_message(
-            TurmoilLeaderMessage(self.game_state, action_group, self.remaining_leaders)).chosen_leader
+        response = yield TurmoilLeaderMessage(self.game_state, action_group, self.remaining_leaders)
+        self.eyrie_leader: EyrieLeaders = response.chosen_leader
         print(
             f" - Chose {self.eyrie_leader.name.capitalize()} as new eyrie leader")
         self.assign_leader_viziers()

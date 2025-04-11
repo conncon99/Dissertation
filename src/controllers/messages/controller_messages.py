@@ -32,7 +32,8 @@ class ControllerMessages(Enum):
     KEEP_CLEARING_RESPONSE = auto()
     MARCH_1_RESPONSE = auto()
     MARCH_2_RESPONSE = auto()
-    OVERWORK_RESPONSE = auto()
+    OVERWORK_CLEARING_RESPONSE = auto()
+    OVERWORK_DISCARD_RESPONSE = auto()
     MARQUISE_BUILDING_RESPONSE = auto()
     WOOD_REMOVAL_RESPONSE = auto()
     MARQUISE_BUILDING_SETUP_RESPONSE = auto()
@@ -44,8 +45,10 @@ class ControllerMessages(Enum):
     ROOST_SETUP_RESPONSE = auto()
     LEADER_SETUP_RESPONSE = auto()
     DECREE_RECRUIT_CLEARING_RESPONSE = auto()
-    EXTEND_DECREE_RESPONSE_1 = auto()
-    EXTEND_DECREE_RESPONSE_2 = auto()
+    EXTEND_DECREE_CARD_RESPONSE_1 = auto()
+    EXTEND_DECREE_ACTION_RESPONSE_1 = auto()
+    EXTEND_DECREE_CARD_RESPONSE_2 = auto()
+    EXTEND_DECREE_ACTION_RESPONSE_2 = auto()
     DECREE_BUILD_RESPONSE = auto()
     TURMOIL_LEADER_RESPONSE = auto()
 
@@ -214,11 +217,16 @@ class March2Response(ControllerMessage):
         self.move = from_clearing, to_clearing, units
 
 
-class OverworkResponse(ControllerMessage):
-    def __init__(self, discard_choice, chosen_clearing):
-        super().__init__(ControllerMessages.OVERWORK_RESPONSE)
-        self.discard_choice = discard_choice
+class OverworkClearingResponse(ControllerMessage):
+    def __init__(self, chosen_clearing):
+        super().__init__(ControllerMessages.OVERWORK_CLEARING_RESPONSE)
         self.chosen_clearing = chosen_clearing
+
+
+class OverworkDiscardResponse(ControllerMessage):
+    def __init__(self, discard_choice):
+        super().__init__(ControllerMessages.OVERWORK_DISCARD_RESPONSE)
+        self.discard_choice = discard_choice
 
 
 class MarquiseBuildingResponse(ControllerMessage):
@@ -282,18 +290,28 @@ class DecreeRecruitClearingResponse(ControllerMessage):
         self.chosen_clearing = chosen_clearing
 
 
-class ExtendDecreeResponse1(ControllerMessage):
-    def __init__(self, chosen_card, chosen_action):
-        super().__init__(ControllerMessages.EXTEND_DECREE_RESPONSE_1)
-        self.chosen_card = chosen_card
+class ExtendDecreeActionResponse1(ControllerMessage):
+    def __init__(self, chosen_action):
+        super().__init__(ControllerMessages.EXTEND_DECREE_ACTION_RESPONSE_1)
         self.chosen_action = chosen_action
 
 
-class ExtendDecreeResponse2(ControllerMessage):
-    def __init__(self, chosen_card, chosen_action):
-        super().__init__(ControllerMessages.EXTEND_DECREE_RESPONSE_2)
+class ExtendDecreeCardResponse1(ControllerMessage):
+    def __init__(self, chosen_card):
+        super().__init__(ControllerMessages.EXTEND_DECREE_CARD_RESPONSE_1)
         self.chosen_card = chosen_card
+
+
+class ExtendDecreeActionResponse2(ControllerMessage):
+    def __init__(self, chosen_action):
+        super().__init__(ControllerMessages.EXTEND_DECREE_ACTION_RESPONSE_2)
         self.chosen_action = chosen_action
+
+
+class ExtendDecreeCardResponse2(ControllerMessage):
+    def __init__(self, chosen_card):
+        super().__init__(ControllerMessages.EXTEND_DECREE_CARD_RESPONSE_2)
+        self.chosen_card = chosen_card
 
 
 class DecreeBuildResponse(ControllerMessage):

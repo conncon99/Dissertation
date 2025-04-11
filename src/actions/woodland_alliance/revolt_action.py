@@ -69,7 +69,7 @@ class RevoltAction(Action):
         for faction in game_state.faction_list:
             if faction.faction_id == executor.faction_id:
                 continue
-            clearing.damage(faction, executor, 999, self.action_group)
+            yield from clearing.damage(faction, executor, 999, self.action_group)
 
         set_print_colour(executor.print_colour)
 

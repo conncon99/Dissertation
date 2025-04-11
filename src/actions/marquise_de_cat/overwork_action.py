@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 from board.clearing import Clearing
 from utils.root_types import Suits
 from pieces.marquise_de_cat.marquise_tokens import Wood
-from controllers.messages.game_messages import OverworkMessage
-from controllers.messages.controller_messages import OverworkResponse
+from controllers.messages.game_messages import OverworkClearingMessage, OverworkDiscardMessage
+from controllers.messages.controller_messages import OverworkClearingResponse, OverworkDiscardResponse
 from actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
@@ -42,7 +42,8 @@ class OverworkAction(Action):
         # find the intersection of card suits in hand and the suits of clearings with sawmills
         valid_clearings = self.get_all_valid_clearings(executor)
         # Choose from that intersection
-        overwork_response: OverworkResponse = yield OverworkMessage(game_state, self.action_group, valid_clearings, executor.hand)
-        executor.discard_card(overwork_response.discard_choice)
-        Wood(overwork_response.chosen_clearing, executor)
+        overwork_clearing_response: OverworkClearingResponse = yield OverworkClearingMessage(game_state, self.action_group, valid_clearings, executor.hand)
+        overwork_discard_response: OverworkDiscardResponse = yield OverworkDiscardMessage(game_state, self.action_group, valid_clearings, executor.hand)
+        executor.discard_card(overwork_discard_response.discard_choice)
+        Wood(overwork_clearing_response.chosen_clearing, executor)
         return super().perform(game_state, executor)

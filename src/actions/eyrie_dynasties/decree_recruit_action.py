@@ -28,12 +28,12 @@ class DecreeRecruitAction(Action):
         if not valid_roosts:
             print(
                 f" - No {self.suit.name.capitalize()} roosts found: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         if len(executor.units) >= executor.max_warriors:
             print(f" - Cannot place any more warriors: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         available_clearings = [roost.space for roost in valid_roosts if not any(isinstance(
@@ -41,7 +41,7 @@ class DecreeRecruitAction(Action):
 
         if available_clearings == []:
             print(f" - No available roosts: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         response = yield DecreeRecruitClearingMessage(game_state, self.action_group, available_clearings)
@@ -51,7 +51,7 @@ class DecreeRecruitAction(Action):
         if executor.eyrie_leader == EyrieLeaders.Charismatic:
             if len(executor.units) >= executor.max_warriors:
                 print(f" - Cannot place any more warriors: TURMOIL TRIGGERED")
-                executor.trigger_turmoil(self.action_group)
+                yield from executor.trigger_turmoil(self.action_group)
                 return
             Pawn(roost_clearing, executor)
 

@@ -50,8 +50,8 @@ class MoveAction(Action):
             # Trigger outrage
             woodland_alliance = next(
                 (faction for faction in game_state.faction_list if faction.faction_id == Factions.WOODLAND_ALLIANCE.value))
-            woodland_alliance.trigger_outrage(
-                executor, to_clearing, self.action_group)
+            yield from woodland_alliance.trigger_outrage(
+                executor, to_clearing, self.action_group, game_state)
 
     def perform(self, game_state, executor):
         # 1. Get all possible moves
@@ -62,5 +62,5 @@ class MoveAction(Action):
         # 3. Execute move
         print(
             f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {len(units)} units")
-        self.move(from_clearing, to_clearing, units, executor, game_state)
+        yield from self.move(from_clearing, to_clearing, units, executor, game_state)
         return super().perform(game_state, executor)

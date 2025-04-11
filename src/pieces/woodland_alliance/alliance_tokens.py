@@ -17,7 +17,7 @@ class Sympathy(Token, PieceWithID):
         # Attacker must add matching card to hand
         self.faction.sympathy.remove(self)
         super().destroy(attacker, action_group)
-        self.faction.trigger_outrage(attacker, self.space, action_group)
+        yield from self.faction.trigger_outrage(attacker, self.space, action_group, self.faction.game_state)
 
     def get_suit(self):
         return self.space.get_suit()

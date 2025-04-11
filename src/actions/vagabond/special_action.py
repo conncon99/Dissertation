@@ -16,6 +16,6 @@ class SpecialAction(Action):
         return executor.character.can_perform_special_action(executor, game_state)
 
     def perform(self, game_state, executor: Vagabond):
-        executor.character.perform_special_action(
+        yield from executor.character.perform_special_action(
             executor, game_state, self.action_group)
         return super().perform(game_state, executor)

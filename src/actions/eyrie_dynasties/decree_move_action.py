@@ -32,7 +32,7 @@ class DecreeMoveAction(MoveAction):
 
         if not valid_moves:
             print(f" - No valid moves: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         # 2. Make a choice of which move to make and who to move
@@ -41,5 +41,5 @@ class DecreeMoveAction(MoveAction):
         # 3. Execute move
         print(
             f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {len(units)} units")
-        self.move(from_clearing, to_clearing, units, executor, game_state)
+        yield from self.move(from_clearing, to_clearing, units, executor, game_state)
         return super(MoveAction, self).perform(game_state, executor)

@@ -22,7 +22,7 @@ class MarchAction(MoveAction):
         march_response_1: March1Response = yield March1Message(game_state, self.action_group, valid_moves)
         from_clearing, to_clearing, units = march_response_1.move
         unit_count = len(units)
-        self.move(from_clearing, to_clearing, units, executor, game_state)
+        yield from self.move(from_clearing, to_clearing, units, executor, game_state)
         print(
             f" - Marching from clearing {from_clearing.index} to clearing {to_clearing.index} with {unit_count} units")
         valid_moves = self.get_all_possible_moves(game_state, executor)
@@ -31,8 +31,8 @@ class MarchAction(MoveAction):
             from_clearing, to_clearing, units = march_response_2.move
             if from_clearing is not None:
                 unit_count = len(units)
-                self.move(from_clearing, to_clearing,
-                          units, executor, game_state)
+                yield from self.move(from_clearing, to_clearing,
+                                     units, executor, game_state)
                 print(
                     f" - Marching from clearing {from_clearing.index} to clearing {to_clearing.index} with {unit_count} units")
         print(f" - {self.name} action completed\n")

@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 class Marquise(Faction):
 
     def __init__(self, controller) -> None:
-        super().__init__(faction_id=1,
+        super().__init__(faction_id=1, setup_order=0,
                          reach_value=10, max_warriors=25, controller=controller, print_colour="\033[38;5;208m")
         self.max_sawmills = 6
         self.max_workshops = 6
@@ -123,7 +123,6 @@ class Marquise(Faction):
 
         print(f"- Finished {self} Set Up\n")
         return
-        yield
 
     def get_bonus_card_draws(self):
         if len(self.recruiters) >= 5:
@@ -138,11 +137,10 @@ class Marquise(Faction):
         if field_hospital_cards != []:
             # send game message to allow marquise to use field hospital
             field_hospital_cards.append(None)
-
-            message = FieldHospitalMessage(
-                self.game_state, action_group, field_hospital_cards)
-
-            chosen_card = yield message.chosen_card
+            self.game_state.active_player = self
+            response = yield FieldHospitalMessage(self.game_state, action_group, field_hospital_cards)
+            self.game_state.active_player = self.game_state.current_player
+            chosen_card = response.chosen_card
 
             if chosen_card is not None:
                 print(
@@ -154,3 +152,5 @@ class Marquise(Faction):
                 print(" - Field Hospital not used")
         else:
             print(" - No valid cards for Field Hospital")
+        return
+        yield

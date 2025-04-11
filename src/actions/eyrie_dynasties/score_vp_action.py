@@ -18,5 +18,6 @@ class ScoreVpAction(Action):
 
     def perform(self, game_state, executor: EyrieDynasties):
         executor.add_vp(executor.roost_track[len(executor.roosts)])
+        print(f"Gained {executor.roost_track[len(executor.roosts)]} VP")
         return super().perform(game_state, executor)
         yield

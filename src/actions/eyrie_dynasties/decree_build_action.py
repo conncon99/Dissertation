@@ -23,7 +23,7 @@ class DecreeBuildAction(Action):
     def perform(self, game_state: GameState, executor: EyrieDynasties):
         if len(executor.roosts) >= executor.max_roosts:
             print(" - Cannot place any more roosts: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         # Make a list of clearings that the eyrie owns that matches the suit of this card
@@ -33,7 +33,7 @@ class DecreeBuildAction(Action):
         if not available_clearings:
             print(
                 f" - no available {self.suit.name.capitalize()} clearings for roosts: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         # Choose clearing

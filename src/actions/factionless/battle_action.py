@@ -72,12 +72,13 @@ class BattleAction(Action):
 
     def perform(self, game_state, executor):
         # 1. Choose clearing to battle on and who to battle against
-        clearing = executor.controller.send_game_message(
-            BattleClearingChoiceMessage(game_state, self.action_group, self._get_valid_battle_clearings(game_state, executor))).chosen_clearing
-        target = executor.controller.send_game_message(BattleTargetChoiceMessage(
-            game_state, self.action_group, self._get_valid_battle_targets(clearing, executor, game_state))).chosen_target
+        response = yield BattleClearingChoiceMessage(game_state, self.action_group, self._get_valid_battle_clearings(game_state, executor))
+        clearing = response.chosen_clearing
+
+        response = yield BattleTargetChoiceMessage(game_state, self.action_group, self._get_valid_battle_targets(clearing, executor, game_state))
+        target = response.chosen_target
         # 2. battle
-        self.battle(clearing, target, executor, game_state)
+        yield from self.battle(clearing, target, executor, game_state)
         self.times_used += 1
 
     def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
@@ -92,10 +93,11 @@ class BattleAction(Action):
             # If they have multiple ambush cards choose one, otherwise use the only one
             game_state.battle_data = BattleData(
                 attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id)
-            ambush_response: AmbushResponse = defender.controller.send_game_message(
-                AmbushMessage(game_state, self.action_group, defender, attacker, clearing, False, False, available_ambush_cards))
+            game_state.active_player = defender
+            ambush_response: AmbushResponse = yield AmbushMessage(game_state, self.action_group, defender, attacker, clearing, False, False, available_ambush_cards)
+            game_state.active_player = game_state.current_player
             if ambush_response.ambush_card is not None:
-                ambush_response.ambush_card._callback(
+                yield from ambush_response.ambush_card._callback(
                     game_state, self.action_group, battle_modifier)
 
         if attacker.faction_id == Factions.VAGABOND.value:
@@ -111,8 +113,10 @@ class BattleAction(Action):
                 available_allies.append(None)
                 game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id ==
                                                     game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None)
-                chosen_ally = attacker.controller.send_game_message(
-                    ChooseAllyMessage(game_state, self.action_group, available_allies)).chosen_ally
+                game_state.active_player = attacker
+                response = yield ChooseAllyMessage(game_state, self.action_group, available_allies)
+                chosen_ally = response.chosen_ally
+                game_state.active_player = game_state.current_player
                 attacker.battle_ally = chosen_ally
                 friendly_warrior_count = attacker.satchel.get_non_damaged_count(Items.SWORD) if chosen_ally is None else attacker.satchel.get_non_damaged_count(
                     Items.SWORD) + clearing.get_faction_warrior_count(chosen_ally.faction_id)
@@ -140,6 +144,9 @@ class BattleAction(Action):
             attacker_dmg = min(max(roll1, roll2), friendly_warrior_count)
             defender_dmg = min(min(roll1, roll2), enemy_warrior_count)
 
+        print(f" - Attacker ({attacker}) Damage before mods: {attacker_dmg}")
+        print(f" - Defender ({defender}) Damage before mods: {defender_dmg}")
+
         if game_state.use_manual_rolling:
             attacker_dmg = int(input("Enter Attacker Damage: "))
             defender_dmg = int(input("Enter Defender Damage: "))
@@ -150,15 +157,15 @@ class BattleAction(Action):
             attacker_dmg += 1
 
         for callback in defender.battle_callbacks[BattleCallbackTimes.IN_BATTLE_ATTACKER]:
-            callback(game_state, self.action_group, battle_modifier)
+            yield from callback(game_state, self.action_group, battle_modifier)
             game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
                                                 attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE_DEFENDER]:
-            callback(game_state, self.action_group, battle_modifier)
+            yield from callback(game_state, self.action_group, battle_modifier)
             game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
                                                 attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
         for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE]:
-            callback(game_state, self.action_group, battle_modifier)
+            yield from callback(game_state, self.action_group, battle_modifier)
             game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
                                                 attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
 
@@ -167,10 +174,10 @@ class BattleAction(Action):
         attacker_dmg = max(attacker_dmg, 0)
         defender_dmg = max(defender_dmg, 0)
 
-        clearing.damage(victim=defender, attacker=attacker,
-                        amount=attacker_dmg, action_group=self.action_group)
-        clearing.damage(victim=attacker, attacker=defender,
-                        amount=defender_dmg, action_group=self.action_group)
+        yield from clearing.damage(victim=defender, attacker=attacker,
+                                   amount=attacker_dmg, action_group=self.action_group)
+        yield from clearing.damage(victim=attacker, attacker=defender,
+                                   amount=defender_dmg, action_group=self.action_group)
         if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
             attacker.battle_ally = None
         set_print_colour(attacker.print_colour)

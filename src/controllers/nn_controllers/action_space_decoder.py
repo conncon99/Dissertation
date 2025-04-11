@@ -1,6 +1,7 @@
 from __future__ import annotations
 from cards.cards import *
 from pieces.marquise_de_cat.marquise_buildings import Recruiter, Sawmill, Workshop
+from utils.root_types import EyrieLeaders, BUILD, BATTLE, RECRUIT, MOVE
 from actions.action_handler import ActionGroup
 from pieces.piece_with_id import PieceWithID
 
@@ -178,8 +179,21 @@ def decode_marquise_building_types(output):
 def decode_wood_output(output, game_state: GameState):
     return [wood for wood in game_state.marquise.wood if wood.id == output][0]
 
+# Eyrie Dynasty
 
-### MASKS ###
+
+def decode_leader_output(output):
+    leader_mapping = {0: EyrieLeaders.Despot, 1: EyrieLeaders.Commander,
+                      2: EyrieLeaders.Charismatic, 3: EyrieLeaders.Builder}
+    return leader_mapping[output]
+
+
+def decode_decree_type_output(output):
+    decree_type_mapping = {0: RECRUIT, 1: MOVE, 2: BATTLE, 3: BUILD}
+    return decree_type_mapping[output]
+
+    ### MASKS ###
+
 
 class Masker:
 

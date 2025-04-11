@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
+import numpy as np
 if TYPE_CHECKING:
     from utils.game_settings import GameSettings
     from factions.faction import Faction
 from board.classic_map import ClassicMap
-from utils.root_types import Items, GamePhase, Suits, Factions
+from utils.root_types import Items, GamePhase, Factions
 from utils.callback_handler import CallbackTimes
 from cards.deck import Deck
 from utils.game_state import GameState
@@ -14,6 +15,7 @@ from controllers.nn_controllers.marquise_nn_controller import MarquiseNNControll
 from controllers.nn_controllers.observation_space_encoder import ObservationSpace
 from actions.action_group_registry import ActionGroupRegistry
 from pieces.piece_with_id import PieceWithID
+import types
 import itertools
 
 from utils.root_types import GamePhase
@@ -21,11 +23,12 @@ from utils.root_types import GamePhase
 
 class GameManager:
 
-    def __init__(self, settings: GameSettings, turn_limit: int, training_mode=False) -> None:
+    def __init__(self, settings: GameSettings, turn_limit: int, training_faction: Optional[Faction] = None) -> None:
         self._initialized = True
         self.settings = settings
         self.winner = None
         self.done = False
+        self.training_faction = training_faction
         self.game_phase = GamePhase.BIRDSONG
         self.game_state = GameState()
         self.game_state.turn_limit = turn_limit
@@ -36,13 +39,15 @@ class GameManager:
         self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
                                 Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
         self.setup_complete = False
-        self.last_faction = None
-        self.time_iterator = None
-        self.action_group_iterator = None
-        self.current_faction = None
-        self.current_time = None
         self.current_group = None
-        self.group_generator = None
+        self.setup_order = []
+        self.current_faction_setup_index = 0
+        self.current_faction_index = 0
+        self.current_time_index = 0
+        self.current_group_index = 0
+        self.faction_setup_iter = None
+        self.action_group_iter = None
+
         self._initialize_game_state()
         self.create_map()
         self.setup_game()
@@ -74,13 +79,11 @@ class GameManager:
 
     def _initialize_faction_setup(self):
 
-        self.faction_setup_iter = iter([
-            (faction, faction.setup_faction(
-                self.game_state.board, self.game_state.deck, self.game_state))
-            for faction in self.settings.faction_list
-        ])
-        # print("[DEBUG] Factions being set up:", [
-        #       type(f).__name__ for f, _ in self.faction_setup_iter])
+        # self.faction_setup_iter = iter([
+        #     (faction, faction.setup_faction(
+        #         self.game_state.board, self.game_state.deck, self.game_state))
+        #     for faction in self.settings.get_setup_order()
+        # ])
 
         self.pending_setup_faction = None
         self.pending_setup_gen = None
@@ -90,26 +93,13 @@ class GameManager:
                 action_group.actions.append(ClaimDominanceAction())
 
     def setup_game(self):
+        self.setup_order = self.settings.get_setup_order()
         self.deck.shuffle()
-        for faction in self.settings.faction_list:
+        for faction in self.setup_order:
             faction.hand.extend(self.deck.draw(3))
 
-    def reset(self):
-        self.turn_count = 0
-        self.done = False
-        self.winner = None
-        self.setup_complete = False
-        self._initialize_game_state()
-        self.create_map()
-        self.setup_game()
-        self._initialize_faction_setup()
-        self.group_generator = None
-        self.faction_iterator = None
-        self.last_faction = None
-        return self._run_setup_step()
 
-
-### * Iterators ###
+### Iterators ###
 
 # Iterate through factions ->
 # For each faction, iterate through each Callback Time
@@ -117,101 +107,33 @@ class GameManager:
 # For each action group, iterate through each action (where an ActionChoiceMessage counts as a distinct step)
 # For each action, iterate through each step of it (whenever send_game_message() is called)
 
-    def _run_setup_step(self, action=None):
-        if not hasattr(self, 'faction_setup_iter'):
-            self._initialize_faction_setup()
-        if self.pending_setup_gen:
-            if action is not None:
-                self.current_faction.controller.inject_action(action)
-                response = self.current_faction.controller.send_game_message(
-                    self.current_message)
-                try:
-                    self.current_message = self.pending_setup_gen.send(
-                        response)
-                    return self._get_observation(), 0.0, False, {}
-                except StopIteration:
-                    self.pending_setup_gen = None
-
-        while not self.setup_complete:
-            try:
-                faction, gen = next(self.faction_setup_iter)
-                self.current_faction = faction
-                self.game_state.current_player = self.current_faction
-                set_print_colour(self.current_faction.print_colour)
-                self.pending_setup_gen = gen
-                self.current_message = next(gen, None)
-                if self.current_message is not None:
-                    return self._get_observation(), 0.0, False, {}
-                else:
-                    self.pending_setup_gen = None  # Setup was silent, skip to next
-            except StopIteration:
-                self.setup_complete = True
-                self.faction_iterator = itertools.cycle(self.turn_order)
-                self._advance_to_next_step()
-                return self._get_observation(), 0.0, False, {}
-
-    def _advance_to_next_step(self):
-        if self.current_faction == self.turn_order[-1]:
-            self.turn_count += 1
-            if self.turn_count >= self.turn_limit:
-                self.done = True
-                return
-
-        self.current_faction = next(self.faction_iterator)
-        set_print_colour(self.current_faction.print_colour)
-        self.phase_iterator = iter(CallbackTimes)
-        self._advance_to_next_phase()
-
-    def _advance_to_next_phase(self):
-        try:
-            self.current_phase = next(self.phase_iterator)
-            self.group_iterator = iter(
-                self.current_faction.actions[self.current_phase])
-            self._advance_to_next_group()
-        except StopIteration:
-            self._advance_to_next_step()
-
-    def _advance_to_next_group(self):
-        try:
-            self.current_group = next(self.group_iterator)
-            self.group_generator = self.current_group.step_action_group(
-                self.current_faction, self.game_state)
-            self._advance_group_step()
-        except StopIteration:
-            print("Advancing to Next Phase")
-            self._advance_to_next_phase()
-
-    def _advance_group_step(self, action=None):
-        if self.group_generator is None:
-            self._advance_to_next_group()
-            return
-
-        try:
-            if action is not None:
-                self.current_faction.controller.inject_action(action)
-                response = self.current_faction.controller.send_game_message(
-                    self.current_message)
-                self.current_message = self.group_generator.send(response)
-            else:
-                self.current_message = next(self.group_generator)
-        except StopIteration:
-            self._advance_to_next_group()
-
-    def _get_observation(self):
+    def get_observation(self):  # TODO: Make get_observation also return an action mask
+        # print("Storing obs")
         if self.current_message is None:
-            return ObservationSpace.encode_game_state(self.game_state, None, self.current_group)
+            return ObservationSpace.encode_game_state(self.game_state, None, self.current_group).astype(np.float32)
         return ObservationSpace.encode_game_state(
             self.game_state, self.current_message.type, self.current_group
-        )
+        ).astype(np.float32)
 
     def _calculate_reward(self):
-        vp = self.current_faction.victory_points
-        reward = vp - getattr(self.current_faction, '_last_vp', 0)
-        self.current_faction._last_vp = vp
-        return reward
+        # vp = self.game_state.current_faction.victory_points
+        # reward = vp - getattr(self.game_state.current_faction, '_last_vp', 0)
+        # self.game_state.current_faction._last_vp = vp
+        # return reward
+        return 0.0
 
     def _check_win_conditions(self):
         winners = []
+
+        for faction in self.settings.faction_list:
+            if faction.dominance:
+                if faction.faction_id == Factions.VAGABOND.value:
+                    print(f"{faction} is in a coalition with {faction.dominance}")
+                else:
+                    print(
+                        f"{faction} is working towards {faction.dominance.name.capitalize()} Dominance")
+            else:
+                print(f"{faction} VP: {faction.victory_points}")
 
         for faction in self.settings.faction_list:
             if faction.dominance and faction.has_won:
@@ -233,44 +155,140 @@ class GameManager:
 ### * STEP *###
 
     def step(self, action=None):
-        from controllers.messages.game_messages import GameMessages
 
-        if self.done:
-            return self._get_observation(), 0.0, True, {}
+        if self.done:  # If the game is already done, just return
+            self.done = True
+            return self.get_observation(), 0.0, True, {}
 
-        if not self.setup_complete:
+        if not self.setup_complete:  # Handle Setup First
             return self._run_setup_step(action)
+        else:  # Do normal step
+            return self._run_game_step(action)
 
-        if self.current_message is not None:
-            assert action is not None, "Action must be provided when a decision is pending."
-            self._advance_group_step(action)
-        else:
-            self._advance_group_step()
+    def _run_setup_step(self, action):
+        while not self.setup_complete:
+            current_faction = self.setup_order[self.current_faction_setup_index]
+            self.game_state.current_player = self.setup_order[self.current_faction_setup_index]
+            self.game_state.active_player = current_faction
+            set_print_colour(current_faction.print_colour)
 
-        self._check_win_conditions()
+            if not self.faction_setup_iter:
+                gen = iter(current_faction.setup_faction(
+                    self.map, self.deck, self.game_state))
 
-        done = self.done or (self.turn_count >= self.turn_limit)
-        return self._get_observation(), self._calculate_reward(), done, {}
-
-    def _handle_wins(self, current_faction: Faction):
-        """Determines if anyone has won the game by reaching 30 VP. 
-        If multiple people win at the same turn, the person whose turn it is wins"""
-        potential_winners = []
-        for faction in self.settings.faction_list:
-
-            if faction.dominance:
-                if faction.faction_id == Factions.VAGABOND.value:
-                    print(f"{faction} is in a coalition with {faction.dominance}")
+                if isinstance(gen, types.GeneratorType):
+                    self.faction_setup_iter = gen
+                    try:
+                        self.current_message = next(self.faction_setup_iter)
+                        if self.current_message is not None:
+                            return self.get_observation(), 0.0, False, {}
+                    except:
+                        # Faction setup completed immediately
+                        self._advance_setup_index()
+                        continue
                 else:
-                    print(
-                        f"{faction} is working towards {faction.dominance.name.capitalize()} Dominance")
-            else:
-                print(f"{faction} VP: {faction.victory_points}")
+                    # There were no yields
+                    self._advance_setup_index()
+                    continue
 
-            if faction.dominance and faction.has_won:
-                self.winner = faction
-            elif faction.victory_points >= 30:
-                self.winner = faction
+            # Iterate through setup order
+            try:
+                self.current_message = self.faction_setup_iter.send(action)
+                if self.current_message is not None:
+                    return self.get_observation(), 0.0, False, {}
+            except StopIteration:
+                self._advance_setup_index()
+                continue
+        return self.get_observation(), 0.0, False, {}
+
+    def _advance_setup_index(self):
+        self.current_faction_setup_index += 1
+        self.current_message = None
+        self.faction_setup_iter = None
+        if self.current_faction_setup_index >= len(self.setup_order):
+            self.setup_complete = True
+
+    def _is_training_faction(self, current_faction: Faction):
+        return self.training_faction and self.training_faction.faction_id == current_faction.faction_id
+
+    def _run_game_step(self, action):
+        starting_faction_index = self.current_faction_index
+        while not self.done:
+            current_faction = self.turn_order[self.current_faction_index]
+            self.game_state.current_player = current_faction
+            self.game_state.active_player = current_faction
+            set_print_colour(current_faction.print_colour)
+            current_time = list(CallbackTimes)[self.current_time_index]
+            current_group_set = current_faction.actions[current_time]
+            current_group = current_group_set[self.current_group_index]
+
+            # Action Group handles messages here
+            if not self.action_group_iter:
+                gen = iter(current_group.step_action_group(
+                    current_faction, self.game_state))
+
+                if isinstance(gen, types.GeneratorType):
+                    self.action_group_iter = gen
+                    try:
+                        self.current_message = next(self.action_group_iter)
+                        self._check_win_conditions()
+                        if self.current_message is not None:
+                            return self.get_observation(), 0.0, False, {}
+                    except:
+                        self._check_win_conditions()
+                        obs = self.get_observation()
+                        reward = self._calculate_reward()
+                        self._advance_step_indexes()
+                        if self.current_faction_index != starting_faction_index:
+                            return obs, reward, False, {}
+                        continue
+                else:
+                    # There were no yields
+                    self._check_win_conditions()
+                    obs = self.get_observation()
+                    reward = self._calculate_reward()
+                    # TODO: Bug appearing where only first action group at a given time appears
+                    self._advance_step_indexes()
+                    if self.current_faction_index != starting_faction_index:
+                        return obs, reward, False, {}
+                    continue
+
+            # Iterate through setup order
+            try:
+                self.current_message = self.action_group_iter.send(action)
+                if self.current_message is not None:
+                    return self.get_observation(), 0.0, False, {}
+            except StopIteration:
+                self._check_win_conditions()
+                obs = self.get_observation()
+                reward = self._calculate_reward()
+                self._advance_step_indexes()
+                if self.current_faction_index != starting_faction_index:
+                    return obs, reward, False, {}
+                continue
+        return self.get_observation(), self._calculate_reward(), True, {}
+
+    def _advance_step_indexes(self):
+        self.current_message = None
+        current_faction = self.turn_order[self.current_faction_index]
+        self.game_state.current_player = current_faction
+        self.game_state.active_player = current_faction
+        set_print_colour(current_faction.print_colour)
+        current_time = list(CallbackTimes)[self.current_time_index]
+        current_group_set = current_faction.actions[current_time]
+
+        self.action_group_iter = None
+        self.current_group_index += 1
+        if self.current_group_index >= len(current_group_set):
+            self.current_group_index = 0
+            self.current_time_index += 1
+            if self.current_time_index >= len(list(CallbackTimes)):
+                self.current_time_index = 0
+                self.current_faction_index += 1
+                if self.current_faction_index >= len(self.turn_order):
+                    self.current_faction_index = 0
+                    self.turn_count += 1
+                    print(f"Turn: {self.turn_count}")
 
     def _get_faction_by_id(self, faction_id: int) -> Faction:
         for faction in self.settings.faction_list:
@@ -281,3 +299,9 @@ class GameManager:
     def reset_ids(self):
         PieceWithID.reset_ids()
         ActionGroupRegistry.reset()
+
+    def get_current_faction(self):
+        if self.setup_complete:
+            return self.setup_order[self.current_faction_setup_index]
+        else:
+            return self.turn_order[self.current_faction_index]

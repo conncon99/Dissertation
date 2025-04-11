@@ -44,8 +44,10 @@ class AllianceBase(Building):
             for i in range(num_to_discard):
                 if self.faction.supporters == []:
                     break
-                chosen_discard = self.faction.controller.send_game_message(AllianceNoBaseMessage(
-                    self.faction.game_state, action_group, self.faction.supporters)).chosen_card
+                self.faction.game_state.active_player = self.faction
+                response = yield AllianceNoBaseMessage(self.faction.game_state, action_group, self.faction.supporters)
+                chosen_discard = response.chosen_card
+                self.faction.game_state.active_player = attacker
                 self.faction.discard_card(chosen_discard)
                 self.faction.supporters.remove(chosen_discard)
 

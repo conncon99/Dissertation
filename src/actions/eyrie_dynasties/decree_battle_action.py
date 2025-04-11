@@ -31,7 +31,7 @@ class DecreeBattleAction(BattleAction):
         if not valid_clearings:
             print(
                 f"No valid clearings found for suit {self.suit}: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         response = yield BattleClearingChoiceMessage(game_state, self.action_group, valid_clearings)
@@ -43,7 +43,7 @@ class DecreeBattleAction(BattleAction):
         if not valid_targets:
             print(
                 f"No valid targets found for suit {self.suit}: TURMOIL TRIGGERED")
-            executor.trigger_turmoil(self.action_group)
+            yield from executor.trigger_turmoil(self.action_group)
             return
 
         response = yield BattleTargetChoiceMessage(game_state, self.action_group, valid_targets)

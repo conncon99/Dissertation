@@ -3,7 +3,9 @@ from actions.action_handler import Action
 from utils.root_types import Items, Factions
 from typing import TYPE_CHECKING
 from board.clearing import Clearing
-from controllers.messages.game_messages import StrikeFactionChoiceMessage,  StrikePieceTargetingMessage
+from controllers.messages.game_messages import StrikeFactionChoiceMessage, StrikePieceTargetingMessage
+from pieces.woodland_alliance.alliance_buildings import AllianceBase
+from pieces.woodland_alliance.alliance_tokens import Sympathy
 from utils.colour_utils import set_print_colour
 from actions.action_group_registry import ActionIDs
 
@@ -45,7 +47,10 @@ class StrikeAction(Action):
             chosen_piece = response.chosen_piece
             print(
                 f" - Destroying Token/Building on Clearing {executor.vagabond_pawn.space.index}")
-            chosen_piece.destroy(executor, self.action_group)
+            if isinstance(chosen_piece, Sympathy) or isinstance(chosen_piece, AllianceBase):
+                yield from chosen_piece.destroy(executor, self.action_group)
+            else:
+                chosen_piece.destroy(executor, self.action_group)
         else:
             print(
                 f" - Destroying warrior on Clearing {executor.vagabond_pawn.space.index}")
@@ -54,7 +59,7 @@ class StrikeAction(Action):
 
             if chosen_faction.faction_id == Factions.MARQUISE_DE_CAT.value and chosen_faction.keep is not None:
                 set_print_colour(chosen_faction.print_colour)
-                chosen_faction.use_field_hospital(
+                yield from chosen_faction.use_field_hospital(
                     executor.vagabond_pawn.space, 1, self.action_group)
                 set_print_colour(executor.print_colour)
 
@@ -62,3 +67,4 @@ class StrikeAction(Action):
         executor.satchel.exhaust_item(Items.CROSSBOW)
 
         return super().perform(game_state, executor)
+        yield

@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 class WoodlandAlliance(Faction):
     def __init__(self, controller) -> None:
-        super().__init__(faction_id=3, reach_value=3,
+        super().__init__(faction_id=3, reach_value=3, setup_order=2,
                          max_warriors=10, controller=controller, print_colour="\033[38;5;82m")
         self.sympathy: List[Sympathy] = []
         self.max_bases = 3
@@ -64,8 +64,8 @@ class WoodlandAlliance(Faction):
         self.supporters.extend(self.deck.draw(3))
         print(f"- Added 3 Supporters")
         print(f"- Finished {self} Set Up\n")
-        yield
         return
+        yield
 
     def get_crafting_resources(self):
         crafting_resources = {suit: 0 for suit in Suits}
@@ -79,7 +79,7 @@ class WoodlandAlliance(Faction):
     def get_base_count(self) -> int:
         return sum(base is not None for base in self.bases.values())
 
-    def trigger_outrage(self, triggerer: Faction, clearing: Clearing, action_group):
+    def trigger_outrage(self, triggerer: Faction, clearing: Clearing, action_group, game_state: GameState):
         set_print_colour(self.print_colour)
         print(
             f" - OUTRAGE TRIGGERED by {triggerer} in clearing {clearing.index}")
@@ -88,18 +88,22 @@ class WoodlandAlliance(Faction):
         if any(card.suit == Suits.BIRD or card.suit == clearing.get_suit() for card in triggerer.hand):
             valid_cards = [card for card in triggerer.hand if card.suit ==
                            Suits.BIRD or card.suit == clearing.get_suit()]
-            chosen_card = triggerer.controller.send_game_message(
-                TriggererOutrageMessage(self.game_state, action_group, valid_cards)).chosen_card
+            game_state.active_player = triggerer
+            response = yield TriggererOutrageMessage(self.game_state, action_group, valid_cards)
+            chosen_card = response.chosen_card
+            game_state.active_player = game_state.current_player
             triggerer.hand.remove(chosen_card)
             print(
                 f" - {triggerer} has given matching card '{chosen_card}' to The {self}")
         # 2. If the player does not have a matching card, they must show the alliance their hand, and the alliance chooses which card to take
         elif len(triggerer.hand) > 0:
-            chosen_card = self.controller.send_game_message(
-                AllianceOutrageMessage(self.game_state, action_group, triggerer.hand)).chosen_card
+            game_state.active_player = self
+            response = yield AllianceOutrageMessage(self.game_state, action_group, triggerer.hand)
+            chosen_card = response.chosen_card
             triggerer.hand.remove(chosen_card)
             print(
                 f" - The {self} has taken non-matching card '{chosen_card}' from {triggerer}")
+            game_state.active_player = triggerer
         # 3. If the player has no cards, the alliance draws a card from the deck
         else:
             chosen_card = self.deck.draw(1)
@@ -110,10 +114,13 @@ class WoodlandAlliance(Faction):
             else:
                 set_print_colour(triggerer.print_colour)
                 return
+                yield
 
         # 4. Wherever this card comes from, it gets added to the alliance's supporter deck
         self.add_supporter(chosen_card)
         set_print_colour(triggerer.print_colour)
+        return
+        yield
 
     def add_supporter(self, card: Card):
         if self.get_base_count() > 0 or len(self.supporters) < 5:

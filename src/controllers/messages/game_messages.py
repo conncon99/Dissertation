@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 class GameMessages(Enum):
     AMBUSH_MESSAGE = auto()
-    BATTLE_START_MESSAGE = auto()
+    BATTLE_START_MESSAGE = auto()  # Never Used
     BATTLE_END_MESSAGE = auto()
     BATTLE_USE_CARD_MESSAGE = auto()
     PIECE_TARGETING_MESSAGE = auto()
@@ -32,7 +32,7 @@ class GameMessages(Enum):
     MARCH_2_MESSAGE = auto()
     MARCH_2_CHOICE_MESSAGE = auto()
     MARCH_2_UNITS_MESSAGE = auto()
-    OVERWORK_MESSAGE = auto()
+    OVERWORK_CLEARING_MESSAGE = auto()
     OVERWORK_DISCARD_MESSAGE = auto()
     MARQUISE_BUILDING_MESSAGE = auto()
     WOOD_REMOVAL_MESSAGE = auto()
@@ -49,8 +49,10 @@ class GameMessages(Enum):
     ROOST_SETUP_MESSAGE = auto()
     LEADER_SETUP_MESSAGE = auto()
     DECREE_RECRUIT_CLEARING_MESSAGE = auto()
-    EXTEND_DECREE_MESSAGE_1 = auto()
-    EXTEND_DECREE_MESSAGE_2 = auto()
+    EXTEND_DECREE_ACTION_MESSAGE_1 = auto()
+    EXTEND_DECREE_CARD_MESSAGE_1 = auto()
+    EXTEND_DECREE_ACTION_MESSAGE_2 = auto()
+    EXTEND_DECREE_CARD_MESSAGE_2 = auto()
     DECREE_BUILD_MESSAGE = auto()
     TURMOIL_LEADER_MESSAGE = auto()
 
@@ -249,9 +251,18 @@ class March2Message(GameMessage):
         self.available_moves = available_moves
 
 
-class OverworkMessage(GameMessage):
+class OverworkClearingMessage(GameMessage):
     def __init__(self, game_state, action_group, available_clearings, hand):
-        super().__init__(game_state, GameMessages.OVERWORK_MESSAGE, action_group)
+        super().__init__(game_state, GameMessages.OVERWORK_CLEARING_MESSAGE, action_group)
+        self.available_clearings = available_clearings
+        if not isinstance(self.available_clearings, list):
+            self.available_clearings = [available_clearings]
+        self.hand = hand
+
+
+class OverworkDiscardMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_clearings, hand):
+        super().__init__(game_state, GameMessages.OVERWORK_DISCARD_MESSAGE, action_group)
         self.available_clearings = available_clearings
         if not isinstance(self.available_clearings, list):
             self.available_clearings = [available_clearings]
@@ -316,16 +327,30 @@ class DecreeRecruitClearingMessage(GameMessage):
         self.available_clearings = available_clearings
 
 
-class ExtendDecreeMessage1(GameMessage):
+class ExtendDecreeActionMessage1(GameMessage):
     def __init__(self, game_state, action_group, available_cards, decree_types):
-        super().__init__(game_state, GameMessages.EXTEND_DECREE_MESSAGE_1, action_group)
+        super().__init__(game_state, GameMessages.EXTEND_DECREE_ACTION_MESSAGE_1, action_group)
         self.decree_types = decree_types
         self.available_cards = available_cards
 
 
-class ExtendDecreeMessage2(GameMessage):
+class ExtendDecreeCardMessage1(GameMessage):
     def __init__(self, game_state, action_group, available_cards, decree_types):
-        super().__init__(game_state, GameMessages.EXTEND_DECREE_MESSAGE_2, action_group)
+        super().__init__(game_state, GameMessages.EXTEND_DECREE_CARD_MESSAGE_1, action_group)
+        self.decree_types = decree_types
+        self.available_cards = available_cards
+
+
+class ExtendDecreeActionMessage2(GameMessage):
+    def __init__(self, game_state, action_group, available_cards, decree_types):
+        super().__init__(game_state, GameMessages.EXTEND_DECREE_ACTION_MESSAGE_2, action_group)
+        self.decree_types = decree_types
+        self.available_cards = available_cards
+
+
+class ExtendDecreeCardMessage2(GameMessage):
+    def __init__(self, game_state, action_group, available_cards, decree_types):
+        super().__init__(game_state, GameMessages.EXTEND_DECREE_CARD_MESSAGE_2, action_group)
         self.decree_types = decree_types
         self.available_cards = available_cards
 

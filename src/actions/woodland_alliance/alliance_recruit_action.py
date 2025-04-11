@@ -18,12 +18,14 @@ class AllianceRecruitAction(Action):
         self.id = ActionIDs.ALLIANCE_RECRUIT
 
     def can_perform(self, executor: WoodlandAlliance, game_state=None):
-        return len(executor.units) + executor.officers < executor.max_warriors and super().can_perform(executor, game_state) and any(base is not None for base in executor.bases.values())
+        return len(executor.units) + executor.officers < executor.max_warriors and super().can_perform(executor, game_state) and len(self._get_available_clearings(executor)) > 0
 
     def perform(self, game_state, executor: WoodlandAlliance):
-        available_clearings = [
-            base.space for base in executor.bases.values() if base is not None and not any(isinstance(token, Keep) for token in base.space.tokens[Factions.MARQUISE_DE_CAT.value])]
+        available_clearings = self._get_available_clearings(executor)
         response = yield AllianceRecruitMessage(game_state, self.action_group, available_clearings)
         clearing: Clearing = response.chosen_clearing
         Pawn(clearing, executor)
         return super().perform(game_state, executor)
+
+    def _get_available_clearings(self, executor: WoodlandAlliance):
+        return [base.space for base in executor.bases.values() if base is not None and not any(isinstance(token, Keep) for token in base.space.tokens[Factions.MARQUISE_DE_CAT.value])]

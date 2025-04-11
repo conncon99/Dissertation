@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 class Vagabond(Faction):
     def __init__(self, controller, use_manual_card_draw=False):
-        super().__init__(faction_id=4, reach_value=5, max_warriors=0,
+        super().__init__(faction_id=4, reach_value=5, max_warriors=0, setup_order=3,
                          controller=controller, print_colour="\033[38;5;250m")
 
         self.satchel = Satchel(self)

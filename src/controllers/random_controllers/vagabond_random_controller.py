@@ -18,6 +18,15 @@ class VagabondRandomController(VagabondController):
         """A dummy controller that chooses all its options randomly"""
         super().__init__()
 
+    def _handle_faction_messages(self, msg):
+        if self.pending_action:
+            print("- Using Pending Action")
+            action = self.pending_action
+            self.pending_action = None
+            return action
+        else:
+            return super()._handle_faction_messages(msg)
+
     def _handle_ambushes(self, msg: AmbushMessage) -> AmbushResponse:
         msg.available_ambush_cards.append(None)
         return AmbushResponse(random.choice(msg.available_ambush_cards))
