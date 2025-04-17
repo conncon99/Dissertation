@@ -1,12 +1,12 @@
 from __future__ import annotations
-from pieces.building import Building
+from src.pieces.building import Building
 from typing import TYPE_CHECKING
-from pieces.marquise_de_cat.marquise_tokens import Wood
-from pieces.pawn import Pawn
-from board.clearing import Clearing
+from src.pieces.marquise_de_cat.marquise_tokens import Wood
+from src.pieces.pawn import Pawn
 
 if TYPE_CHECKING:
-    from factions.marquise_de_cat import Marquise
+    from src.factions.marquise_de_cat import Marquise
+    from src.board.clearing import Clearing
 
 
 class Sawmill(Building):
@@ -25,7 +25,6 @@ class Workshop(Building):
         faction.workshops.append(self)
 
     def get_suit(self):
-        assert isinstance(self.space, Clearing)
         return self.space.get_suit()
 
 

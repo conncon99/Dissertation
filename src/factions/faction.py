@@ -2,18 +2,20 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Dict, List, TYPE_CHECKING, Optional, Callable, Generator, Any
+import logging
 
-from utils.root_types import Suits, Items
-from utils.callback_handler import CallbackTimes, BattleCallbackTimes
-from actions.action_handler import ActionGroup, Action
+from src.utils.root_types import Suits, Items
+from src.utils.callback_handler import CallbackTimes, BattleCallbackTimes
+from src.actions.action_handler import ActionGroup
 
 if TYPE_CHECKING:
-    from cards.card import Card
-    from pieces.pawn import Pawn
-    from controllers.base_controllers.controller import Controller
-    from cards.deck import Deck
-    from utils.game_state import GameState
-    from controllers.messages.game_messages import GameMessage
+    from src.actions.action_handler import Action
+    from src.cards.card import Card
+    from src.pieces.pawn import Pawn
+    from src.controllers.base_controllers.controller import Controller
+    from src.cards.deck import Deck
+    from src.utils.game_state import GameState
+    from src.controllers.messages.game_messages import GameMessage
 
 
 @dataclass
@@ -24,6 +26,13 @@ class Faction(ABC):
     controller: Controller
 
     victory_points: int = 0
+
+    prev_vp: int = 0
+    prev_unit_count: int = 0
+    prev_clearings_controlled: int = 0
+    prev_dominance_clearings_controlled: int = 0
+    prev_active_cards_count: int = 0
+
     hand: List[Card] = field(default_factory=list)
     items: List[Items] = field(default_factory=list)
     active_cards: List[Card] = field(default_factory=list)
@@ -33,6 +42,7 @@ class Faction(ABC):
     deck: Deck = None
     print_colour: str = ""
     game_state: GameState = None
+    logger: logging.Logger = logging.getLogger(__name__)
 
     dominance: Optional[Suits] = None
     has_won: bool = False

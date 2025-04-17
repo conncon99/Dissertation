@@ -1,16 +1,17 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import List, Tuple, TYPE_CHECKING
-from controllers.messages.game_messages import MoveMessage
-from utils.root_types import Factions, Items
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import MoveFromMessage, MoveToMessage, MoveUnitsMessage
+from src.controllers.messages.controller_messages import MoveFromResponse, MoveToResponse, MoveUnitsResponse
+from src.utils.root_types import Factions
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from board.clearing import Clearing
-    from pieces.pawn import Pawn
-    from factions.faction import Faction
-    from utils.game_state import GameState
+    from src.board.clearing import Clearing
+    from src.pieces.pawn import Pawn
+    from src.factions.faction import Faction
+    from src.utils.game_state import GameState
 
 
 class MoveAction(Action):
@@ -46,7 +47,8 @@ class MoveAction(Action):
             to_clearing.units[executor.faction_id].append(unit)
             unit.space = to_clearing
         if any(faction.faction_id == Factions.WOODLAND_ALLIANCE for faction in game_state.faction_list) and executor.faction_id != Factions.WOODLAND_ALLIANCE.value and any(isinstance(item, Sympathy) for item in to_clearing.tokens[Factions.WOODLAND_ALLIANCE.value]):
-            print(" - Moved into clearing with a sympathy token: Outrage Triggered")
+            self.logger.info(
+                " - Moved into clearing with a sympathy token: Outrage Triggered")
             # Trigger outrage
             woodland_alliance = next(
                 (faction for faction in game_state.faction_list if faction.faction_id == Factions.WOODLAND_ALLIANCE.value))
@@ -57,10 +59,24 @@ class MoveAction(Action):
         # 1. Get all possible moves
         valid_moves = self.get_all_possible_moves(game_state, executor)
         # 2. Make a choice of which move to make and who to move
-        response = yield MoveMessage(game_state, self.action_group, valid_moves)
-        from_clearing, to_clearing, units = response.move
+
+        move_from_response: MoveFromResponse = yield MoveFromMessage(game_state, self.action_group, list(set([move[0] for move in valid_moves])))
+
+        from_clearing: Clearing = move_from_response.from_clearing
+
+        move_to_response: MoveToResponse = yield MoveToMessage(game_state, self.action_group, list(set([move[1]
+                                                                                                   for move in valid_moves if move[0] == from_clearing])))
+        to_clearing: Clearing = move_to_response.to_clearing
+
+        move_units_response: MoveUnitsResponse = yield MoveUnitsMessage(game_state, self.action_group, from_clearing.units[executor.faction_id])
+
+        num_units = move_units_response.num_units
+
+        units = from_clearing.units[executor.faction_id][:num_units]
+        self.logger.debug(
+            f"Max available Units: {from_clearing.units[executor.faction_id]}")
         # 3. Execute move
-        print(
-            f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {len(units)} units")
+        self.logger.info(
+            f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {num_units} units")
         yield from self.move(from_clearing, to_clearing, units, executor, game_state)
         return super().perform(game_state, executor)

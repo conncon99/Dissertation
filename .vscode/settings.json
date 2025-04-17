@@ -12,9 +12,12 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-
+    "python.formatting.autopep8Args": [
+        "--ignore", "E402"
+    ],
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8",
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
       }
+      
 }

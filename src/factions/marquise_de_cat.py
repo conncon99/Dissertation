@@ -1,32 +1,32 @@
 from __future__ import annotations
-from factions.faction import Faction
-from pieces.marquise_de_cat.marquise_tokens import Keep
-from controllers.messages.game_messages import MarquiseBuildingSetupMessage
-from controllers.messages.controller_messages import MarquiseBuildingSetupResponse
-from controllers.messages.game_messages import FieldHospitalMessage
-from actions.action_handler import ActionGroup
-from actions.marquise_de_cat.place_wood import PlaceWood
-from actions.marquise_de_cat.recruit_action import RecruitAction
-from actions.factionless.craft_action import CraftAction
-from actions.factionless.draw_and_discard_action import DrawAndDiscardAction
-from actions.marquise_de_cat.overwork_action import OverworkAction
-from actions.marquise_de_cat.marquise_build import MarquiseBuild
-from actions.marquise_de_cat.march_action import MarchAction
-from actions.marquise_de_cat.spend_bird_card_action import SpendBirdCardAction
-from actions.factionless.battle_action import BattleAction
-from actions.factionless.play_dominance_action import PlayDominanceAction
-from utils.root_types import Suits
-from board.map import Map
-from utils.callback_handler import CallbackTimes
+from src.factions.faction import Faction
+from src.pieces.marquise_de_cat.marquise_tokens import Keep
+from src.controllers.messages.game_messages import MarquiseWorkshopSetupMessage, MarquiseRecruiterSetupMessage, MarquiseSawmillSetupMessage
+from src.controllers.messages.controller_messages import MarquiseWorkshopSetupResponse, MarquiseRecruiterSetupResponse, MarquiseSawmillSetupResponse
+from src.controllers.messages.game_messages import FieldHospitalMessage
+from src.actions.action_handler import ActionGroup
+from src.actions.marquise_de_cat.place_wood import PlaceWood
+from src.actions.marquise_de_cat.recruit_action import RecruitAction
+from src.actions.factionless.craft_action import CraftAction
+from src.actions.factionless.draw_and_discard_action import DrawAndDiscardAction
+from src.actions.marquise_de_cat.overwork_action import OverworkAction
+from src.actions.marquise_de_cat.marquise_build import MarquiseBuild
+from src.actions.marquise_de_cat.march_action import MarchAction
+from src.actions.marquise_de_cat.spend_bird_card_action import SpendBirdCardAction
+from src.actions.factionless.battle_action import BattleAction
+from src.actions.factionless.play_dominance_action import PlayDominanceAction
+from src.utils.root_types import Suits
+from src.board.map import Map
+from src.utils.callback_handler import CallbackTimes
 from typing import List, TYPE_CHECKING, Dict
-from controllers.messages.game_messages import KeepClearingMessage
-from pieces.pawn import Pawn
-from pieces.marquise_de_cat.marquise_buildings import Sawmill, Workshop, Recruiter
+from src.controllers.messages.game_messages import KeepClearingMessage
+from src.pieces.pawn import Pawn
+from src.pieces.marquise_de_cat.marquise_buildings import Sawmill, Workshop, Recruiter
 if TYPE_CHECKING:
-    from board.clearing import Clearing
-    from pieces.marquise_de_cat.marquise_tokens import Wood
-    from cards.deck import Deck
-    from utils.game_state import GameState
+    from src.board.clearing import Clearing
+    from src.pieces.marquise_de_cat.marquise_tokens import Wood
+    from src.cards.deck import Deck
+    from src.utils.game_state import GameState
 
 
 class Marquise(Faction):
@@ -74,7 +74,7 @@ class Marquise(Faction):
         return crafting_resources
 
     def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
-        print(f"Setting Up {self}")
+        self.logger.info(f"Setting Up {self}")
 
         self.deck = deck
         self.game_state = game_state
@@ -86,7 +86,7 @@ class Marquise(Faction):
         response = yield KeepClearingMessage(game_state, None, free_corner_clearings)
         keep_clearing: Clearing = response.keep_clearing
         self.keep = Keep(keep_clearing, self)
-        print(f"- Placed Keep in clearing {keep_clearing.index}")
+        self.logger.info(f"- Placed Keep in clearing {keep_clearing.index}")
 
         # Place warrior in each clearing except the diagonally opposite corner from the keep
         for clearing in map.clearings:
@@ -104,24 +104,35 @@ class Marquise(Faction):
         if keep_clearing.has_free_slots():
             available_clearings.append(keep_clearing)
 
-        setup_response: MarquiseBuildingSetupResponse = yield MarquiseBuildingSetupMessage(
-            game_state, None, available_clearings)
+        sawmill_response: MarquiseSawmillSetupResponse = yield MarquiseSawmillSetupMessage(game_state, None, available_clearings)
 
-        sawmill = Sawmill(setup_response.sawmill_clearing, self,
-                          setup_response.sawmill_clearing.get_first_free_slot())
-        recruiter = Recruiter(setup_response.recruiter_clearing, self,
-                              setup_response.recruiter_clearing.get_first_free_slot())
-        workshop = Workshop(setup_response.workshop_clearing, self,
-                            setup_response.workshop_clearing.get_first_free_slot())
+        sawmill = Sawmill(sawmill_response.sawmill_clearing, self,
+                          sawmill_response.sawmill_clearing.get_first_free_slot())
 
-        print(
+        if not sawmill_response.sawmill_clearing.has_free_slots():
+            available_clearings.remove(sawmill_response.sawmill_clearing)
+
+        recruiter_response: MarquiseRecruiterSetupResponse = yield MarquiseRecruiterSetupMessage(game_state, None, available_clearings)
+
+        recruiter = Recruiter(recruiter_response.recruiter_clearing, self,
+                              recruiter_response.recruiter_clearing.get_first_free_slot())
+
+        if not recruiter_response.recruiter_clearing.has_free_slots():
+            available_clearings.remove(recruiter_response.recruiter_clearing)
+
+        workshop_response: MarquiseWorkshopSetupResponse = yield MarquiseWorkshopSetupMessage(game_state, None, available_clearings)
+
+        workshop = Workshop(workshop_response.workshop_clearing, self,
+                            workshop_response.workshop_clearing.get_first_free_slot())
+
+        self.logger.info(
             f"- Placed Sawmill in clearing {sawmill.space.index} at slot {sawmill.slot_idx}")
-        print(
+        self.logger.info(
             f"- Placed Recruiter in clearing {recruiter.space.index} at slot {recruiter.slot_idx}")
-        print(
+        self.logger.info(
             f"- Placed Workshop in clearing {workshop.space.index} at slot {workshop.slot_idx}")
 
-        print(f"- Finished {self} Set Up\n")
+        self.logger.info(f"- Finished {self} Set Up\n")
         return
 
     def get_bonus_card_draws(self):
@@ -143,14 +154,16 @@ class Marquise(Faction):
             chosen_card = response.chosen_card
 
             if chosen_card is not None:
-                print(
+                self.logger.info(
                     f" - Using Field Hospital to save {units_destroyed} units on clearing {clearing.index}")
                 self.discard_card(chosen_card)
                 for _ in range(units_destroyed):
                     Pawn(self.keep.space, self)
             else:
-                print(" - Field Hospital not used")
+                pass
+                self.logger.info(" - Field Hospital not used")
         else:
-            print(" - No valid cards for Field Hospital")
+            pass
+            self.logger.info(" - No valid cards for Field Hospital")
         return
         yield

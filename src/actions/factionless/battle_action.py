@@ -1,22 +1,22 @@
 from __future__ import annotations
-import random
-from actions.action_handler import Action
-from controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage, AmbushMessage, ChooseAllyMessage
-from controllers.messages.controller_messages import AmbushResponse
-from utils.root_types import EyrieLeaders, Factions, Items, Suits
+import numpy as np
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage, AmbushMessage, ChooseAllyMessage
+from src.controllers.messages.controller_messages import AmbushResponse
+from src.utils.root_types import EyrieLeaders, Factions, Items, Suits
 
 from typing import TYPE_CHECKING, List
 
-from utils.callback_handler import BattleCallbackTimes
-from utils.colour_utils import set_print_colour
-from actions.action_group_registry import ActionIDs
-from controllers.nn_controllers.battle_data import BattleData
+from src.utils.callback_handler import BattleCallbackTimes
+from src.utils.colour_utils import set_print_colour
+from src.actions.action_group_registry import ActionIDs
+from src.controllers.nn_controllers.battle_data import BattleData
 
 if TYPE_CHECKING:
-    from utils.game_state import GameState
-    from board.clearing import Clearing
-    from factions.faction import Faction
-    from factions.vagabond.vagabond import Vagabond
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
+    from src.factions.faction import Faction
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class BattleModifiers():
@@ -84,7 +84,7 @@ class BattleAction(Action):
     def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
         battle_modifier = BattleModifiers(attacker, defender, clearing)
 
-        from cards.card import AmbushCard
+        from src.cards.card import AmbushCard
 
         available_ambush_cards = [
             card for card in defender.hand if isinstance(card, AmbushCard) and (card.suit == clearing.get_suit() or card.suit == Suits.BIRD)]
@@ -121,7 +121,9 @@ class BattleAction(Action):
                 friendly_warrior_count = attacker.satchel.get_non_damaged_count(Items.SWORD) if chosen_ally is None else attacker.satchel.get_non_damaged_count(
                     Items.SWORD) + clearing.get_faction_warrior_count(chosen_ally.faction_id)
                 if chosen_ally is not None:
-                    print(f" - Attacking with '{chosen_ally}' as ally")
+                    pass
+                    self.logger.info(
+                        f" - Attacking with '{chosen_ally}' as ally")
             else:
                 friendly_warrior_count = attacker.satchel.get_non_damaged_count(
                     Items.SWORD)
@@ -133,8 +135,8 @@ class BattleAction(Action):
         enemy_warrior_count = clearing.get_faction_warrior_count(
             defender.faction_id) if defender.faction_id != Factions.VAGABOND.value else defender.satchel.get_non_damaged_count(Items.SWORD)
 
-        roll1 = random.randint(0, 3)
-        roll2 = random.randint(0, 3)
+        roll1 = np.random.randint(0, 4)
+        roll2 = np.random.randint(0, 4)
         # Attackers take the higher roll, with damage being limited by the number of warriors
         if defender.faction_id == Factions.WOODLAND_ALLIANCE.value:
             # Woodland Alliance Guerilla Warfare
@@ -144,8 +146,10 @@ class BattleAction(Action):
             attacker_dmg = min(max(roll1, roll2), friendly_warrior_count)
             defender_dmg = min(min(roll1, roll2), enemy_warrior_count)
 
-        print(f" - Attacker ({attacker}) Damage before mods: {attacker_dmg}")
-        print(f" - Defender ({defender}) Damage before mods: {defender_dmg}")
+        self.logger.debug(
+            f" - Attacker ({attacker}) Damage before mods: {attacker_dmg}")
+        self.logger.debug(
+            f" - Defender ({defender}) Damage before mods: {defender_dmg}")
 
         if game_state.use_manual_rolling:
             attacker_dmg = int(input("Enter Attacker Damage: "))
@@ -175,9 +179,9 @@ class BattleAction(Action):
         defender_dmg = max(defender_dmg, 0)
 
         yield from clearing.damage(victim=defender, attacker=attacker,
-                                   amount=attacker_dmg, action_group=self.action_group)
+                                   amount=attacker_dmg, logger=self.logger, action_group=self.action_group)
         yield from clearing.damage(victim=attacker, attacker=defender,
-                                   amount=defender_dmg, action_group=self.action_group)
+                                   amount=defender_dmg, logger=self.logger, action_group=self.action_group)
         if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
             attacker.battle_ally = None
         set_print_colour(attacker.print_colour)

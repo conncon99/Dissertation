@@ -1,7 +1,8 @@
-from utils.root_types import Suits, Items
+from src.utils.root_types import Suits, Items
 from typing import Tuple
 from dataclasses import dataclass
-from random import shuffle
+import numpy as np
+import logging
 
 
 @dataclass
@@ -46,16 +47,17 @@ class QuestDeck():
         self.use_manual_card_draw = use_manual_card_draw
         self.quests = [RABBIT_ERRAND, FOX_ERRAND, MOUSE_ESCORT, RABBIT_EXPEL_BANDITS,
                        MOUSE_EXPEL_BANDITS, RABBIT_FEND_BEAR, MOUSE_FEND_BEAR, FUNDRAISING, RABBIT_SPEECH, FOX_SPEECH, MOUSE_GUARD_DUTY, RABBIT_GUARD_DUTY, FOX_LOGISTICS_HELP, MOUSE_LOGISTICS_HELP, REPAIR_A_SHED]
-        shuffle(self.quests)
+        np.random.shuffle(self.quests)
+        self.logger = logging.getLogger(__name__)
 
     def draw(self, amount: int):
         drawn_cards = []
         while len(drawn_cards) < amount and len(self.quests) > 0:
             if self.use_manual_card_draw:
-                print("Choose remaining quest from deck:")
+                self.logger.info("Choose remaining quest from deck:")
                 self.deck_mapping = {i: card for i,
                                      card in enumerate(self.quests)}
-                print(self.deck_mapping)
+                self.logger.info(self.deck_mapping)
                 str_index = input("Enter the quest you want: ")
                 while not str_index.isnumeric() or str_index.isnumeric() and (int(str_index) < 0 or int(str_index) >= len(self.quests)):
                     str_index = input("Enter the quest you want: ")

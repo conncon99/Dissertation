@@ -3,9 +3,9 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from collections import deque
-from utils.colour_utils import original_print
+from src.utils.colour_utils import original_print
 import matplotlib.pyplot as plt
-from controllers.nn_controllers.icm import ICM
+from src.controllers.nn_controllers.icm import ICM
 
 loss_history = []
 icm_loss_history = []

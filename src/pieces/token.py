@@ -1,13 +1,12 @@
 from __future__ import annotations
-from pieces.piece import Piece
+from src.pieces.piece import Piece
 from typing import TYPE_CHECKING
-from utils.root_types import EyrieLeaders, Factions
-from factions.vagabond.relationship_track import HOSTILE
-from pieces.piece_with_id import PieceWithID
+from src.utils.root_types import EyrieLeaders, Factions
+from src.pieces.piece_with_id import PieceWithID
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.clearing import Clearing
+    from src.factions.faction import Faction
+    from src.board.clearing import Clearing
 
 
 class Token(Piece, PieceWithID):
@@ -25,8 +24,9 @@ class Token(Piece, PieceWithID):
 
     def destroy(self, attacker: Faction, action_group=None):
         if attacker and not attacker.dominance:
+            from src.factions.vagabond.relationship_track import HOSTILE
             if attacker.faction_id == Factions.VAGABOND.value and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:
-                print(f" - {attacker} gained 1 VP due to Infamy")
+                self.logger.info(f" - {attacker} gained 1 VP due to Infamy")
                 attacker.add_vp(1)
 
             attacker.add_vp(1)
@@ -34,5 +34,5 @@ class Token(Piece, PieceWithID):
                 attacker.gained_despot_bonus = True
         self.space.tokens[self.faction.faction_id].remove(self)
         if attacker:
-            print(f" - {attacker} destroyed {self}")
+            self.logger.info(f" - {attacker} destroyed {self}")
         PieceWithID.destroy(self)

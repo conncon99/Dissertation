@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import OrganizeMessage
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import OrganizeMessage
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from pieces.pawn import Pawn
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.pieces.pawn import Pawn
 
 
 class OrganizeAction(Action):
@@ -28,7 +28,7 @@ class OrganizeAction(Action):
         chosen_unit: Pawn = response.chosen_unit
 
         Sympathy(chosen_unit.space, executor)
-        print(
+        self.logger.info(
             f" - Replaced warrior on clearing {chosen_unit.space.index} with a Sympathy token")
         chosen_unit.destroy(None, self.action_group)
 

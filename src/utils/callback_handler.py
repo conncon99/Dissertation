@@ -1,12 +1,12 @@
 from typing import Any, List, Callable, TYPE_CHECKING, Dict
 from enum import Enum, auto
-from controllers.messages.controller_messages import ActionChoiceResponse
-from controllers.messages.game_messages import ActionChoiceMessage
-from utils.root_types import GamePhase
+from src.controllers.messages.controller_messages import ActionChoiceResponse
+from src.controllers.messages.game_messages import ActionChoiceMessage
+from src.utils.root_types import GamePhase
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from controllers.base_controllers.controller import Controller
+    from src.factions.faction import Faction
+    from src.controllers.base_controllers.controller import Controller
 
 
 class CallbackTimes(Enum):

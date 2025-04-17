@@ -1,6 +1,6 @@
-from board.map import Map
-from board.forest import Forest
-from utils.root_types import Suits
+from src.board.map import Map
+from src.board.forest import Forest
+from src.utils.root_types import Suits
 
 
 class ClassicMap(Map):

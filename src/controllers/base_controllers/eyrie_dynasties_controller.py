@@ -1,6 +1,6 @@
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
-from controllers.base_controllers.controller import Controller
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
+from src.controllers.base_controllers.controller import Controller
 from abc import abstractmethod
 
 
@@ -16,15 +16,20 @@ class EyrieDynastiesController(Controller):
                 return self._handle_leader_setup_message(msg)
             case GameMessages.DECREE_RECRUIT_CLEARING_MESSAGE:
                 return self._handle_decree_recruit_message(msg)
-            case GameMessages.EXTEND_DECREE_MESSAGE_1:
-                return self._handle_extend_decree_message_1(msg)
-            case GameMessages.EXTEND_DECREE_MESSAGE_2:
-                return self._handle_extend_decree_message_2(msg)
+            case GameMessages.EXTEND_DECREE_ACTION_MESSAGE_1:
+                return self._handle_extend_decree_action_1(msg)
+            case GameMessages.EXTEND_DECREE_CARD_MESSAGE_1:
+                return self._handle_extend_decree_card_1(msg)
+            case GameMessages.EXTEND_DECREE_ACTION_MESSAGE_2:
+                return self._handle_extend_decree_action_2(msg)
+            case GameMessages.EXTEND_DECREE_CARD_MESSAGE_2:
+                return self._handle_extend_decree_card_2(msg)
             case GameMessages.DECREE_BUILD_MESSAGE:
                 return self._handle_decree_build_message(msg)
             case GameMessages.TURMOIL_LEADER_MESSAGE:
                 return self._handle_turmoil_leader_message(msg)
-        return None
+        raise TypeError(
+            f"Invalid GameMessage Type {msg.type.name} for EyrieController")
 
     @abstractmethod
     def _handle_roostless_message(
@@ -43,12 +48,20 @@ class EyrieDynastiesController(Controller):
         self, msg: DecreeRecruitClearingMessage) -> DecreeRecruitClearingResponse: ...
 
     @abstractmethod
-    def _handle_extend_decree_message_1(
-        self, msg: ExtendDecreeMessage1) -> ExtendDecreeResponse1: ...
+    def _handle_extend_decree_card_1(
+        self, msg: ExtendDecreeCardMessage1) -> ExtendDecreeCardResponse1: ...
 
     @abstractmethod
-    def _handle_extend_decree_message_2(
-        self, msg: ExtendDecreeMessage2) -> ExtendDecreeResponse2: ...
+    def _handle_extend_decree_action_1(
+        self, msg: ExtendDecreeCardMessage1) -> ExtendDecreeCardResponse1: ...
+
+    @abstractmethod
+    def _handle_extend_decree_card_2(
+        self, msg: ExtendDecreeCardMessage2) -> ExtendDecreeCardResponse2: ...
+
+    @abstractmethod
+    def _handle_extend_decree_action_2(
+        self, msg: ExtendDecreeCardMessage2) -> ExtendDecreeCardResponse2: ...
 
     @abstractmethod
     def _handle_decree_build_message(

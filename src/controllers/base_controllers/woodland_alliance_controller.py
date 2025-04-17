@@ -1,6 +1,6 @@
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
-from controllers.base_controllers.controller import Controller
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
+from src.controllers.base_controllers.controller import Controller
 from abc import abstractmethod
 
 
@@ -28,7 +28,8 @@ class AllianceController(Controller):
                 return self._handle_organize_message(msg)
             case GameMessages.ALLIANCE_OUTRAGE_MESSAGE:
                 return self._handle_alliance_outrage_message(msg)
-        return None
+        raise TypeError(
+            f"Invalid GameMessage Type {msg.type.name} for AllianceController")
 
     @abstractmethod
     def _handle_no_bases_message(

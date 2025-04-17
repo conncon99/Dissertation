@@ -1,19 +1,21 @@
 from __future__ import annotations
-from cards.cards import *
-from random import shuffle
+from src.cards.cards import *
+import numpy as np
 from typing import TYPE_CHECKING, List
-from cards.cards import DOMINANCE_CARDS
+import logging
+from src.cards.cards import DOMINANCE_CARDS
 
 if TYPE_CHECKING:
-    from cards.card import Card
-    from factions.faction import Faction
-    from board.map import Map
+    from src.cards.card import Card
+    from src.factions.faction import Faction
+    from src.board.map import Map
 
 
 class Deck:
 
     def __init__(self, map: Map, use_manual_card_draw=False) -> None:
         self.use_manual_card_draw = use_manual_card_draw
+        self.logger = logging.getLogger("Deck")
         self.deck = [
             # Item Cards
             SWORD_MOUSE,
@@ -81,7 +83,7 @@ class Deck:
 
     def shuffle(self):
         """Shuffle the deck"""
-        shuffle(self.deck)
+        np.random.shuffle(self.deck)
 
     def draw(self, number: int) -> List[Card]:
         """Draw a specified number of cards from the deck"""
@@ -89,16 +91,17 @@ class Deck:
         while len(drawn_cards) < number:
             # If the deck is empty, replenish it
             if not self.deck and self.discard != []:
-                print(f" - Deck is empty, replenishing...")
+                self.logger.info(f" - Deck is empty, replenishing...")
                 self.replenish_deck()
             elif not self.deck and not self.discard:
-                print(f" - Deck and Discard are empty, no card drawn")
+                self.logger.info(
+                    f" - Deck and Discard are empty, no card drawn")
                 return drawn_cards
             if self.use_manual_card_draw:
-                print("Choose remaining card from deck:")
+                self.logger.info("Choose remaining card from deck:")
                 self.deck_mapping = {i: card for i,
                                      card in enumerate(self.deck)}
-                print(self.deck_mapping)
+                self.logger.info(self.deck_mapping)
                 str_index = input("Enter the card you want: ")
                 while not str_index.isnumeric() or str_index.isnumeric() and (int(str_index) < 0 or int(str_index) >= len(self.deck)):
                     str_index = input("Enter the card you want: ")
@@ -119,7 +122,8 @@ class Deck:
 
         if card in DOMINANCE_CARDS:
             self.map.available_dominance_cards.append(card)
-            print(f" - Placed {card} in available dominance card pile")
+            self.logger.info(
+                f" - Placed {card} in available dominance card pile")
         else:
             self.discard.append(card)
-            print(f" - Discarded '{card}'")
+            self.logger.info(f" - Discarded '{card}'")

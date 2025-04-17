@@ -1,14 +1,15 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Items, Suits
-from board.clearing import Clearing
-from controllers.messages.game_messages import ChooseQuestMessage, ChooseQuestRewardMessage, QuestUseItemTrackMessage
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Items
+from src.board.clearing import Clearing
+from src.controllers.messages.game_messages import ChooseQuestMessage, ChooseQuestRewardMessage, QuestUseItemTrackMessage
+from src.controllers.messages.controller_messages import QuestUseItemTrackResponse
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
-    from factions.vagabond.quests import QuestCard
+    from src.factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.quests import QuestCard
 
 
 class QuestAction(Action):
@@ -28,23 +29,28 @@ class QuestAction(Action):
         response = yield ChooseQuestMessage(game_state, self.action_group, available_quests)
         chosen_quest = response.chosen_quest
 
-        print(
+        self.logger.info(
             f" - completed quest: '{chosen_quest}' in Clearing {executor.vagabond_pawn.space.index}")
 
         item1, item2 = chosen_quest.items
         use_item_track_1, use_item_track_2 = False, False
-        if self._get_track_item_count(executor, item1) > 0:
-            response = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item1], self._get_track_item_count(executor, item1))
+        if self._get_track_item_count(executor, item1) > 0 and executor.satchel.available_items[item1] > 0:
+            response: QuestUseItemTrackResponse = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item1], self._get_track_item_count(executor, item1))
             use_item_track_1 = response.use_item_track
+        elif self._get_track_item_count(executor, item1) > 0:
+            use_item_track_1 = True
         executor.satchel.exhaust_item(item1, use_item_track_1)
-        if self._get_track_item_count(executor, item2) > 0:
-            response = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item2], self._get_track_item_count(executor, item2))
+
+        if self._get_track_item_count(executor, item2) > 0 and executor.satchel.available_items[item2] > 0:
+            response: QuestUseItemTrackResponse = yield QuestUseItemTrackMessage(game_state, self.action_group, executor.satchel.available_items[item2], self._get_track_item_count(executor, item2))
             use_item_track_2 = response.use_item_track
+        elif self._get_track_item_count(executor, item2) > 0:
+            use_item_track_2 = True
         executor.satchel.exhaust_item(item2, use_item_track_2)
 
         executor.completed_quests[chosen_quest.suit] += 1
         new_quest_card = executor.quest_deck.draw(1)
-        print(f" - Drew new quest card: {new_quest_card}")
+        self.logger.info(f" - Drew new quest card: {new_quest_card}")
         executor.quest_cards.extend(new_quest_card)
 
         # Choose Reward
@@ -53,12 +59,12 @@ class QuestAction(Action):
 
         if take_vp_reward:
             executor.add_vp(executor.completed_quests[chosen_quest.suit])
-            print(
+            self.logger.info(
                 f" - Gaining {executor.completed_quests[chosen_quest.suit]} victory points as a reward")
         else:
             reward_cards = executor.deck.draw(2)
             executor.hand.extend(reward_cards)
-            print(f" - Drew cards {reward_cards} as a reward")
+            self.logger.info(f" - Drew cards {reward_cards} as a reward")
 
         return super().perform(game_state, executor)
 

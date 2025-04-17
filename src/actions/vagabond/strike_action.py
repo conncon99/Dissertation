@@ -1,16 +1,16 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from utils.root_types import Items, Factions
+from src.actions.action_handler import Action
+from src.utils.root_types import Items, Factions
 from typing import TYPE_CHECKING
-from board.clearing import Clearing
-from controllers.messages.game_messages import StrikeFactionChoiceMessage, StrikePieceTargetingMessage
-from pieces.woodland_alliance.alliance_buildings import AllianceBase
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from utils.colour_utils import set_print_colour
-from actions.action_group_registry import ActionIDs
+from src.board.clearing import Clearing
+from src.controllers.messages.game_messages import StrikeFactionChoiceMessage, StrikePieceTargetingMessage
+from src.pieces.woodland_alliance.alliance_buildings import AllianceBase
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.utils.colour_utils import set_print_colour
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class StrikeAction(Action):
@@ -30,29 +30,29 @@ class StrikeAction(Action):
         # Choose Faction to target
         response = yield StrikeFactionChoiceMessage(game_state, self.action_group, available_factions)
         chosen_faction = response.chosen_faction
-        print(
+        self.logger.info(
             f" - Targeting {chosen_faction} with strike on Clearing {executor.vagabond_pawn.space.index}")
 
         # If there are no warriors, choose piece to target
         if executor.vagabond_pawn.space.get_faction_warrior_count(chosen_faction.faction_id) == 0:
             available_targets = []
             for slot in executor.vagabond_pawn.space.slots:
-                if slot is not None:
+                if slot is not None and slot.faction and slot.faction.faction_id == chosen_faction.faction_id:
                     available_targets.append(slot)
 
             for token in executor.vagabond_pawn.space.tokens[chosen_faction.faction_id]:
                 available_targets.append(token)
 
-            response = yield StrikePieceTargetingMessage(game_state, self.action_group, available_targets)
+            response = yield StrikePieceTargetingMessage(game_state, self.action_group, available_targets, chosen_faction)
             chosen_piece = response.chosen_piece
-            print(
+            self.logger.info(
                 f" - Destroying Token/Building on Clearing {executor.vagabond_pawn.space.index}")
             if isinstance(chosen_piece, Sympathy) or isinstance(chosen_piece, AllianceBase):
                 yield from chosen_piece.destroy(executor, self.action_group)
             else:
                 chosen_piece.destroy(executor, self.action_group)
         else:
-            print(
+            self.logger.info(
                 f" - Destroying warrior on Clearing {executor.vagabond_pawn.space.index}")
             executor.vagabond_pawn.space.units[chosen_faction.faction_id][0].destroy(
                 executor, self.action_group)

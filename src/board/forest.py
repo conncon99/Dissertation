@@ -1,8 +1,8 @@
-from board.space import Space
+from src.board.space import Space
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from board.clearing import Clearing
-    from utils.game_settings import GameSettings
+    from src.board.clearing import Clearing
+    from src.utils.game_settings import GameSettings
 
 
 class Forest(Space):

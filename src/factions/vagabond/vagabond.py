@@ -1,37 +1,38 @@
 from __future__ import annotations
-from factions.faction import Faction
+from src.factions.faction import Faction
 from typing import List, TYPE_CHECKING, Dict, Optional
-from utils.root_types import Items, Suits
-from factions.vagabond.satchel import Satchel
-from factions.vagabond.quests import QuestCard, QuestDeck
-from pieces.vagabond.vagabond_pawn import VagabondPawn
-from factions.vagabond.vagabond_characters import Characters
-from board.clearing import Clearing
-from controllers.messages.game_messages import ChooseCharacterMessage, VagabondPlacementMessage
-from factions.vagabond.relationship_track import RelationshipTrack, ALLIED
-from utils.callback_handler import CallbackTimes
-from actions.action_handler import ActionGroup
-from actions.vagabond.slip_action import SlipAction
-from actions.vagabond.refresh_action import RefreshAction
-from actions.vagabond.vagabond_move_action import VagabondMoveAction
-from actions.vagabond.explore_action import ExploreAction
-from actions.vagabond.special_action import SpecialAction
-from actions.vagabond.quest_action import QuestAction
-from actions.vagabond.repair_action import RepairAction
-from actions.vagabond.vagabond_craft import VagabondCraft
-from actions.factionless.draw_and_discard_action import DrawAndDiscardAction
-from actions.vagabond.evenings_rest_action import EveningRestAction
-from actions.vagabond.empty_satchel_action import EmptySatchelAction
-from actions.vagabond.strike_action import StrikeAction
-from actions.vagabond.vagabond_battle_action import VagabondBattleAction
-from actions.vagabond.aid_action import AidAction
-from actions.factionless.play_dominance_action import PlayDominanceAction
+from src.utils.root_types import Items, Suits
+from src.factions.vagabond.satchel import Satchel
+from src.factions.vagabond.quests import QuestCard, QuestDeck
+from src.pieces.vagabond.vagabond_pawn import VagabondPawn
+from src.factions.vagabond.vagabond_characters import Characters
+from src.board.clearing import Clearing
+from src.controllers.messages.game_messages import ChooseCharacterMessage, VagabondPlacementMessage
+from src.factions.vagabond.relationship_track import RelationshipTrack, ALLIED
+from src.utils.callback_handler import CallbackTimes
+from src.actions.action_handler import ActionGroup
+from src.actions.vagabond.slip_action import SlipAction
+from src.actions.vagabond.refresh_action import RefreshAction
+from src.actions.vagabond.vagabond_move_action import VagabondMoveAction
+from src.actions.vagabond.explore_action import ExploreAction
+from src.actions.vagabond.special_action import SpecialAction
+from src.actions.vagabond.quest_action import QuestAction
+from src.actions.vagabond.repair_action import RepairAction
+from src.actions.vagabond.vagabond_craft import VagabondCraft
+from src.actions.factionless.draw_and_discard_action import DrawAndDiscardAction
+from src.actions.vagabond.evenings_rest_action import EveningRestAction
+from src.actions.vagabond.empty_satchel_action import EmptySatchelAction
+from src.actions.vagabond.strike_action import StrikeAction
+from src.actions.vagabond.vagabond_battle_action import VagabondBattleAction
+from src.actions.vagabond.aid_action import AidAction
+from src.actions.factionless.play_dominance_action import PlayDominanceAction
+import logging
 
 if TYPE_CHECKING:
-    from board.map import Map
-    from cards.deck import Deck
-    from factions.vagabond.vagabond_characters import VagabondCharacter
-    from utils.game_state import GameState
+    from src.board.map import Map
+    from src.cards.deck import Deck
+    from src.factions.vagabond.vagabond_characters import VagabondCharacter
+    from src.utils.game_state import GameState
 
 
 class Vagabond(Faction):
@@ -79,32 +80,32 @@ class Vagabond(Faction):
         return crafting_resources
 
     def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
-        print(f"Setting up {self}")
+        self.logger.info(f"Setting up {self}")
         self.deck = deck
         self.game_state = game_state
 
         # 1. Choose Character
         response = yield ChooseCharacterMessage(game_state, None, [character for character in Characters])
         self.character: VagabondCharacter = response.chosen_character.value
-        print(f" - Chosen {self.character} as Character")
+        self.logger.info(f" - Chosen {self.character} as Character")
 
         # 2. Place Pawn in forest
         response = yield VagabondPlacementMessage(game_state, None, map.forests)
         VagabondPawn(response.chosen_forest, self)
 
-        print(
+        self.logger.info(
             f" - Placed Vagabond Pawn in Forest {self.vagabond_pawn.space.index}")
 
         # 3. Get 3 quests
         self.quest_cards.extend(self.quest_deck.draw(3))
-        print(f" - Drew quest cards: {self.quest_cards}")
+        self.logger.info(f" - Drew quest cards: {self.quest_cards}")
 
         # 4. Take starting items
         for item in self.character.starting_items:
             self.satchel.add_item(item)
-        print(f" - Starting Items: {self.character.starting_items}")
+        self.logger.info(f" - Starting Items: {self.character.starting_items}")
 
-        print(f"- Finished {self} Set Up\n")
+        self.logger.info(f"- Finished {self} Set Up\n")
 
     def get_allied_warriors_in_clearing(self, clearing: Clearing) -> List[Faction]:
         available_allies = []

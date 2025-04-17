@@ -1,15 +1,15 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from pieces.pawn import Pawn
-from controllers.messages.game_messages import AllianceRecruitMessage
-from utils.root_types import Factions
-from pieces.marquise_de_cat.marquise_tokens import Keep
-from actions.action_group_registry import ActionIDs
+from src.pieces.pawn import Pawn
+from src.controllers.messages.game_messages import AllianceRecruitMessage
+from src.utils.root_types import Factions
+from src.pieces.marquise_de_cat.marquise_tokens import Keep
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from board.clearing import Clearing
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.board.clearing import Clearing
 
 
 class AllianceRecruitAction(Action):

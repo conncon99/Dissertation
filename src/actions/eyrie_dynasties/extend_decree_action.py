@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Suits, RECRUIT, MOVE, BATTLE, BUILD
-from controllers.messages.controller_messages import ExtendDecreeActionResponse1, ExtendDecreeActionResponse2, ExtendDecreeCardResponse1, ExtendDecreeCardResponse2
-from controllers.messages.game_messages import ExtendDecreeActionMessage1, ExtendDecreeActionMessage2, ExtendDecreeCardMessage1, ExtendDecreeCardMessage2
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Suits, RECRUIT, MOVE, BATTLE, BUILD
+from src.controllers.messages.controller_messages import ExtendDecreeActionResponse1, ExtendDecreeActionResponse2, ExtendDecreeCardResponse1, ExtendDecreeCardResponse2
+from src.controllers.messages.game_messages import ExtendDecreeActionMessage1, ExtendDecreeActionMessage2, ExtendDecreeCardMessage1, ExtendDecreeCardMessage2
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.eyrie_dynasties import EyrieDynasties
+    from src.factions.eyrie_dynasties import EyrieDynasties
 
 
 class ExtendDecreeAction(Action):
@@ -22,7 +22,6 @@ class ExtendDecreeAction(Action):
 
         extend_decree_action_response_1: ExtendDecreeActionResponse1 = yield ExtendDecreeActionMessage1(game_state, self.action_group, executor.hand, decree_types)
         decree_type = extend_decree_action_response_1.chosen_action
-
         extend_decree_card_response_1: ExtendDecreeCardResponse1 = yield ExtendDecreeCardMessage1(game_state, self.action_group, executor.hand, decree_types)
         card1 = extend_decree_card_response_1.chosen_card
 
@@ -36,15 +35,13 @@ class ExtendDecreeAction(Action):
         if valid_cards:
             decree_types.append(None)
 
-        extend_decree_action_response_2: ExtendDecreeActionResponse2 = yield ExtendDecreeActionMessage2(game_state, self.action_group, executor.hand, decree_types)
-        decree_type = extend_decree_action_response_2.chosen_action
+            extend_decree_action_response_2: ExtendDecreeActionResponse2 = yield ExtendDecreeActionMessage2(game_state, self.action_group, executor.hand, decree_types)
+            decree_type = extend_decree_action_response_2.chosen_action
 
-        extend_decree_card_response_2: ExtendDecreeCardResponse2 = yield ExtendDecreeCardMessage2(game_state, self.action_group, executor.hand, decree_types)
-        card2 = extend_decree_card_response_2.chosen_card
-
-        # 4. If it exists, add card 2 to the relevant part of the decree and remove it from the hand (do not discard)
-        if decree_type:
-            executor.add_card_to_decree(card2, decree_type)
+            if decree_type is not None:
+                extend_decree_card_response_2: ExtendDecreeCardResponse2 = yield ExtendDecreeCardMessage2(game_state, self.action_group, executor.hand, decree_types)
+                card2 = extend_decree_card_response_2.chosen_card
+                executor.add_card_to_decree(card2, decree_type)
         return super().perform(game_state, executor)
 
     def can_perform(self, executor, game_state=None):

@@ -1,12 +1,12 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import TrainMessage
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import TrainMessage
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
+    from src.factions.woodland_alliance import WoodlandAlliance
 
 
 class TrainAction(Action):
@@ -30,7 +30,7 @@ class TrainAction(Action):
 
         executor.discard_card(chosen_card)
         executor.officers += 1
-        print(
+        self.logger.info(
             f" - Increased Officers to {executor.officers} by expending '{chosen_card}'")
 
         return super().perform(game_state, executor)

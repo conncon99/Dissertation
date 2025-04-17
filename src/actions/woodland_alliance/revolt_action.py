@@ -1,19 +1,19 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING, List
-from pieces.pawn import Pawn
-from pieces.woodland_alliance.alliance_buildings import AllianceBase
-from controllers.messages.game_messages import RevoltClearingMessage, RevoltDiscardMessage
-from utils.colour_utils import set_print_colour
-from utils.root_types import Suits, Factions
-from pieces.marquise_de_cat.marquise_tokens import Keep
-from actions.action_group_registry import ActionIDs
+from src.pieces.pawn import Pawn
+from src.pieces.woodland_alliance.alliance_buildings import AllianceBase
+from src.controllers.messages.game_messages import RevoltClearingMessage, RevoltDiscardMessage
+from src.utils.colour_utils import set_print_colour
+from src.utils.root_types import Suits, Factions
+from src.pieces.marquise_de_cat.marquise_tokens import Keep
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from utils.game_state import GameState
-    from board.clearing import Clearing
-    from cards.card import Card
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
+    from src.cards.card import Card
 
 
 class RevoltAction(Action):
@@ -56,7 +56,7 @@ class RevoltAction(Action):
         response = yield RevoltClearingMessage(game_state, self.action_group, valid_clearings)
         clearing: Clearing = response.chosen_clearing
 
-        print(f" - Revolted on clearing {clearing.index}")
+        self.logger.info(f" - Revolted on clearing {clearing.index}")
 
         for i in range(2):
             valid_supporters = self.get_valid_supporters(executor, clearing)
@@ -69,7 +69,7 @@ class RevoltAction(Action):
         for faction in game_state.faction_list:
             if faction.faction_id == executor.faction_id:
                 continue
-            yield from clearing.damage(faction, executor, 999, self.action_group)
+            yield from clearing.damage(faction, executor, 999, self.logger, self.action_group)
 
         set_print_colour(executor.print_colour)
 
@@ -82,12 +82,13 @@ class RevoltAction(Action):
                 if len(executor.units) + executor.officers < executor.max_warriors:
                     Pawn(clearing, executor)
                     warriors_placed += 1
-        print(
+        self.logger.info(
             f" - Placed {warriors_placed} warriors on clearing {clearing.index}")
 
         # 4. Place a warrior in the officers box
         if len(executor.units) + executor.officers < executor.max_warriors:
             executor.officers += 1
-            print(f" - Increased Officer Count to {executor.officers}")
+            self.logger.info(
+                f" - Increased Officer Count to {executor.officers}")
 
         return super().perform(game_state, executor)

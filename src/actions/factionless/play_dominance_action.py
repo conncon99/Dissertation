@@ -1,17 +1,16 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from cards.cards import DOMINANCE_CARDS
+from src.actions.action_handler import Action
+from src.cards.cards import DOMINANCE_CARDS
 from typing import TYPE_CHECKING
-from utils.root_types import Factions
-from controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
-from factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Factions
+from src.controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from cards.card import DominanceCard
-    from utils.game_state import GameState
-    from factions.faction import Faction
-    from factions.vagabond.vagabond import Vagabond
+    from src.cards.card import DominanceCard
+    from src.utils.game_state import GameState
+    from src.factions.faction import Faction
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class PlayDominanceAction(Action):
@@ -41,7 +40,7 @@ class PlayDominanceAction(Action):
         if executor.faction_id != Factions.VAGABOND.value:
             chosen_card.owner = executor
             chosen_card.activate(game_state.board, self.action_group)
-            print(f" - {executor} has activated {chosen_card}")
+            self.logger.info(f" - {executor} has activated {chosen_card}")
         else:
             # Get the player other than the vagabond with the lowest VP
             # On a tie the vagabond chooses between the tied players
@@ -55,11 +54,12 @@ class PlayDominanceAction(Action):
                 chosen_faction: Faction = response.chosen_faction
             executor.dominance = chosen_faction
             # If the faction is hostile, move their relationship to indifferent
+            from src.factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
             if executor.relationship_track.relationship_level[chosen_faction.faction_id] == HOSTILE:
                 executor.relationship_track.relationship_level[chosen_faction.faction_id] = INDIFFERENT
             executor.relationship_track.relationship_level
             executor.hand.remove(chosen_card)
-            print(
+            self.logger.info(
                 f" - {executor} has activated {chosen_card} to form a coalition with {chosen_faction}")
         return super().perform(game_state, executor)
         yield

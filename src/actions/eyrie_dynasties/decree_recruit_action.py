@@ -1,22 +1,24 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Suits, EyrieLeaders, Factions
-from pieces.pawn import Pawn
-from controllers.messages.game_messages import DecreeRecruitClearingMessage
-from pieces.marquise_de_cat.marquise_tokens import Keep
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Suits, EyrieLeaders, Factions
+from src.pieces.pawn import Pawn
+from src.controllers.messages.game_messages import DecreeRecruitClearingMessage
+from src.pieces.marquise_de_cat.marquise_tokens import Keep
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.eyrie_dynasties import EyrieDynasties
-    from board.clearing import Clearing
+    from src.factions.eyrie_dynasties import EyrieDynasties
+    from src.board.clearing import Clearing
 
 
 class DecreeRecruitAction(Action):
     def __init__(self, suit: Suits, name="Decree Recruit", max_uses=1, is_action_group_modifier=False):
         super().__init__(name, max_uses, is_action_group_modifier)
         self.suit = suit
-        self.id = ActionIDs.DECREE_RECRUIT
+        id_dict = {Suits.FOX: ActionIDs.DECREE_MOVE_FOX, Suits.MOUSE: ActionIDs.DECREE_MOVE_MOUSE,
+                   Suits.RABBIT: ActionIDs.DECREE_MOVE_RABBIT, Suits.BIRD: ActionIDs.DECREE_MOVE_BIRD}
+        self.id = id_dict[self.suit]
 
     def can_perform(self, executor, game_state=None):
         return True
@@ -26,13 +28,14 @@ class DecreeRecruitAction(Action):
             roost for roost in executor.roosts if roost.get_suit() == self.suit]
 
         if not valid_roosts:
-            print(
+            self.logger.info(
                 f" - No {self.suit.name.capitalize()} roosts found: TURMOIL TRIGGERED")
             yield from executor.trigger_turmoil(self.action_group)
             return
 
         if len(executor.units) >= executor.max_warriors:
-            print(f" - Cannot place any more warriors: TURMOIL TRIGGERED")
+            self.logger.info(
+                f" - Cannot place any more warriors: TURMOIL TRIGGERED")
             yield from executor.trigger_turmoil(self.action_group)
             return
 
@@ -40,7 +43,7 @@ class DecreeRecruitAction(Action):
             token, Keep) for token in roost.space.tokens[Factions.MARQUISE_DE_CAT.value])]
 
         if available_clearings == []:
-            print(f" - No available roosts: TURMOIL TRIGGERED")
+            self.logger.info(f" - No available roosts: TURMOIL TRIGGERED")
             yield from executor.trigger_turmoil(self.action_group)
             return
 
@@ -50,7 +53,8 @@ class DecreeRecruitAction(Action):
 
         if executor.eyrie_leader == EyrieLeaders.Charismatic:
             if len(executor.units) >= executor.max_warriors:
-                print(f" - Cannot place any more warriors: TURMOIL TRIGGERED")
+                self.logger.info(
+                    f" - Cannot place any more warriors: TURMOIL TRIGGERED")
                 yield from executor.trigger_turmoil(self.action_group)
                 return
             Pawn(roost_clearing, executor)

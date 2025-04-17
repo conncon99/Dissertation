@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.clearing import Clearing
+    from src.factions.faction import Faction
+    from src.board.clearing import Clearing
 
 
 class BattleData:
