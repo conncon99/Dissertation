@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Dict
-from utils.root_types import Factions
+from src.utils.root_types import Factions
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 # Relationship Track
 # Marker for each faction
@@ -16,6 +16,7 @@ ALLIED = 4
 class RelationshipTrack:
     def __init__(self, vagabond: Vagabond):
         self.vagabond = vagabond
+        self.loggger = vagabond.logger
         # {Faction ID : Relationship Level}
         self.relationship_level: Dict[int, int] = {
             faction.value: INDIFFERENT for faction in Factions if faction != Factions.VAGABOND}
@@ -37,14 +38,15 @@ class RelationshipTrack:
 
         if self.relationship_level[faction_id] == ALLIED:
             self.vagabond.add_vp(2)
-            print(f" - Gained 2 VP for aiding an allied faction")
+            self.loggger.info(f" - Gained 2 VP for aiding an allied faction")
         self.aids_this_turn[faction_id] += 1
-        print(f" - Aids This Turn: {self.aids_this_turn[faction_id]}")
+        self.loggger.info(
+            f" - Aids This Turn: {self.aids_this_turn[faction_id]}")
         relationship_level = self.relationship_level[faction_id]
         if self.aids_this_turn[faction_id] == self.aids_per_level_up[relationship_level] and (self.relationship_level[faction_id] != HOSTILE or self.relationship_level[faction_id] != ALLIED):
             self.relationship_level[faction_id] += 1
             self.aids_this_turn[faction_id] = 0
             self.vagabond.add_vp(
                 self.level_up_rewards[self.relationship_level[faction_id]])
-            print(
+            self.loggger.info(
                 f" - Relationship level increased, gaining {self.level_up_rewards[self.relationship_level[faction_id]]} VP")

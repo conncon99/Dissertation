@@ -1,17 +1,17 @@
 from __future__ import annotations
 from typing import List, TYPE_CHECKING
-from utils.root_types import GamePhase
+from src.utils.root_types import GamePhase
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.map import Map
-    from factions.marquise_de_cat import Marquise
-    from factions.eyrie_dynasties import EyrieDynasties
-    from factions.woodland_alliance import WoodlandAlliance
-    from factions.vagabond.vagabond import Vagabond
-    from cards.deck import Deck
-    from utils.root_types import Items
-    from controllers.nn_controllers.battle_data import BattleData
+    from src.factions.faction import Faction
+    from src.board.map import Map
+    from src.factions.marquise_de_cat import Marquise
+    from src.factions.eyrie_dynasties import EyrieDynasties
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.factions.vagabond.vagabond import Vagabond
+    from src.cards.deck import Deck
+    from src.utils.root_types import Items
+    from src.controllers.nn_controllers.battle_data import BattleData
 
 
 class GameState:

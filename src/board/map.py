@@ -1,14 +1,14 @@
 from __future__ import annotations
-from board.clearing import Clearing
+from src.board.clearing import Clearing
 from abc import ABC, abstractmethod
-from utils.root_types import BASE_SUITS, Items
-from pieces.factionless.buildings.ruin import Ruin
-import random
+from src.utils.root_types import BASE_SUITS, Items
+from src.pieces.factionless.buildings.ruin import Ruin
+import numpy as np
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cards.card import DominanceCard
-    from board.forest import Forest
+    from src.cards.card import DominanceCard
+    from src.board.forest import Forest
 
 
 class Map(ABC):
@@ -49,8 +49,8 @@ class Map(ABC):
         slots = [None] * slot_count
         clearing = Clearing(index, suit, slots, [], [], self.game_state)
         if has_ruin:
-            ruin_item_idx = random.randint(
-                0, len(self.available_ruin_items) - 1)
+            ruin_item_idx = np.random.randint(
+                0, len(self.available_ruin_items))
             clearing.slots[0] = Ruin(
                 clearing, self.available_ruin_items.pop(ruin_item_idx), 0)
         self.clearings.append(clearing)

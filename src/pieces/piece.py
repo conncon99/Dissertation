@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+import logging
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.space import Space
+    from src.factions.faction import Faction
+    from src.board.space import Space
 
 
 class PieceMeta(type):
@@ -17,6 +18,7 @@ class Piece(metaclass=PieceMeta):
         self.space = space
         self.faction = faction
         self.name = name
+        self.logger = logging.getLogger(__name__)
 
     def __repr__(self):
         return self.name

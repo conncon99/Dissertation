@@ -1,9 +1,9 @@
 from __future__ import annotations
-from controllers.base_controllers.marquise_controller import MarquiseController
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
-from controllers.nn_controllers.action_space_decoder import *
-from utils.root_types import Suits
+from src.controllers.base_controllers.marquise_controller import MarquiseController
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
+from src.controllers.nn_controllers.action_space_decoder import *
+from src.utils.root_types import Suits
 
 
 class MarquiseNNController(MarquiseController):
@@ -35,9 +35,6 @@ class MarquiseNNController(MarquiseController):
 
     def _handle_codebreakers(self, msg: CodebreakersMessage) -> CodebreakersResponse:
         return CodebreakersResponse(decode_faction_output(self.pending_action, msg.game_state))
-
-    def _handle_battle_end(self, msg):
-        raise NotImplementedError
 
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
         return PieceTargetingResponse(decode_piece_output(self.pending_action, msg.game_state))

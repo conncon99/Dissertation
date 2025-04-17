@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from board.clearing import Clearing
-from board.forest import Forest
-from controllers.messages.game_messages import SlipMessage
-from actions.action_group_registry import ActionIDs
+from src.board.clearing import Clearing
+from src.board.forest import Forest
+from src.controllers.messages.game_messages import SlipMessage
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class SlipAction(Action):
@@ -29,7 +29,7 @@ class SlipAction(Action):
         to_space.units[executor.faction_id].append(executor.vagabond_pawn)
         executor.vagabond_pawn.space = to_space
 
-        print(
+        self.logger.info(
             f" - Vagabond has slipped from {self._space_type(from_space)} {from_space.index} to {self._space_type(to_space)} {to_space.index}")
 
         return super().perform(game_state, executor)

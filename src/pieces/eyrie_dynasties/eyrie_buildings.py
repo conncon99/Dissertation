@@ -1,10 +1,10 @@
 from __future__ import annotations
-from pieces.building import Building
-from board.clearing import Clearing
+from src.pieces.building import Building
+from src.board.clearing import Clearing
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from factions.eyrie_dynasties import EyrieDynasties
+    from src.factions.eyrie_dynasties import EyrieDynasties
 
 
 class Roost(Building):

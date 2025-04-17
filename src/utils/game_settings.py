@@ -1,6 +1,6 @@
 from typing import List
-from factions.faction import Faction
-from random import shuffle
+from src.factions.faction import Faction
+import numpy as np
 
 
 class GameSettings:
@@ -17,7 +17,7 @@ class GameSettings:
         """Generates a random turn order from the list of factions"""
         if not self.turn_order:
             turn_order = [faction for faction in self.faction_list]
-            shuffle(turn_order)
+            np.random.shuffle(turn_order)
             self.turn_order = turn_order
         return self.turn_order
 

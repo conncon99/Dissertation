@@ -1,14 +1,14 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Items
+from src.utils.root_types import Items
 
-from controllers.messages.game_messages import RepairItemMessage
-from controllers.messages.controller_messages import RepairItemResponse
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import RepairItemMessage
+from src.controllers.messages.controller_messages import RepairItemResponse
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class RepairAction(Action):

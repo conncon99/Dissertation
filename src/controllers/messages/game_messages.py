@@ -1,16 +1,17 @@
+from __future__ import annotations
 from enum import Enum, auto
 from typing import TYPE_CHECKING
-# if TYPE_CHECKING:
-#     from utils.callback_handler import GameAction
+if TYPE_CHECKING:
+    from src.utils.game_state import GameState
+    from src.actions.action_handler import ActionGroup
 
 
 class GameMessages(Enum):
     AMBUSH_MESSAGE = auto()
-    BATTLE_START_MESSAGE = auto()  # Never Used
-    BATTLE_END_MESSAGE = auto()
     BATTLE_USE_CARD_MESSAGE = auto()
     PIECE_TARGETING_MESSAGE = auto()
-    MOVE_MESSAGE = auto()
+    MOVE_FROM_MESSAGE = auto()
+    MOVE_TO_MESSAGE = auto()
     MOVE_UNITS_MESSAGE = auto()
     CRAFT_MESSAGE = auto()
     DISCARD_CHOICE_MESSAGE = auto()
@@ -18,29 +19,26 @@ class GameMessages(Enum):
     CHOOSE_DOMINANCE_MESSAGE = auto()
     STAND_AND_DELIVER_MESSAGE = auto()
     TAX_COLLECTOR_MESSAGE = auto()
+    BETTER_BURROW_BANK_MESSAGE = auto()
     CODEBREAKERS_MESSAGE = auto()
     CLAIM_DOMINANCE_SUIT_MESSAGE = auto()
     CLAIM_DOMINANCE_CARD_MESSAGE = auto()
 
+    TRIGGERER_OUTRAGE_MESSAGE = auto()
     BATTLE_CLEARING_CHOICE_MESSAGE = auto()
     BATTLE_TARGET_CHOICE_MESSAGE = auto()
 
     # Marquise messages
     KEEP_CLEARING_MESSAGE = auto()
-    MARCH_1_MESSAGE = auto()
-    MARCH_1_UNITS_MESSAGE = auto()
-    MARCH_2_MESSAGE = auto()
-    MARCH_2_CHOICE_MESSAGE = auto()
-    MARCH_2_UNITS_MESSAGE = auto()
+    MARCH_AGAIN_MESSAGE = auto()
     OVERWORK_CLEARING_MESSAGE = auto()
     OVERWORK_DISCARD_MESSAGE = auto()
-    MARQUISE_BUILDING_MESSAGE = auto()
+    MARQUISE_BUILDING_CLEARING_MESSAGE = auto()
+    MARQUISE_BUILDING_TYPE_MESSAGE = auto()
     WOOD_REMOVAL_MESSAGE = auto()
-    MARQUISE_SETUP_BUILDINGS_MESSAGE = auto()
     MARQUISE_SETUP_SAWMILL_MESSAGE = auto()
     MARQUISE_SETUP_WORKSHOP_MESSAGE = auto()
     MARQUISE_SETUP_RECRUITER_MESSAGE = auto()
-    MARQUISE_BUILDING_TYPE_MESSAGE = auto()
     MARQUISE_SPEND_BIRD_CARD_MESSAGE = auto()
     FIELD_HOSPITAL_MESSAGE = auto()
 
@@ -66,8 +64,6 @@ class GameMessages(Enum):
     SPREAD_SYMPATHY_DISCARD_MESSAGE = auto()
     ALLIANCE_RECRUIT_MESSAGE = auto()
     ORGANIZE_MESSAGE = auto()
-    BETTER_BURROW_BANK_MESSAGE = auto()
-    TRIGGERER_OUTRAGE_MESSAGE = auto()
     ALLIANCE_OUTRAGE_MESSAGE = auto()
 
     # Vagabond Messages
@@ -92,13 +88,14 @@ class GameMessages(Enum):
     AID_TAKE_ITEM_CHOICE_MESSAGE = auto()
     BATTLE_DAMAGE_ITEM_MESSAGE = auto()
     COALITION_CHOICE_MESSAGE = auto()
-    ALLY_MOVEMENT_MESSAGE = auto()
+    ALLY_MOVEMENT_FACTION_MESSAGE = auto()
+    ALLY_MOVEMENT_UNITS_MESSAGE = auto()
     CHOOSE_ALLY_MESSAGE = auto()
     ALLY_DAMAGE_SPLIT_MESSAGE = auto()
 
 
 class GameMessage:
-    def __init__(self, game_state, type, action_group) -> None:
+    def __init__(self, game_state: GameState, type: GameMessages, action_group: ActionGroup) -> None:
         self.game_state = game_state
         self.type = type
         self.action_group = action_group
@@ -126,21 +123,6 @@ class BattleUseCardMessage(GameMessage):
     def __init__(self, game_state, action_group, card_type):
         super().__init__(game_state, GameMessages.BATTLE_USE_CARD_MESSAGE, action_group)
         self.card_type = card_type
-
-
-class BattleEndMessage(GameMessage):
-    def __init__(self, game_state, action_group, friendly_faction, enemy_faction, clearing, is_attacker, battle_callbacks, attacker_roll, defender_roll) -> None:
-        super().__init__(game_state, GameMessages.BATTLE_END_MESSAGE, action_group)
-        self.friendly_faction = friendly_faction
-        self.enemy_faction = enemy_faction
-        self.clearing = clearing
-        self.is_attacker = is_attacker
-        self.battle_callbacks = battle_callbacks
-        self.attacker_roll = attacker_roll
-        self.defender_roll = defender_roll
-
-    def __repr__(self) -> str:
-        return f"Battle End Message[\n    Friendly Faction: {str(self.friendly_faction)},\n    Enemy Faction: {str(self.enemy_faction)},\n    Clearing: {self.clearing.index},\n    Is Attacker: {self.is_attacker},\n    Battle Callbacks: {self.battle_callbacks},\n    Attacker Dice Roll: {self.attacker_roll},\n    Defender Dice Roll: {self.defender_roll}\n]"
 
 
 class BetterBurrowBankMessage(GameMessage):
@@ -187,10 +169,22 @@ class ChooseDominanceMessage(GameMessage):
         self.available_cards = available_cards
 
 
-class MoveMessage(GameMessage):
-    def __init__(self, game_state, action_group, available_moves) -> None:
-        super().__init__(game_state, GameMessages.MOVE_MESSAGE, action_group)
-        self.available_moves = available_moves
+class MoveFromMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_from_clearings) -> None:
+        super().__init__(game_state, GameMessages.MOVE_FROM_MESSAGE, action_group)
+        self.available_from_clearings = available_from_clearings
+
+
+class MoveToMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_to_clearings) -> None:
+        super().__init__(game_state, GameMessages.MOVE_TO_MESSAGE, action_group)
+        self.available_to_clearings = available_to_clearings
+
+
+class MoveUnitsMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_units) -> None:
+        super().__init__(game_state, GameMessages.MOVE_UNITS_MESSAGE, action_group)
+        self.available_units = available_units
 
 
 class CraftMessage(GameMessage):
@@ -239,39 +233,34 @@ class KeepClearingMessage(GameMessage):
         self.available_clearings = available_clearings
 
 
-class March1Message(GameMessage):
-    def __init__(self, game_state, action_group, available_moves) -> None:
-        super().__init__(game_state, GameMessages.MARCH_1_MESSAGE, action_group)
-        self.available_moves = available_moves
-
-
-class March2Message(GameMessage):
-    def __init__(self, game_state, action_group, available_moves) -> None:
-        super().__init__(game_state, GameMessages.MARCH_2_MESSAGE, action_group)
-        self.available_moves = available_moves
+class MarchAgainMessage(GameMessage):
+    def __init__(self, game_state, action_group):
+        super().__init__(game_state, GameMessages.MARCH_AGAIN_MESSAGE, action_group)
 
 
 class OverworkClearingMessage(GameMessage):
-    def __init__(self, game_state, action_group, available_clearings, hand):
+    def __init__(self, game_state, action_group, available_clearings):
         super().__init__(game_state, GameMessages.OVERWORK_CLEARING_MESSAGE, action_group)
         self.available_clearings = available_clearings
         if not isinstance(self.available_clearings, list):
             self.available_clearings = [available_clearings]
-        self.hand = hand
 
 
 class OverworkDiscardMessage(GameMessage):
-    def __init__(self, game_state, action_group, available_clearings, hand):
+    def __init__(self, game_state, action_group, available_cards):
         super().__init__(game_state, GameMessages.OVERWORK_DISCARD_MESSAGE, action_group)
-        self.available_clearings = available_clearings
-        if not isinstance(self.available_clearings, list):
-            self.available_clearings = [available_clearings]
-        self.hand = hand
+        self.available_cards = available_cards
 
 
-class MarquiseBuildingMessage(GameMessage):
+class MarquiseBuildingTypeMessage(GameMessage):
     def __init__(self, game_state, action_group, clearing_building_options):
-        super().__init__(game_state, GameMessages.MARQUISE_BUILDING_MESSAGE, action_group)
+        super().__init__(game_state, GameMessages.MARQUISE_BUILDING_TYPE_MESSAGE, action_group)
+        self.clearing_building_options = clearing_building_options
+
+
+class MarquiseBuildingClearingMessage(GameMessage):
+    def __init__(self, game_state, action_group, clearing_building_options):
+        super().__init__(game_state, GameMessages.MARQUISE_BUILDING_CLEARING_MESSAGE, action_group)
         self.clearing_building_options = clearing_building_options
 
 
@@ -281,9 +270,21 @@ class WoodRemovalMessage(GameMessage):
         self.wood_list = wood_list
 
 
-class MarquiseBuildingSetupMessage(GameMessage):
+class MarquiseRecruiterSetupMessage(GameMessage):
     def __init__(self, game_state, action_group, available_clearings):
-        super().__init__(game_state, GameMessages.MARQUISE_SETUP_BUILDINGS_MESSAGE, action_group)
+        super().__init__(game_state, GameMessages.MARQUISE_SETUP_RECRUITER_MESSAGE, action_group)
+        self.available_clearings = available_clearings
+
+
+class MarquiseSawmillSetupMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_clearings):
+        super().__init__(game_state, GameMessages.MARQUISE_SETUP_SAWMILL_MESSAGE, action_group)
+        self.available_clearings = available_clearings
+
+
+class MarquiseWorkshopSetupMessage(GameMessage):
+    def __init__(self, game_state, action_group, available_clearings):
+        super().__init__(game_state, GameMessages.MARQUISE_SETUP_WORKSHOP_MESSAGE, action_group)
         self.available_clearings = available_clearings
 
 
@@ -526,9 +527,10 @@ class StrikeFactionChoiceMessage(GameMessage):
 
 
 class StrikePieceTargetingMessage(GameMessage):
-    def __init__(self, game_state, action_group, available_pieces):
+    def __init__(self, game_state, action_group, available_pieces, chosen_faction):
         super().__init__(game_state, GameMessages.STRIKE_PIECE_TARGETING_MESSAGE, action_group)
         self.available_pieces = available_pieces
+        self.chosen_faction = chosen_faction
 
 
 class AidFactionChoiceMessage(GameMessage):
@@ -574,10 +576,17 @@ class CoalitionChoiceMessage(GameMessage):
         self.available_factions = available_factions
 
 
-class AllyMovementMessage(GameMessage):
+class AllyMovementFactionMessage(GameMessage):
     def __init__(self, game_state, action_group, available_allies, from_clearing):
-        super().__init__(game_state, GameMessages.ALLY_MOVEMENT_MESSAGE, action_group)
+        super().__init__(game_state, GameMessages.ALLY_MOVEMENT_FACTION_MESSAGE, action_group)
         self.available_allies = available_allies
+        self.from_clearing = from_clearing
+
+
+class AllyMovementUnitMessage(GameMessage):
+    def __init__(self, game_state, action_group, chosen_ally, from_clearing):
+        super().__init__(game_state, GameMessages.ALLY_MOVEMENT_UNITS_MESSAGE, action_group)
+        self.chosen_ally = chosen_ally
         self.from_clearing = from_clearing
 
 

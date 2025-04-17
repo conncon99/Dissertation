@@ -2,24 +2,24 @@ from __future__ import annotations
 from math import inf
 from typing import TYPE_CHECKING, List, Dict
 import numpy as np
-from controllers.messages.game_messages import GameMessages
-from utils.root_types import Factions, Suits, Items, EyrieLeaders, RECRUIT, MOVE, BUILD, BATTLE
-from factions.vagabond.vagabond_characters import RangerCharacter, TinkerCharacter, ThiefCharacter, Characters
-from actions.action_group_registry import ActionGroupRegistry, ActionIDs
-from factions.vagabond.quests import *
-from pieces.piece_with_id import PieceWithID
-from cards.cards import *
+from src.controllers.messages.game_messages import GameMessages
+from src.utils.root_types import Factions, Suits, Items, EyrieLeaders, RECRUIT, MOVE, BUILD, BATTLE
+from src.factions.vagabond.vagabond_characters import RangerCharacter, TinkerCharacter, ThiefCharacter, Characters
+from src.actions.action_group_registry import ActionGroupRegistry, ActionIDs
+from src.factions.vagabond.quests import *
+from src.pieces.piece_with_id import PieceWithID
+from src.cards.cards import *
 
 
 if TYPE_CHECKING:
-    from actions.action_handler import ActionGroup
-    from utils.game_state import GameState
-    from factions.faction import Faction
-    from board.clearing import Clearing
-    from board.forest import Forest
-    from cards.card import Card
-    from controllers.nn_controllers.battle_data import BattleData
-    # from pieces.factionless.buildings.ruin import Ruin
+    from src.actions.action_handler import ActionGroup
+    from src.utils.game_state import GameState
+    from src.factions.faction import Faction
+    from src.board.clearing import Clearing
+    from src.board.forest import Forest
+    from src.cards.card import Card
+    from src.controllers.nn_controllers.battle_data import BattleData
+    # from src.pieces.factionless.buildings.ruin import Ruin
 
 
 class ObservationSpace:

@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Items
-from board.clearing import Clearing
-from pieces.factionless.buildings.ruin import Ruin
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Items
+from src.board.clearing import Clearing
+from src.pieces.factionless.buildings.ruin import Ruin
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class ExploreAction(Action):
@@ -27,11 +27,11 @@ class ExploreAction(Action):
                 break
 
         assert ruin is not None
-        print(
+        self.logger.info(
             f" - Searching Ruin of Clearing {executor.vagabond_pawn.space.index}")
         executor.satchel.add_item(ruin.item)
         executor.add_vp(1)
-        print(
+        self.logger.info(
             f" - Added {ruin.item.name.capitalize()} to satchel and gained 1 Victory Point")
         ruin.destroy(None)
         return super().perform(game_state, executor)

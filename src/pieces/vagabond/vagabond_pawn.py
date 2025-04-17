@@ -1,12 +1,12 @@
 from __future__ import annotations
-from pieces.pawn import Pawn
+from src.pieces.pawn import Pawn
 from typing import TYPE_CHECKING
-from utils.colour_utils import set_print_colour
-from controllers.messages.game_messages import BattleDamageItemMessage
-from controllers.messages.controller_messages import BattleDamageItemResponse
+from src.utils.colour_utils import set_print_colour
+from src.controllers.messages.game_messages import BattleDamageItemMessage
+from src.controllers.messages.controller_messages import BattleDamageItemResponse
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class VagabondPawn(Pawn):
@@ -19,7 +19,7 @@ class VagabondPawn(Pawn):
         for _ in range(amount):
             self.faction: Vagabond
             if not self.faction.satchel.has_available_item() and not self.faction.satchel.has_available_exhausted_items() and self.faction.active_bag_count == 0 and self.faction.active_coin_count == 0 and self.faction.active_tea_count == 0:
-                print(f" - {self.faction} has no undamaged items")
+                self.logger.info(f" - {self.faction} has no undamaged items")
                 break
             available_items = [
                 item for item, amount in self.faction.satchel.available_items.items() for _ in range(amount)]
@@ -33,5 +33,5 @@ class VagabondPawn(Pawn):
         set_print_colour(attacker.print_colour)
 
     def destroy(self, attacker, action_group=None):
-        print(" - Vagabond cannot be destroyed")
+        self.logger.debug(" - Vagabond cannot be destroyed")
         return

@@ -1,6 +1,6 @@
-from actions.action_handler import Action
-from controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
+from src.actions.action_group_registry import ActionIDs
 
 
 class ClaimDominanceAction(Action):
@@ -33,7 +33,7 @@ class ClaimDominanceAction(Action):
         executor.discard_card(chosen_discard)
         executor.hand.append(chosen_dominance)
         game_state.board.available_dominance_cards.remove(chosen_dominance)
-        print(
+        self.logger.info(
             f" - {executor} expended '{chosen_discard}' to take '{chosen_dominance}'")
 
         return super().perform(game_state, executor)

@@ -1,6 +1,7 @@
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
 from abc import ABC, abstractmethod
+import logging
 
 
 class Controller(ABC):
@@ -11,13 +12,12 @@ class Controller(ABC):
 
     def __init__(self) -> None:
         self.pending_action = None
+        self.logger = logging.getLogger("Controller")
 
     def send_game_message(self, msg: GameMessage) -> ControllerMessage:
         match msg.type:
             case GameMessages.AMBUSH_MESSAGE:
                 return self._handle_ambushes(msg)
-            case GameMessages.BATTLE_END_MESSAGE:
-                return self._handle_battle_end(msg)
             case GameMessages.BATTLE_USE_CARD_MESSAGE:
                 return self._handle_battle_card_message(msg)
             case GameMessages.PIECE_TARGETING_MESSAGE:
@@ -44,8 +44,12 @@ class Controller(ABC):
                 return self._handle_battle_clearing_choice(msg)
             case GameMessages.BATTLE_TARGET_CHOICE_MESSAGE:
                 return self._handle_battle_target_choice(msg)
-            case GameMessages.MOVE_MESSAGE:
-                return self._handle_movement(msg)
+            case GameMessages.MOVE_FROM_MESSAGE:
+                return self._handle_move_from(msg)
+            case GameMessages.MOVE_TO_MESSAGE:
+                return self._handle_move_to(msg)
+            case GameMessages.MOVE_UNITS_MESSAGE:
+                return self._handle_move_units(msg)
             case GameMessages.DISCARD_CHOICE_MESSAGE:
                 return self._handle_discard_choice(msg)
             case GameMessages.TRIGGERER_OUTRAGE_MESSAGE:
@@ -87,10 +91,6 @@ class Controller(ABC):
         self, msg: CodebreakersMessage) -> CodebreakersResponse: ...
 
     @abstractmethod
-    def _handle_battle_end(
-        self, msg: BattleEndMessage) -> ControllerMessage: ...
-
-    @abstractmethod
     def _handle_piece_targeting(
         self, msg: PieceTargetingMessage) -> PieceTargetingResponse: ...
 
@@ -99,7 +99,14 @@ class Controller(ABC):
         self, msg: BetterBurrowBankMessage) -> BetterBurrowBankResponse: ...
 
     @abstractmethod
-    def _handle_movement(self, msg: MoveMessage) -> MoveResponse: ...
+    def _handle_move_from(self, msg: MoveFromMessage) -> MoveFromResponse: ...
+
+    @abstractmethod
+    def _handle_move_to(self, msg: MoveToMessage) -> MoveToResponse: ...
+
+    @abstractmethod
+    def _handle_move_units(
+        self, msg: MoveUnitsMessage) -> MoveUnitsResponse: ...
 
     @abstractmethod
     def _handle_crafting(self, msg: CraftMessage) -> CraftResponse: ...

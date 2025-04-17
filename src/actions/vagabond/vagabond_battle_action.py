@@ -1,11 +1,11 @@
 from __future__ import annotations
-from actions.factionless.battle_action import BattleAction
+from src.actions.factionless.battle_action import BattleAction
 from typing import TYPE_CHECKING
-from utils.root_types import Items
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Items
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class VagabondBattleAction(BattleAction):

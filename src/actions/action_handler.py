@@ -9,13 +9,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Optional, TYPE_CHECKING, Generator, Any
 from math import inf
-from utils.game_state import GameState
-from controllers.messages.game_messages import ActionChoiceMessage
-from actions.action_group_registry import ActionGroupRegistry
+from src.utils.game_state import GameState
+from src.controllers.messages.game_messages import ActionChoiceMessage
+from src.actions.action_group_registry import ActionGroupRegistry
 import types
+import logging
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from controllers.messages.game_messages import GameMessage
+    from src.factions.faction import Faction
+    from src.controllers.messages.game_messages import GameMessage
 
 
 class Action(ABC):
@@ -28,6 +29,7 @@ class Action(ABC):
 
     def __init__(self, name: str, max_uses: Optional[int] = None, is_action_group_modifier: bool = False, group_spanning: bool = False) -> None:
         self.name = name
+        self.logger = logging.getLogger(f"{name}")
         self.max_uses = max_uses if max_uses is not None else inf
         self.times_used = 0
         self.is_action_group_modifier = is_action_group_modifier
@@ -48,7 +50,7 @@ class Action(ABC):
 
     @abstractmethod
     def perform(self, game_state: GameState, executor: Faction) -> Generator[GameMessage, Any, None]:
-        print(f" - {self.name} action completed\n")
+        self.logger.info(f" - {self.name} action completed\n")
         if self.group_spanning and self in executor.used_spanning_actions.keys():
             executor.used_spanning_actions[self] += 1
         elif self.group_spanning:
@@ -69,6 +71,7 @@ class ActionGroup:
                                None -> no shared limit. Each Action might still have its own limit.
         """
         self.name = name
+        self.logger = logging.getLogger(f'{name}')
         self.id = id
         self.ordered = ordered
         self.actions = actions if actions is not None else []
@@ -87,7 +90,7 @@ class ActionGroup:
         # Whether this action group can be aborted before all actions are played
         self.can_abort = can_abort
         self.id = self._assign_unique_id()
-        # print(f"ID: {self.id}: {self.name}")
+        self.logger.debug(f"ID: {self.id}: {self.name}")
 
     def _assign_unique_id(self):
         """Generate a globally unique integer ID for this ActionGroup."""
@@ -97,13 +100,16 @@ class ActionGroup:
     def can_perform_any_action(self):
         return self.total_uses < self.max_total_uses
 
+    # TODO: Re-enable action group modifiers when they are working
+
     def step_action_group(self, executor, game_state) -> Generator[GameMessage, Any, None]:
         """Runs one step of this ActionGroup."""
         if not self.started:
             self.started = True
             self._assign_action_group()
             # self._perform_available_modifiers(executor, game_state)
-            print(f"\n[GROUP] Starting '{self.name}' (ordered={self.ordered})")
+            self.logger.info(
+                f"\n[GROUP] Starting '{self.name}' (ordered={self.ordered})")
 
         if self.ordered:
             self._remaining_actions = self.actions[:]
@@ -128,7 +134,7 @@ class ActionGroup:
             available_actions = [
                 action for action in self.actions if action.can_perform(executor, game_state)]
             if not available_actions:
-                print("- No available actions left to perform.")
+                self.logger.debug("- No available actions left to perform.")
                 break
 
             if self.can_abort:
@@ -138,7 +144,7 @@ class ActionGroup:
                 self._chosen_action = available_actions[0]
             else:
                 # Prompt the controller for an action.
-                print("- Waiting for action choice...")
+                self.logger.debug("- Waiting for action choice...")
                 message = ActionChoiceMessage(
                     game_state, self, available_actions)
                 response = yield message
@@ -146,16 +152,17 @@ class ActionGroup:
 
             # If the controller returns None, interpret that as finishing the group.
             if self._chosen_action is None:
-                print(
+                self.logger.debug(
                     f" - Unordered ActionGroup '{self.name}' aborted by controller.")
                 break
 
-            print(f" - Performing action: '{self._chosen_action.name}'")
+            self.logger.info(
+                f" - Performing action: '{self._chosen_action.name}'")
             # Delegate to the chosen action's generator.
             yield from self._chosen_action.perform(game_state, executor)
             self.total_uses += 1
 
-        print(f"[GROUP] Finished group '{self.name}'")
+        self.logger.info(f"[GROUP] Finished group '{self.name}'")
         self.reset_action_group()
 
     def _run_ordered_group(self, executor, game_state) -> Generator[GameMessage, Any, None]:
@@ -163,98 +170,56 @@ class ActionGroup:
             available_actions = [
                 a for a in self._remaining_actions if a.can_perform(executor, game_state)]
             if not available_actions:
-                print("- No available actions left to perform.")
+                self.logger.debug("- No available actions left to perform.")
                 break
 
             # Choose an action.
             if len(available_actions) == 1:
                 self._chosen_action = available_actions[0]
-                print(f"- Automatically selected '{self._chosen_action.name}'")
+                self.logger.debug(
+                    f"- Automatically selected '{self._chosen_action.name}'")
             else:
-                print("- Waiting for action choice...")
+                self.logger.debug("- Waiting for action choice...")
                 message = ActionChoiceMessage(
                     game_state, self, available_actions)
                 response = yield message
                 self._chosen_action = response.chosen_action
                 if self._chosen_action is None:
-                    print(
+                    self.logger.info(
                         f" - ActionGroup '{self.name}' was aborted by controller.")
                     self.cancel_group = True
                     break
 
-            print(f" - Performing action: '{self._chosen_action.name}'")
+            self.logger.info(
+                f" - Performing action: '{self._chosen_action.name}'")
+
             # Delegate the entire action generator with yield from.
             yield from self._delegate_action(self._chosen_action, game_state, executor)
-
+            self.logger.debug(f"Remaining Actions: {self._remaining_actions}")
             self.total_uses += 1
-            self._remaining_actions.remove(self._chosen_action)
+            # Remove Action
+            self.logger.debug(f"Attempting to remove {self._chosen_action}")
+            if self._chosen_action in self._remaining_actions:
+                self._remaining_actions.remove(self._chosen_action)
+            else:
+                self.logger.debug(
+                    "Action not found, getting attempting to find alternate")
+                self._remaining_actions.remove(
+                    self._get_alternate_action(self._chosen_action))
+
             self._chosen_action = None
 
-        print(f"[GROUP] Finished '{self.name}'")
+        self.logger.info(f"[GROUP] Finished '{self.name}'")
         self.reset_action_group()
 
     def _delegate_action(self, action, game_state, executor) -> Generator[GameMessage, Any, None]:
         # Delegate all send() calls directly into the action's perform generator.
         yield from action.perform(game_state, executor)
 
-    # def _step_ordered_one_step(self, executor, game_state) -> Generator[GameMessage, Any, None]:
-    #     """Performs a single message cycle for an ordered group."""
-
-    #     # Resume a currently running action
-    #     if self._current_action_gen:
-    #         try:
-    #             message = next(self._current_action_gen)
-    #             yield message
-    #             return
-    #         except StopIteration:
-    #             self.total_uses += 1
-    #             self._remaining_actions.remove(self._chosen_action)
-    #             self._chosen_action = None
-    #             self._current_action_gen = None
-    #             return
-
-    #     # Select the next action
-    #     while True:
-    #         available = [a for a in self._remaining_actions if a.can_perform(
-    #             executor, game_state)]
-    #         if not available:
-    #             print("- No available actions left to perform.")
-    #             self.cancel_group = True
-    #             return
-
-    #         if len(available) == 1:
-    #             self._chosen_action = available[0]
-    #             print(
-    #                 f" - Automatically selected '{self._chosen_action.name}'")
-    #         else:
-    #             print("- Prompting for action choice...")
-    #             message = ActionChoiceMessage(game_state, self, available)
-    #             response = yield message  # Controller response comes back here
-    #             self._chosen_action = response.chosen_action
-    #             if self._chosen_action is None:
-    #                 print(
-    #                     f" - ActionGroup '{self.name}' was aborted by controller.")
-    #                 self.cancel_group = True
-    #                 return
-    #             print(f" - Selected: '{self._chosen_action.name}'")
-
-    #         # Start the action's generator
-    #         self._current_action_gen = self._chosen_action.perform(
-    #             game_state, executor)
-
-    #         try:
-    #             message = next(self._current_action_gen)
-    #             yield message
-    #             return
-    #         except StopIteration:
-    #             self.total_uses += 1
-    #             self._remaining_actions.remove(self._chosen_action)
-    #             self._chosen_action = None
-    #             self._current_action_gen = None
-
     def _perform_available_modifiers(self, executor, game_state):
         for modifier in (a for a in self.actions if a.is_action_group_modifier and a.can_perform(executor, game_state)):
-            print(f"- Performing available modifier action '{modifier.name}")
+            self.logger.info(
+                f"- Performing available modifier action '{modifier.name}")
             modifier.perform(game_state, executor)
 
     def _assign_action_group(self):
@@ -265,8 +230,13 @@ class ActionGroup:
         if self.max_total_uses == inf:
             return
         self.max_total_uses += amount
-        print(
+        self.logger.info(
             f" - ActionGroup '{self.name}' max uses changed to {self.max_total_uses}")
+
+    def _get_alternate_action(self, chosen_action: Action):
+        viable_actions = [
+            action for action in self._remaining_actions if action.id == chosen_action.id]
+        return viable_actions[0]
 
     def reset_action_group(self):
         for action in self.actions:

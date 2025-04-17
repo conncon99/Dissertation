@@ -1,16 +1,16 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from utils.root_types import Items
+from src.actions.action_handler import Action
+from src.utils.root_types import Items
 from typing import TYPE_CHECKING
-from board.clearing import Clearing
-from controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
-from controllers.messages.controller_messages import AidExhaustItemChoiceResponse
-from actions.action_group_registry import ActionIDs
+from src.board.clearing import Clearing
+from src.controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
+from src.controllers.messages.controller_messages import AidExhaustItemChoiceResponse
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
-    from factions.faction import Faction
-    from cards.card import Card
+    from src.factions.vagabond.vagabond import Vagabond
+    from src.factions.faction import Faction
+    from src.cards.card import Card
 
 
 class AidAction(Action):
@@ -54,7 +54,7 @@ class AidAction(Action):
 
         chosen_faction.hand.append(chosen_card)
         executor.hand.remove(chosen_card)
-        print(f" - Given card '{chosen_card}' to {chosen_faction}")
+        self.logger.info(f" - Given card '{chosen_card}' to {chosen_faction}")
 
         executor.relationship_track.aid_faction(chosen_faction.faction_id)
 
@@ -70,11 +70,12 @@ class AidAction(Action):
         # 7. Take item and add it to available items in satchel
 
         if taken_item is not None:
-            print(
+            self.logger.info(
                 f" - Taken {taken_item.name.capitalize()} from {chosen_faction}")
             chosen_faction.items.remove(taken_item)
             executor.satchel.add_item(taken_item)
         else:
-            print(f" - No item taken from {chosen_faction}")
+            self.logger.info(f" - No item taken from {chosen_faction}")
+            pass
 
         return super().perform(game_state, executor)

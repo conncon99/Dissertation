@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.root_types import Suits
-from utils.callback_handler import CallbackTimes
-from controllers.messages.game_messages import MarquiseSpendBirdCardMessage
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Suits
+from src.utils.callback_handler import CallbackTimes
+from src.controllers.messages.game_messages import MarquiseSpendBirdCardMessage
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.marquise_de_cat import Marquise
+    from src.factions.marquise_de_cat import Marquise
 
 
 class SpendBirdCardAction(Action):

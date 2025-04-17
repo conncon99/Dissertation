@@ -1,5 +1,5 @@
-from cards.card import *
-from utils.root_types import Suits, Items
+from src.cards.card import *
+from src.utils.root_types import Suits, Items
 
 # Royal Viziers
 

@@ -1,15 +1,15 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING, List
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from controllers.messages.game_messages import SpreadSympathyClearingMessage, SpreadSympathyDiscardMessage
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.controllers.messages.game_messages import SpreadSympathyClearingMessage, SpreadSympathyDiscardMessage
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from utils.game_state import GameState
-    from board.clearing import Clearing
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
 
 
 class SpreadSympathyAction(Action):
@@ -69,7 +69,8 @@ class SpreadSympathyAction(Action):
         response = yield SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)
         chosen_clearing = response.chosen_clearing
 
-        print(f" - Spread sympathy to clearing {chosen_clearing.index}")
+        self.logger.info(
+            f" - Spread sympathy to clearing {chosen_clearing.index}")
 
         # 2. Choose supporters to discard
 

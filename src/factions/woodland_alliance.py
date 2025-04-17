@@ -1,32 +1,32 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict, Optional
-from factions.faction import Faction
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from utils.root_types import Suits
-from actions.action_handler import ActionGroup
-from pieces.woodland_alliance.alliance_buildings import AllianceBase
-from actions.factionless.draw_and_discard_action import DrawAndDiscardAction
-from actions.factionless.craft_action import CraftAction
-from actions.woodland_alliance.mobilize_action import MobilizeAction
-from actions.woodland_alliance.train_action import TrainAction
-from actions.woodland_alliance.revolt_action import RevoltAction
-from actions.factionless.play_dominance_action import PlayDominanceAction
-from actions.woodland_alliance.spread_sympathy_action import SpreadSympathyAction
-from actions.woodland_alliance.modify_evening_action_count import ModifyEveningActionCount
-from actions.woodland_alliance.organize_action import OrganizeAction
-from actions.factionless.move_action import MoveAction
-from actions.factionless.battle_action import BattleAction
-from actions.woodland_alliance.alliance_recruit_action import AllianceRecruitAction
-from controllers.messages.game_messages import TriggererOutrageMessage, AllianceOutrageMessage
-from utils.callback_handler import CallbackTimes
-from cards.card import Card
-from utils.colour_utils import set_print_colour
+from src.factions.faction import Faction
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.utils.root_types import Suits
+from src.actions.action_handler import ActionGroup
+from src.pieces.woodland_alliance.alliance_buildings import AllianceBase
+from src.actions.factionless.draw_and_discard_action import DrawAndDiscardAction
+from src.actions.factionless.craft_action import CraftAction
+from src.actions.woodland_alliance.mobilize_action import MobilizeAction
+from src.actions.woodland_alliance.train_action import TrainAction
+from src.actions.woodland_alliance.revolt_action import RevoltAction
+from src.actions.factionless.play_dominance_action import PlayDominanceAction
+from src.actions.woodland_alliance.spread_sympathy_action import SpreadSympathyAction
+from src.actions.woodland_alliance.modify_evening_action_count import ModifyEveningActionCount
+from src.actions.woodland_alliance.organize_action import OrganizeAction
+from src.actions.factionless.move_action import MoveAction
+from src.actions.factionless.battle_action import BattleAction
+from src.actions.woodland_alliance.alliance_recruit_action import AllianceRecruitAction
+from src.controllers.messages.game_messages import TriggererOutrageMessage, AllianceOutrageMessage
+from src.utils.callback_handler import CallbackTimes
+from src.cards.card import Card
+from src.utils.colour_utils import set_print_colour
 
 if TYPE_CHECKING:
-    from board.map import Map
-    from cards.deck import Deck
-    from board.clearing import Clearing
-    from utils.game_state import GameState
+    from src.board.map import Map
+    from src.cards.deck import Deck
+    from src.board.clearing import Clearing
+    from src.utils.game_state import GameState
 
 
 class WoodlandAlliance(Faction):
@@ -58,12 +58,12 @@ class WoodlandAlliance(Faction):
         return "Woodland Alliance"
 
     def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
-        print(f"Setting up {self}")
+        self.logger.info(f"Setting up {self}")
         self.deck = deck
         self.game_state = game_state
         self.supporters.extend(self.deck.draw(3))
-        print(f"- Added 3 Supporters")
-        print(f"- Finished {self} Set Up\n")
+        self.logger.info(f"- Added 3 Supporters")
+        self.logger.info(f"- Finished {self} Set Up\n")
         return
         yield
 
@@ -81,7 +81,7 @@ class WoodlandAlliance(Faction):
 
     def trigger_outrage(self, triggerer: Faction, clearing: Clearing, action_group, game_state: GameState):
         set_print_colour(self.print_colour)
-        print(
+        self.logger.info(
             f" - OUTRAGE TRIGGERED by {triggerer} in clearing {clearing.index}")
         chosen_card = None
         # 1. If player has cards matching the suit of the clearing or bird, they can choose which to give to the woodland alliance
@@ -93,7 +93,7 @@ class WoodlandAlliance(Faction):
             chosen_card = response.chosen_card
             game_state.active_player = game_state.current_player
             triggerer.hand.remove(chosen_card)
-            print(
+            self.logger.info(
                 f" - {triggerer} has given matching card '{chosen_card}' to The {self}")
         # 2. If the player does not have a matching card, they must show the alliance their hand, and the alliance chooses which card to take
         elif len(triggerer.hand) > 0:
@@ -101,7 +101,7 @@ class WoodlandAlliance(Faction):
             response = yield AllianceOutrageMessage(self.game_state, action_group, triggerer.hand)
             chosen_card = response.chosen_card
             triggerer.hand.remove(chosen_card)
-            print(
+            self.logger.info(
                 f" - The {self} has taken non-matching card '{chosen_card}' from {triggerer}")
             game_state.active_player = triggerer
         # 3. If the player has no cards, the alliance draws a card from the deck
@@ -109,7 +109,7 @@ class WoodlandAlliance(Faction):
             chosen_card = self.deck.draw(1)
             if chosen_card != []:
                 chosen_card = chosen_card[0]
-                print(
+                self.logger.info(
                     f" - {triggerer} has no cards, drew '{chosen_card}' from the deck")
             else:
                 set_print_colour(triggerer.print_colour)
@@ -126,5 +126,6 @@ class WoodlandAlliance(Faction):
         if self.get_base_count() > 0 or len(self.supporters) < 5:
             self.supporters.append(card)
         else:
-            print(f" - Reached Supporter Limit, unable to add '{card}'")
+            self.logger.info(
+                f" - Reached Supporter Limit, unable to add '{card}'")
             self.discard_card(card)

@@ -39,7 +39,7 @@ class ActionGroupRegistry:
         return len(cls._instance._id_registry)
 
 
-class ActionIDs(Enum):  # 41
+class ActionIDs(Enum):  # 59
     # Cards - 7
     BETTER_BURROW_BANK = auto()
     CLAIM_DOMINANCE = auto()
@@ -49,11 +49,27 @@ class ActionIDs(Enum):  # 41
     STAND_AND_DELIVER = auto()
     TAX_COLLECTOR = auto()
 
-    # Eyrie Dynasties - 8
-    DECREE_BATTLE = auto()
-    DECREE_BUILD = auto()
-    DECREE_MOVE = auto()
-    DECREE_RECRUIT = auto()
+    # Eyrie Dynasties - 20
+    DECREE_BATTLE_FOX = auto()
+    DECREE_BATTLE_MOUSE = auto()
+    DECREE_BATTLE_BIRD = auto()
+    DECREE_BATTLE_RABBIT = auto()
+
+    DECREE_BUILD_FOX = auto()
+    DECREE_BUILD_MOUSE = auto()
+    DECREE_BUILD_BIRD = auto()
+    DECREE_BUILD_RABBIT = auto()
+
+    DECREE_MOVE_FOX = auto()
+    DECREE_MOVE_MOUSE = auto()
+    DECREE_MOVE_BIRD = auto()
+    DECREE_MOVE_RABBIT = auto()
+
+    DECREE_RECRUIT_FOX = auto()
+    DECREE_RECRUIT_MOUSE = auto()
+    DECREE_RECRUIT_BIRD = auto()
+    DECREE_RECRUIT_RABBIT = auto()
+
     EXTEND_DECREE = auto()
     REPLENISH_HAND = auto()
     ROOSTLESS = auto()

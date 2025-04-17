@@ -1,17 +1,18 @@
 
 from __future__ import annotations
-import random
+import numpy as np
 from typing import List, TYPE_CHECKING
-from utils.root_types import Items, Suits
+from src.utils.root_types import Items, Suits
 from enum import Enum
 from abc import abstractmethod, ABC
-from board.clearing import Clearing
-from controllers.messages.controller_messages import RangerRepairResponse
-from controllers.messages.game_messages import RangerRepairMessage, TinkerCardMessage, ThiefStealMessage
+from src.board.clearing import Clearing
+from src.controllers.messages.controller_messages import RangerRepairResponse
+from src.controllers.messages.game_messages import RangerRepairMessage, TinkerCardMessage, ThiefStealMessage
+import logging
 
 if TYPE_CHECKING:
-    from utils.game_state import GameState
-    from factions.vagabond.vagabond import Vagabond
+    from src.utils.game_state import GameState
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class VagabondCharacter(ABC):
@@ -49,7 +50,7 @@ class ThiefCharacter(VagabondCharacter):
 
         response = yield ThiefStealMessage(game_state, action_group, available_players)
         chosen_player = response.chosen_player
-        selected_card = random.choice(chosen_player.hand)
+        selected_card = np.random.choice(chosen_player.hand)
         chosen_player.hand.remove(selected_card)
         executor.hand.append(selected_card)
 
@@ -72,7 +73,8 @@ class TinkerCharacter(VagabondCharacter):
         chosen_card = response.chosen_card
         executor.hand.append(chosen_card)
         game_state.deck.discard.remove(chosen_card)
-        print(f" - Taken '{chosen_card}' from the discard pile")
+        logger = logging.getLogger(__name__)
+        logger.info(f" - Taken '{chosen_card}' from the discard pile")
 
 
 class RangerCharacter(VagabondCharacter):

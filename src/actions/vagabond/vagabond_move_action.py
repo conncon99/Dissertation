@@ -1,19 +1,21 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from utils.root_types import Items
+from src.actions.action_handler import Action
+from src.utils.root_types import Items
 from typing import TYPE_CHECKING
-from board.clearing import Clearing
-from board.forest import Forest
-from controllers.messages.game_messages import VagabondMoveMessage, AllyMovementMessage
-from controllers.messages.controller_messages import AllyMovementResponse
-from factions.vagabond.relationship_track import HOSTILE, ALLIED
-from actions.action_group_registry import ActionIDs
+from src.board.clearing import Clearing
+from src.board.forest import Forest
+from src.controllers.messages.game_messages import VagabondMoveMessage, AllyMovementFactionMessage, AllyMovementUnitMessage
+from src.controllers.messages.controller_messages import AllyMovementFactionResponse, AllyMovementUnitResponse, VagabondMoveResponse
+from src.actions.action_group_registry import ActionIDs
+
+HOSTILE = 0
+ALLIED = 4
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
-    from utils.game_state import GameState
-    from board.space import Space
-    from pieces.pawn import Pawn
+    from src.factions.vagabond.vagabond import Vagabond
+    from src.utils.game_state import GameState
+    from src.board.space import Space
+    from src.pieces.pawn import Pawn
 
 
 class VagabondMoveAction(Action):
@@ -35,7 +37,7 @@ class VagabondMoveAction(Action):
         available_clearings = self._generate_clearing_costs(
             executor, game_state, self.cobbler_move)
 
-        response = yield VagabondMoveMessage(game_state, self.action_group, available_clearings)
+        response: VagabondMoveResponse = yield VagabondMoveMessage(game_state, self.action_group, available_clearings)
         chosen_clearing: Clearing = response.chosen_clearing
         clearing_cost = available_clearings[chosen_clearing]
 
@@ -53,13 +55,16 @@ class VagabondMoveAction(Action):
         if available_allies != []:
             available_allies.append(None)
 
-            ally_movement_response: AllyMovementResponse = yield AllyMovementMessage(game_state, self.action_group, available_allies, from_space)
-            if ally_movement_response.chosen_ally is not None:
-                print(
-                    f" - {executor} is bringing along {len(ally_movement_response.chosen_units)} allied warriors from {ally_movement_response.chosen_ally}")
-                for unit in ally_movement_response.chosen_units:
+            ally_movement_faction_response: AllyMovementFactionResponse = yield AllyMovementFactionMessage(game_state, self.action_group, available_allies, from_space)
+            if ally_movement_faction_response.chosen_ally is not None:
+                self.logger.debug(
+                    f"Available Units: {len(from_space.units[ally_movement_faction_response.chosen_ally.faction_id])}")
+                ally_movement_units_response: AllyMovementUnitResponse = yield AllyMovementUnitMessage(game_state, self.action_group, ally_movement_faction_response.chosen_ally, from_space)
+                self.logger.info(
+                    f" - {executor} is bringing along {ally_movement_units_response.chosen_unit_count} allied warriors from {ally_movement_faction_response.chosen_ally}")
+                for unit in from_space.units[ally_movement_faction_response.chosen_ally.faction_id][:ally_movement_units_response.chosen_unit_count]:
                     self.move(from_space, to_clearing,
-                              ally_movement_response.chosen_ally.faction_id, unit)
+                              ally_movement_faction_response.chosen_ally.faction_id, unit)
 
         self.move(from_space, to_clearing,
                   executor.faction_id, executor.vagabond_pawn)
@@ -67,7 +72,7 @@ class VagabondMoveAction(Action):
         for _ in range(clearing_cost):
             executor.satchel.exhaust_item(Items.BOOTS)
 
-        print(
+        self.logger.info(
             f" - Vagabond has moved from {self._space_type(from_space)} {from_space.index} to Clearing {to_clearing.index} by exhausting {clearing_cost} Boots")
 
         return super().perform(game_state, executor)

@@ -1,11 +1,11 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from board.forest import Forest
-from actions.action_group_registry import ActionIDs
+from src.board.forest import Forest
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class EveningRestAction(Action):

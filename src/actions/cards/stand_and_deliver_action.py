@@ -1,13 +1,13 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from controllers.messages.game_messages import StandAndDeliverMessage
-import random
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import StandAndDeliverMessage
 from typing import TYPE_CHECKING
-from actions.action_group_registry import ActionIDs
+from src.actions.action_group_registry import ActionIDs
+import numpy as np
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from cards.card import Card
+    from src.factions.faction import Faction
+    from src.cards.card import Card
 
 
 class StandAndDeliverAction(Action):
@@ -26,10 +26,10 @@ class StandAndDeliverAction(Action):
         chosen_player: Faction = response.chosen_player
 
         # 2. Take a random card from that player
-        card = random.choice(chosen_player.hand)
+        card = np.random.choice(chosen_player.hand)
         chosen_player.hand.remove(card)
         executor.hand.append(card)
-        print(
+        self.logger.info(
             f" - {executor} has taken a '{card}' from {chosen_player} and given them 1 Victory Point")
 
         # 3. That player receives a victory point

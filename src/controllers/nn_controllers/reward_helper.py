@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from utils.root_types import Factions
+from src.utils.root_types import Factions
 import math
 
 if TYPE_CHECKING:
-    from utils.game_state import GameState
+    from src.utils.game_state import GameState
 
 
 def sigmoid(x):
