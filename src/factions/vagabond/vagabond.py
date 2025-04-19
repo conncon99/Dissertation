@@ -50,6 +50,14 @@ class Vagabond(Faction):
         self.active_coin_count: int = 0
         self.active_bag_count: int = 0
         self.max_track_count: int = 3
+
+        self.prev_available_items: int = 0
+        self.prev_exhausted_items: int = 0
+        self.prev_damaged_items: int = 0
+        self.prev_bag_track_count: int = 0
+        self.prev_coin_track_count: int = 0
+        self.prev_tea_track_count: int = 0
+
         self.battle_ally: Optional[Faction] = None
 
         self.completed_quests: Dict[Suits, int] = {

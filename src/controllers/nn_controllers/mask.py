@@ -25,7 +25,7 @@ class Mask:
 
     def __init__(self, action_size=60):  # 59 Action IDs and a None Output
         self.action_size = action_size
-        self.logger = logging.getLogger("Mask")
+        self.logger = logging.getLogger()
 
     def create_mask(self, msg: GameMessage) -> List[bool]:
         self.logger.debug(f"Masking {msg.type}")
@@ -215,11 +215,9 @@ class Mask:
                 return self.space_mask(msg.available_spaces)
             case GameMessages.REFRESH_ITEM_MESSAGE:
                 assert isinstance(msg, RefreshItemMessage)
-                # TODO: Ensure params are correct
                 return self.item_mask([], msg.undamaged_items, [], msg.damaged_items)
             case GameMessages.VAGABOND_MOVE_MESSAGE:
                 assert isinstance(msg, VagabondMoveMessage)
-                # TODO: Check if this works
                 return self.clearing_mask(msg.clearing_dict)
             case GameMessages.CHOOSE_QUEST_MESSAGE:
                 assert isinstance(msg, ChooseQuestMessage)

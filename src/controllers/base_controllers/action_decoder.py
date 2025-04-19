@@ -10,7 +10,6 @@ class Decoder:
         logger.debug(f"Decoding {msg.type}")
         match msg.type:
             case GameMessages.ACTION_CHOICE_MESSAGE:
-                # TODO: Update based on number of actions
                 return ActionChoiceResponse(decode_action_output(action, 60, msg.action_group))
             case GameMessages.AMBUSH_MESSAGE:
                 return AmbushResponse(decode_card_output(action))

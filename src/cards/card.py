@@ -22,7 +22,7 @@ class Card:
     def __init__(self, suit: Suits, name: str, is_persistent: bool, description: str) -> None:
         self.suit = suit
         self.name = name
-        self.logger = logging.getLogger(f"{name} + card")
+        self.logger = logging.getLogger()
         self.description = description
         self.is_persistent = is_persistent
         self.is_craftable = False
@@ -168,7 +168,6 @@ class SappersCard(Card):
         use_card: bool = response.use_card
         game_state.active_player = game_state.current_player
         if use_card:
-            # TODO: This should be defender damage mod but apparently I have them switched around
             battle_modifier.attacker_damage_modifier += 1
             self.logger.debug(f"Active cards: {self.owner.active_cards}")
             self.logger.info(
@@ -205,7 +204,6 @@ class BrutalTacticsCard(Card):
 
         if use_card:
             battle_modifier.defender_damage_modifier += 1
-            # TODO: These should probably be defender but maybe the order of things are mixed up
             battle_modifier.attacker.add_vp(1)
             self.logger.info(
                 f" - {self.owner} played {self.name} to deal an extra hit, {battle_modifier.attacker} gained 1 VP")
@@ -277,10 +275,9 @@ class AmbushCard(Card):
         available_ambush_cards = [
             card for card in battle_modifier.attacker.hand if isinstance(card, AmbushCard) and (card.suit == battle_modifier.clearing.get_suit() or card.suit == Suits.BIRD)]
 
+        game_state.active_player = battle_modifier.attacker
         if available_ambush_cards != []:
-            game_state.active_player = battle_modifier.attacker
             ambush_response: AmbushResponse = yield AmbushMessage(game_state, action_group, battle_modifier.attacker, battle_modifier.defender, battle_modifier.clearing, True, True, available_ambush_cards)
-            game_state.active_player = game_state.current_player
             if ambush_response.ambush_card is not None:
                 self.logger.info(
                     f" - {battle_modifier.attacker} Counter-Ambushed using '{ambush_response.ambush_card}'")

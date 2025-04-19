@@ -14,6 +14,7 @@ from src.controllers.nn_controllers.observation_space_encoder import Observation
 from src.actions.action_group_registry import ActionGroupRegistry
 from src.pieces.piece_with_id import PieceWithID
 from src.controllers.nn_controllers.mask import Mask
+from src.factions.vagabond.vagabond import Vagabond
 import types
 import itertools
 import logging
@@ -46,7 +47,7 @@ class GameManager:
         self.current_group_index = 0
         self.faction_setup_iter = None
         self.action_group_iter = None
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
 
         self._initialize_game_state()
         self.create_map()
@@ -115,8 +116,12 @@ class GameManager:
             obs["observations"] = ObservationSpace.encode_game_state(
                 self.game_state, None, self.current_group).clip(0, 1).astype(np.float32)
             obs["action_mask"] = np.zeros(
-                self.masker.action_size, dtype=np.float32)
-            obs["action_mask"][56] = 1
+                self.masker.action_size, dtype=np.float32).clip(0, 1)
+            obs["action_mask"][59] = 1
+            assert np.isfinite(obs["observations"]).all(
+            ), f"observations has a NaN or inf: {obs['observations']}"
+            assert np.isfinite(obs["action_mask"]).all(
+            ), f"action mask has a NaN or inf: {obs['action_mask']}"
             self.logger.debug("No Message Available")
             return obs
         self.logger.debug(
@@ -125,7 +130,12 @@ class GameManager:
             self.game_state, self.current_message.type, self.current_group).clip(0, 1).astype(np.float32)
 
         obs["action_mask"] = np.array(self.masker.create_mask(
-            self.current_message), dtype=np.float32)
+            self.current_message), dtype=np.float32).clip(0, 1)
+
+        assert np.isfinite(obs["observations"]).all(
+        ), f"observations has a NaN or inf: {obs['observations']}"
+        assert np.isfinite(obs["action_mask"]).all(
+        ), f"action mask has a NaN or inf: {obs['action_mask']}"
 
         enabled_actions = [i for i, val in enumerate(
             obs["action_mask"]) if val == 1]
@@ -140,40 +150,87 @@ class GameManager:
         if not player.dominance:
             vp_diff = player.victory_points - player.prev_vp
             player.prev_vp = player.victory_points
+            vp_diff *= 2
             reward += vp_diff
+            player.last_vp_change = vp_diff
         elif player.faction_id == Factions.VAGABOND.value:
-            vp_diff = player.dominance.victory_points - player.prev_vp
-            reward += vp_diff
-            player.prev_vp = player.dominance.victory_points
+            if player.dominance.dominance:
+                reward += player.dominance.last_dominance_change
+            else:
+                reward += player.dominance.last_vp_change
         else:
             if player.dominance != Suits.BIRD:
                 dominance_clearings_ruled = sum(1 if clearing.get_owner() == player.faction_id and clearing.get_suit(
                 ) == player.dominance else 0 for clearing in self.game_state.board.clearings)
-                reward += (dominance_clearings_ruled -
-                           player.prev_dominance_clearings_controlled)
+                dominance_diff = dominance_clearings_ruled - \
+                    player.prev_dominance_clearings_controlled
+                reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
+                player.last_dominance_change = dominance_diff
             else:
                 dominance_clearings_ruled = sum(1 if clearing.get_owner(
                 ) == player.faction_id and clearing in self.game_state.board.corner_clearings else 0 for clearing in self.game_state.board.clearings)
-                reward += (dominance_clearings_ruled -
-                           player.prev_dominance_clearings_controlled)
+                dominance_diff = dominance_clearings_ruled - \
+                    player.prev_dominance_clearings_controlled
+                reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
+                player.last_dominance_change = dominance_diff
 
-        # Clearing Owned Reward
-        owned_clearing_count = sum(1 if clearing.get_owner(
-        ) == player.faction_id else 0 for clearing in self.game_state.board.clearings)
+        # # Clearing Owned Reward
+        # owned_clearing_count = sum(1 if clearing.get_owner(
+        # ) == player.faction_id else 0 for clearing in self.game_state.board.clearings)
 
-        reward += owned_clearing_count - player.prev_clearings_controlled
-        player.prev_clearings_controlled = owned_clearing_count
+        # reward += owned_clearing_count - player.prev_clearings_controlled
+        # player.prev_clearings_controlled = owned_clearing_count
 
-        # Number of warriors gained this turn
-        reward += (len(player.units) - player.prev_unit_count) * 0.2
-        player.prev_unit_count = len(player.units)
+        # # Number of warriors gained this turn
+        # reward += (len(player.units) - player.prev_unit_count) * 0.2
+        # player.prev_unit_count = len(player.units)
 
-        # Crafted Active Card reward
-        reward += (len(player.active_cards) -
-                   player.prev_active_cards_count) * 0.5
-        player.prev_active_cards_count = len(player.active_cards)
+        # # Crafted Active Card reward
+        # reward += (len(player.active_cards) -
+        #            player.prev_active_cards_count) * 0.5
+        # player.prev_active_cards_count = len(player.active_cards)
+
+        # # Vagabond Rewards
+        # if player.faction_id == Factions.VAGABOND.value:
+        #     assert isinstance(player, Vagabond)
+
+        #     # Item Track Rewards
+        #     reward += (player.active_coin_count - player.prev_coin_track_count)
+        #     reward += (player.active_tea_count - player.prev_tea_track_count)
+        #     reward += (player.active_bag_count - player.prev_bag_track_count)
+        #     player.prev_coin_track_count = player.active_coin_count
+        #     player.prev_tea_track_count = player.active_tea_count
+        #     player.prev_bag_track_count = player.active_bag_count
+
+        #     # Satchel
+        #     # Available, Exhausted, Damaged
+
+        #     available_item_count = sum(
+        #         1 for item, amount in player.satchel.available_items.items() for _ in range(amount))
+        #     exhausted_item_count = sum(
+        #         1 for item, amount in player.satchel.exhausted_items.items() for _ in range(amount))
+        #     exhausted_damaged_item_count = sum(
+        #         1 for item, amount in player.satchel.exhausted_damaged_items.items() for _ in range(amount))
+        #     damaged_item_count = sum(
+        #         1 for item, amount in player.satchel.available_damaged_items.items() for _ in range(amount))
+
+        #     total_exhausted_count = exhausted_damaged_item_count + exhausted_item_count
+        #     total_damaged_count = exhausted_damaged_item_count + damaged_item_count
+
+        #     reward += (available_item_count -
+        #                player.prev_available_items) * 0.25
+        #     # reward += (player.prev_exhausted_items -
+        #     #            total_exhausted_count) * 0.25
+        #     # reward += (player.prev_damaged_items - total_damaged_count) * 0.25
+
+        #     player.prev_available_items = available_item_count
+        #     player.prev_exhausted_items = total_exhausted_count
+        #     player.prev_damaged_items = total_damaged_count
+
+        # Turn Penalty
+        # reward -= self.turn_count * 0.005
 
         if isinstance(self.winner, list):
             if player in self.winner:
@@ -191,6 +248,24 @@ class GameManager:
 
     def _check_win_conditions(self):
         winners = []
+
+        for faction in self.settings.faction_list:
+            if faction.dominance and not faction.faction_id == Factions.VAGABOND:
+                needed_clearings = 2 if faction.dominance == Suits.BIRD else 3
+                if faction.dominance == Suits.BIRD:
+                    current_clearings = sum(1 if clearing.get_owner(
+                    ) == faction.faction_id and clearing in self.game_state.board.corner_clearings else 0 for clearing in self.game_state.board.clearings)
+                else:
+                    current_clearings = sum(1 if clearing.get_owner() == faction.faction_id and clearing.get_suit(
+                    ) == faction.dominance else 0 for clearing in self.game_state.board.clearings)
+
+                self.logger.info(
+                    f"{faction} is working towards {faction.dominance} dominance ({current_clearings}/{needed_clearings})")
+            elif faction.dominance and faction.faction_id == Factions.VAGABOND:
+                self.logger.info(
+                    f"{faction} is in a coalition with {faction.dominance}")
+            else:
+                self.logger.info(f"{faction} VP: {faction.victory_points}")
 
         for faction in self.settings.faction_list:
             if faction.dominance and faction.has_won:

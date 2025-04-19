@@ -15,7 +15,7 @@ class Deck:
 
     def __init__(self, map: Map, use_manual_card_draw=False) -> None:
         self.use_manual_card_draw = use_manual_card_draw
-        self.logger = logging.getLogger("Deck")
+        self.logger = logging.getLogger()
         self.deck = [
             # Item Cards
             SWORD_MOUSE,

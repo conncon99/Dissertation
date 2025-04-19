@@ -10,6 +10,7 @@ from src.controllers.player_controllers.marquise_player_controller import Marqui
 from src.controllers.player_controllers.alliance_player_controller import AlliancePlayerController
 from src.controllers.player_controllers.eyrie_player_controller import EyriePlayerController
 from src.controllers.player_controllers.vagabond_player_controller import VagabondPlayerController
+from src.controllers.nn_controllers.nn_controller import Alliance_NN_Controller
 import logging
 import os
 
@@ -25,22 +26,25 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
-NUM_RUNS = 5
+NUM_RUNS = 1
 TURN_LIMIT = 100
 
 for i in range(NUM_RUNS):
 
     marquise = Marquise(MarquiseRandomController())
     eyrie_dynasties = EyrieDynasties(EyrieRandomController())
-    woodland_alliance = WoodlandAlliance(AllianceRandomController())
-    # vagabond = Vagabond(VagabondRandomController())
+    # woodland_alliance = WoodlandAlliance(AllianceRandomController())
+    vagabond = Vagabond(VagabondRandomController())
 
     # marquise = Marquise(MarquisePlayerController())
     # eyrie_dynasties = EyrieDynasties(EyriePlayerController())
     # woodland_alliance = WoodlandAlliance(AlliancePlayerController())
-    vagabond = Vagabond(VagabondPlayerController())
+    # vagabond = Vagabond(VagabondPlayerController())
+
+    woodland_alliance = WoodlandAlliance(Alliance_NN_Controller)
+    Alliance_NN_Controller.reset_state()
 
     settings = GameSettings(
         [marquise, eyrie_dynasties, woodland_alliance, vagabond])
@@ -62,3 +66,7 @@ for i in range(NUM_RUNS):
         logger.info(f"Winner: {gm.winner}")
     else:
         logger.info("No winner declared.")
+
+    for faction in gm.turn_order:
+        if not faction.dominance:
+            logger.info(f"{faction} VP: {faction.victory_points}")

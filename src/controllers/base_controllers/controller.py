@@ -12,7 +12,7 @@ class Controller(ABC):
 
     def __init__(self) -> None:
         self.pending_action = None
-        self.logger = logging.getLogger("Controller")
+        self.logger = logging.getLogger()
 
     def send_game_message(self, msg: GameMessage) -> ControllerMessage:
         match msg.type:

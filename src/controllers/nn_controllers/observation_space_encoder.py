@@ -129,7 +129,7 @@ class ObservationSpace:
         observation_space.extend(cls._encode_vagabond_data(game_state))
 
         #### GameMessage ####
-        observation_space.append(cls._encode_game_message(message_type))
+        observation_space.extend(cls._encode_game_message(message_type))
 
         #### Battles ####
         observation_space.extend(cls._encode_battle(game_state))
@@ -138,7 +138,7 @@ class ObservationSpace:
         if action_group:
             # Action Group ID
             observation_space.append(
-                action_group.id / ActionGroupRegistry.get_registery_size())
+                0 if ActionGroupRegistry.get_registery_size() == 0 else action_group.id / ActionGroupRegistry.get_registery_size())
             # Is action group ordered
             observation_space.append(1.0 if action_group.ordered else 0.0)
             # Can action space be aborted
@@ -622,7 +622,11 @@ class ObservationSpace:
 
     @classmethod
     def _encode_game_message(cls, message_type: GameMessages):
-        return message_type.value / len(GameMessages) if message_type else 0.0
+        message_encoding = []
+        for i in range(len(GameMessages)):
+            message_encoding.append(
+                1.0 if message_type and message_type.value == i + 1 else 0.0)
+        return message_encoding
 
     @classmethod
     def _encode_action_list(cls, action_list: List[Action]) -> List[float]:
