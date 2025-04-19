@@ -29,7 +29,7 @@ class Action(ABC):
 
     def __init__(self, name: str, max_uses: Optional[int] = None, is_action_group_modifier: bool = False, group_spanning: bool = False) -> None:
         self.name = name
-        self.logger = logging.getLogger(f"{name}")
+        self.logger = logging.getLogger()
         self.max_uses = max_uses if max_uses is not None else inf
         self.times_used = 0
         self.is_action_group_modifier = is_action_group_modifier
@@ -71,7 +71,7 @@ class ActionGroup:
                                None -> no shared limit. Each Action might still have its own limit.
         """
         self.name = name
-        self.logger = logging.getLogger(f'{name}')
+        self.logger = logging.getLogger()
         self.id = id
         self.ordered = ordered
         self.actions = actions if actions is not None else []
@@ -100,8 +100,6 @@ class ActionGroup:
     def can_perform_any_action(self):
         return self.total_uses < self.max_total_uses
 
-    # TODO: Re-enable action group modifiers when they are working
-
     def step_action_group(self, executor, game_state) -> Generator[GameMessage, Any, None]:
         """Runs one step of this ActionGroup."""
         if not self.started:
@@ -129,26 +127,57 @@ class ActionGroup:
         Unordered group: actions may be performed in any order.
         The controller may choose to finish the group by returning a None action.
         """
-        while not self.cancel_group and self.can_perform_any_action():
+
+        while not self.cancel_group:
+
             # Dynamically compute the available actions.
-            available_actions = [
-                action for action in self.actions if action.can_perform(executor, game_state)]
-            if not available_actions:
-                self.logger.debug("- No available actions left to perform.")
-                break
+            primary_actions = [action for action in self.actions if action.can_perform(
+                executor, game_state) and not action.is_action_group_modifier]
+            modifier_actions = [action for action in self.actions if action.can_perform(
+                executor, game_state) and action.is_action_group_modifier]
 
             if self.can_abort:
-                available_actions.append(None)
+                if primary_actions:
+                    primary_actions.append(None)
+                if modifier_actions:
+                    modifier_actions.append(None)
 
-            if len(available_actions) == 1:
-                self._chosen_action = available_actions[0]
+            self.logger.debug(
+                f"{executor} modifier_actions: {modifier_actions}")
+            self.logger.debug(f"{executor} hand: {executor.hand}")
+
+            if not self.can_perform_any_action():
+                if modifier_actions:
+                    self.logger.debug(
+                        "- Max actions hit, offering modifier actions")
+                    if len(modifier_actions) == 1:
+                        self._chosen_action = modifier_actions[0]
+                    else:
+                        response = yield ActionChoiceMessage(game_state, self, modifier_actions)
+                        self._chosen_action = response.chosen_action
+                else:
+                    self.logger.debug(
+                        "- Max actions hit, no modifiers available. Exiting.")
+                    break
             else:
-                # Prompt the controller for an action.
-                self.logger.debug("- Waiting for action choice...")
-                message = ActionChoiceMessage(
-                    game_state, self, available_actions)
-                response = yield message
-                self._chosen_action = response.chosen_action
+                if primary_actions:
+                    if len(primary_actions) == 1:
+                        self._chosen_action = primary_actions[0]
+                    else:
+                        self.logger.debug(
+                            "- Waiting for Primary Action Choice...")
+                        response = yield ActionChoiceMessage(game_state, self, primary_actions)
+                        self._chosen_action = response.chosen_action
+                elif modifier_actions:
+                    if len(modifier_actions) == 1:
+                        self._chosen_action = modifier_actions[0]
+                    else:
+                        self.logger.debug(
+                            "- Waiting for Modifier Action Choice...")
+                        response = yield ActionChoiceMessage(game_state, self, modifier_actions)
+                        self._chosen_action = response.chosen_action
+                else:
+                    break
 
             # If the controller returns None, interpret that as finishing the group.
             if self._chosen_action is None:
@@ -160,7 +189,8 @@ class ActionGroup:
                 f" - Performing action: '{self._chosen_action.name}'")
             # Delegate to the chosen action's generator.
             yield from self._chosen_action.perform(game_state, executor)
-            self.total_uses += 1
+            if not self._chosen_action.is_action_group_modifier:
+                self.total_uses += 1
 
         self.logger.info(f"[GROUP] Finished group '{self.name}'")
         self.reset_action_group()

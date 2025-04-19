@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 
 class GameMessages(Enum):
+    # 19
     AMBUSH_MESSAGE = auto()
     BATTLE_USE_CARD_MESSAGE = auto()
     PIECE_TARGETING_MESSAGE = auto()
@@ -28,7 +29,7 @@ class GameMessages(Enum):
     BATTLE_CLEARING_CHOICE_MESSAGE = auto()
     BATTLE_TARGET_CHOICE_MESSAGE = auto()
 
-    # Marquise messages
+    # Marquise messages - 12
     KEEP_CLEARING_MESSAGE = auto()
     MARCH_AGAIN_MESSAGE = auto()
     OVERWORK_CLEARING_MESSAGE = auto()
@@ -42,7 +43,7 @@ class GameMessages(Enum):
     MARQUISE_SPEND_BIRD_CARD_MESSAGE = auto()
     FIELD_HOSPITAL_MESSAGE = auto()
 
-    # Eyrie Dynasties Messages
+    # Eyrie Dynasties Messages - 10
     ROOSTLESS_MESSAGE = auto()
     ROOST_SETUP_MESSAGE = auto()
     LEADER_SETUP_MESSAGE = auto()
@@ -54,7 +55,7 @@ class GameMessages(Enum):
     DECREE_BUILD_MESSAGE = auto()
     TURMOIL_LEADER_MESSAGE = auto()
 
-    # Woodland Alliance Messages
+    # Woodland Alliance Messages - 10
     ALLIANCE_NO_BASE_MESSAGE = auto()
     MOBILIZE_MESSAGE = auto()
     TRAIN_MESSAGE = auto()
@@ -66,7 +67,7 @@ class GameMessages(Enum):
     ORGANIZE_MESSAGE = auto()
     ALLIANCE_OUTRAGE_MESSAGE = auto()
 
-    # Vagabond Messages
+    # Vagabond Messages - 25
     CHOOSE_CHARACTER_MESSAGE = auto()
     VAGABOND_PLACEMENT_MESSAGE = auto()
     RANGER_REPAIR_MESSAGE = auto()

@@ -73,7 +73,7 @@ class TinkerCharacter(VagabondCharacter):
         chosen_card = response.chosen_card
         executor.hand.append(chosen_card)
         game_state.deck.discard.remove(chosen_card)
-        logger = logging.getLogger(__name__)
+        logger = logging.getLogger()
         logger.info(f" - Taken '{chosen_card}' from the discard pile")
 
 

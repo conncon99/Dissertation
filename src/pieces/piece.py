@@ -18,7 +18,7 @@ class Piece(metaclass=PieceMeta):
         self.space = space
         self.faction = faction
         self.name = name
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
 
     def __repr__(self):
         return self.name

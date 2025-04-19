@@ -8,7 +8,7 @@ class PieceWithID:
 
     def __init__(self, piece_type: str):
         self.piece_type = piece_type
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger()
         # Initialize ID tracking for this piece type if not already done
         if piece_type not in PieceWithID._next_ids:
             PieceWithID._next_ids[piece_type] = 0
@@ -46,5 +46,5 @@ class PieceWithID:
         cls._next_ids.clear()
         cls._free_ids.clear()
         cls._instances.clear()
-        logger = logging.getLogger(__name__)
+        logger = logging.getLogger()
         logger.debug(" - Reset all piece IDs")

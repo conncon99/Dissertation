@@ -32,10 +32,10 @@ class RootEnv(AECEnv):
         self.possible_agents = ["marquise", "eyrie",
                                 "woodland_alliance", "vagabond"]
         self.agents = self.possible_agents[:]
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
 
         action_size = 60
-        obs_dim = 785
+        obs_dim = 860
         self.action_spaces = {agent: Discrete(
             action_size) for agent in self.agents}
 
@@ -56,6 +56,10 @@ class RootEnv(AECEnv):
         return self.action_spaces[agent]
 
     def observe(self, agent):
+
+        if agent in self.observations.keys():
+            return self.observations[agent]
+        # self.logger.warning("Used Unsaved Observation")
         return self.gm.get_observation()
 
     def reset(self, seed=None, options=None):
@@ -71,7 +75,6 @@ class RootEnv(AECEnv):
         self.observations = {}
 
         # Set up Factions and Game Manager
-        # TODO: Sort out valid controllers/decoders
         marquise = Marquise(controller=None)
         eyrie = EyrieDynasties(controller=None)
         woodland_alliance = WoodlandAlliance(controller=None)
@@ -81,12 +84,11 @@ class RootEnv(AECEnv):
         self.gm = GameManager(settings, turn_limit=100)
         self.gm.reset_ids()
 
-        self.gm.game_state.current_player = None
-
         self.agent_selection = self._faction_to_agent(
             settings.get_setup_order()[0])
-        self.gm.step()
-        self._update_agent_selection_from_gm()
+        self.gm.game_state.current_player = self.gm.setup_order[0]
+        self.gm.game_state.active_player = self.gm.setup_order[0]
+        self.observations[self.agent_selection] = self.gm.get_observation()
 
     def render(self):
         for faction in self.gm.settings.faction_list:
@@ -102,7 +104,8 @@ class RootEnv(AECEnv):
 
     def step(self, action):
 
-        self._update_agent_selection_from_gm()
+        if self.gm.game_state.active_player:
+            self._update_agent_selection_from_gm()
         # Just means the program is done as all agents terminate at the same time
         if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
             self.agents = []
@@ -144,7 +147,7 @@ class RootEnv(AECEnv):
         if self.gm.done:
             self.terminations = {
                 agent: self.gm.done for agent in self.possible_agents}
-            self.agents = False
+            self.agents = []
             for agent in self.possible_agents:
                 self.logger.debug(
                     f"{agent} Cumulative Rewards: {self._cumulative_rewards[agent]}")

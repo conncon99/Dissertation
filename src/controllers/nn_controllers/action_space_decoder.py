@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from src.utils.game_state import GameState
 
 
-logger = logging.getLogger("Action Decoder")
+logger = logging.getLogger()
 
 
 def decode_binary_choice(output):

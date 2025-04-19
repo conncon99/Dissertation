@@ -32,6 +32,8 @@ class Faction(ABC):
     prev_clearings_controlled: int = 0
     prev_dominance_clearings_controlled: int = 0
     prev_active_cards_count: int = 0
+    last_vp_change: int = 0
+    last_dominance_change: int = 0
 
     hand: List[Card] = field(default_factory=list)
     items: List[Items] = field(default_factory=list)
@@ -42,7 +44,7 @@ class Faction(ABC):
     deck: Deck = None
     print_colour: str = ""
     game_state: GameState = None
-    logger: logging.Logger = logging.getLogger(__name__)
+    logger: logging.Logger = logging.getLogger()
 
     dominance: Optional[Suits] = None
     has_won: bool = False

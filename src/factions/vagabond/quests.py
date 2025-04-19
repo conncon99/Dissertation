@@ -48,7 +48,7 @@ class QuestDeck():
         self.quests = [RABBIT_ERRAND, FOX_ERRAND, MOUSE_ESCORT, RABBIT_EXPEL_BANDITS,
                        MOUSE_EXPEL_BANDITS, RABBIT_FEND_BEAR, MOUSE_FEND_BEAR, FUNDRAISING, RABBIT_SPEECH, FOX_SPEECH, MOUSE_GUARD_DUTY, RABBIT_GUARD_DUTY, FOX_LOGISTICS_HELP, MOUSE_LOGISTICS_HELP, REPAIR_A_SHED]
         np.random.shuffle(self.quests)
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger()
 
     def draw(self, amount: int):
         drawn_cards = []
