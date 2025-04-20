@@ -71,16 +71,19 @@ class TorchActionMaskModel(TorchModelV2, nn.Module):
         obs_time = obs_flat.view(B, T, self.obs_size)
 
         # Build packed sequence so LSTM skips padding efficiently.
+
+        lengths = torch.as_tensor(seq_lens, device="cpu", dtype=torch.int32)
+
         packed = pack_padded_sequence(
             obs_time,
-            lengths=torch.as_tensor(seq_lens, device=obs_flat.device),
+            lengths=lengths,
             batch_first=True,
             enforce_sorted=False,
         )
 
         # Prepare previous hidden state: RLlib supplies [B, hidden]; need [1, B, hidden]
-        hx = state[0].unsqueeze(0)
-        cx = state[1].unsqueeze(0)
+        hx = state[0].unsqueeze(0).to(obs_flat.device)
+        cx = state[1].unsqueeze(0).to(obs_flat.device)
 
         packed_out, (h_n, c_n) = self.lstm(packed, (hx, cx))
         unpacked, _ = pad_packed_sequence(

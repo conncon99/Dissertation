@@ -109,7 +109,6 @@ class GameManager:
 # For each action group, iterate through each action (where an ActionChoiceMessage counts as a distinct step)
 # For each action, iterate through each step of it (whenever send_game_message() is called)
 
-
     def get_observation(self):
         obs = {}
         if self.current_message is None:
@@ -150,7 +149,6 @@ class GameManager:
         if not player.dominance:
             vp_diff = player.victory_points - player.prev_vp
             player.prev_vp = player.victory_points
-            vp_diff *= 2
             reward += vp_diff
             player.last_vp_change = vp_diff
         elif player.faction_id == Factions.VAGABOND.value:
@@ -162,16 +160,17 @@ class GameManager:
             if player.dominance != Suits.BIRD:
                 dominance_clearings_ruled = sum(1 if clearing.get_owner() == player.faction_id and clearing.get_suit(
                 ) == player.dominance else 0 for clearing in self.game_state.board.clearings)
-                dominance_diff = dominance_clearings_ruled - \
-                    player.prev_dominance_clearings_controlled
+                dominance_diff = (dominance_clearings_ruled -
+                                  player.prev_dominance_clearings_controlled) * 10
                 reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
                 player.last_dominance_change = dominance_diff
             else:
+
                 dominance_clearings_ruled = sum(1 if clearing.get_owner(
                 ) == player.faction_id and clearing in self.game_state.board.corner_clearings else 0 for clearing in self.game_state.board.clearings)
-                dominance_diff = dominance_clearings_ruled - \
-                    player.prev_dominance_clearings_controlled
+                dominance_diff = (
+                    dominance_clearings_ruled - player.prev_dominance_clearings_controlled) * 10
                 reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
                 player.last_dominance_change = dominance_diff
@@ -250,7 +249,7 @@ class GameManager:
         winners = []
 
         for faction in self.settings.faction_list:
-            if faction.dominance and not faction.faction_id == Factions.VAGABOND:
+            if faction.dominance and faction.faction_id != Factions.VAGABOND:
                 needed_clearings = 2 if faction.dominance == Suits.BIRD else 3
                 if faction.dominance == Suits.BIRD:
                     current_clearings = sum(1 if clearing.get_owner(

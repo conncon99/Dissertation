@@ -3,6 +3,10 @@ print.log
 .vscode/
 tempCodeRunnerFile.py
 replacement_script.py
-.saved_models/
+saved_models/
 *.pth
 .venv/
+training/
+training/checkpoints/
+training/logs/
+*.png

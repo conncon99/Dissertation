@@ -65,11 +65,11 @@ if __name__ == "__main__":
 
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.WARNING)
-    ch.setFormatter(logging.Formatter(
-        "%(asctime)s [%(levelname)s] %(message)s"))
-    logger.addHandler(ch)
+    # ch = logging.StreamHandler()
+    # ch.setLevel(logging.WARNING)
+    # ch.setFormatter(logging.Formatter(
+    #     "%(asctime)s [%(levelname)s] %(message)s"))
+    # logger.addHandler(ch)
 
     current_fh = new_file_handler(0)
     logger.addHandler(current_fh)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             },
             policy_mapping_fn=lambda agent_id, *args, **kw: agent_id
         )
-        .resources(num_gpus=int(os.environ.get("RLLIB_NUM_GPUS", "0")))
+        .resources(num_gpus=1)  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
         .debugging(log_level='WARN')  # INFO, DEBUG, WARN, ERROR
         .training(
             lr=2e-5,
@@ -176,7 +176,7 @@ if __name__ == "__main__":
             result['env_runners']['episodes_this_iter'])
         train_dict['total_steps'].append(result['num_env_steps_sampled'])
 
-        logger.info(f"Episode: {i}")
+        logger.warning(f"Episode: {i}")
         for faction in train_dict['faction_losses'].keys():
             learner_info = result["info"]["learner"].get(faction)
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         if (i + 1) % 10 == 0:
 
             algo.save(checkpoint_dir)
-            logger.info(
+            logger.warning(
                 f"Checkpoint saved at iteration {i + 1}: {checkpoint_dir}")
 
             plot_metric(

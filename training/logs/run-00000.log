@@ -1,73 +1,946 @@
-2025-04-19 18:11:33,728 [DEBUG] Loaded backend Agg version v2.2.
-2025-04-19 18:11:34,076 [DEBUG] Attempting to acquire lock 3155498400336 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\node_ip_address.json.lock
-2025-04-19 18:11:34,088 [DEBUG] Lock 3155498400336 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\node_ip_address.json.lock
-2025-04-19 18:11:34,088 [DEBUG] Attempting to release lock 3155498400336 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\node_ip_address.json.lock
-2025-04-19 18:11:34,088 [DEBUG] Lock 3155498400336 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\node_ip_address.json.lock
-2025-04-19 18:11:34,088 [DEBUG] Attempting to acquire lock 3155498020624 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,088 [DEBUG] Lock 3155498020624 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,089 [DEBUG] Attempting to release lock 3155498020624 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,089 [DEBUG] Lock 3155498020624 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,089 [DEBUG] Attempting to acquire lock 3155494850576 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,089 [DEBUG] Lock 3155494850576 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to release lock 3155494850576 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155494850576 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to acquire lock 3155496753232 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155496753232 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to release lock 3155496753232 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155496753232 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to acquire lock 3155495937360 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155495937360 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to release lock 3155495937360 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155495937360 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Attempting to acquire lock 3155476743120 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,096 [DEBUG] Lock 3155476743120 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,105 [DEBUG] Attempting to release lock 3155476743120 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:34,105 [DEBUG] Lock 3155476743120 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_18-11-34_075895_9604\ports_by_node.json.lock
-2025-04-19 18:11:35,988 [DEBUG] Reset Called
-2025-04-19 18:11:35,988 [DEBUG] ID: 0: Dominance
-2025-04-19 18:11:35,988 [DEBUG] ID: 1: Birdsong-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 2: Daylight-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 3: Evening-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 4: Birdsong
-2025-04-19 18:11:35,988 [DEBUG] ID: 5: Daylight-1
-2025-04-19 18:11:35,988 [DEBUG] ID: 6: Daylight-2
-2025-04-19 18:11:35,988 [DEBUG] ID: 7: Daylight-3
-2025-04-19 18:11:35,988 [DEBUG] ID: 8: Evening
-2025-04-19 18:11:35,988 [DEBUG] ID: 9: Dominance
-2025-04-19 18:11:35,988 [DEBUG] ID: 10: Birdsong-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 11: Daylight-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 12: Evening-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 13: Daylight-Craft
-2025-04-19 18:11:35,988 [DEBUG] ID: 14: Daylight-Decree-Recruit
-2025-04-19 18:11:35,988 [DEBUG] ID: 15: Daylight-Decree-Move
-2025-04-19 18:11:35,988 [DEBUG] ID: 16: Daylight-Decree-Battle
-2025-04-19 18:11:35,988 [DEBUG] ID: 17: Daylight-Decree-Build
-2025-04-19 18:11:35,988 [DEBUG] ID: 18: Daylight-End
-2025-04-19 18:11:35,988 [DEBUG] ID: 19: Birdsong
-2025-04-19 18:11:35,988 [DEBUG] ID: 20: Evening
-2025-04-19 18:11:35,988 [DEBUG] ID: 21: Dominance
-2025-04-19 18:11:35,988 [DEBUG] ID: 22: Birdsong-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 23: Daylight-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 24: Evening-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 25: Birdsong-1
-2025-04-19 18:11:35,988 [DEBUG] ID: 26: Birdsong-2
-2025-04-19 18:11:35,988 [DEBUG] ID: 27: Daylight
-2025-04-19 18:11:35,988 [DEBUG] ID: 28: Evening-Officer-Count
-2025-04-19 18:11:35,988 [DEBUG] ID: 29: Evening-1
-2025-04-19 18:11:35,988 [DEBUG] ID: 30: Evening-2
-2025-04-19 18:11:35,988 [DEBUG] ID: 31: Dominance
-2025-04-19 18:11:35,988 [DEBUG] ID: 32: Birdsong-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 33: Daylight-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 34: Evening-Start
-2025-04-19 18:11:35,988 [DEBUG] ID: 35: Birdsong-1
-2025-04-19 18:11:35,988 [DEBUG] ID: 36: Birdsong-2
-2025-04-19 18:11:35,988 [DEBUG] ID: 37: Daylight
-2025-04-19 18:11:35,988 [DEBUG] ID: 38: Evening-1
-2025-04-19 18:11:35,988 [DEBUG] ID: 39: Evening-2
-2025-04-19 18:11:35,988 [DEBUG] ID: 40: Evening-3
-2025-04-19 18:11:35,988 [DEBUG]  - Spawned 'Ruin' with ID 0
-2025-04-19 18:11:35,988 [DEBUG]  - Spawned 'Ruin' with ID 1
-2025-04-19 18:11:35,988 [DEBUG]  - Spawned 'Ruin' with ID 2
-2025-04-19 18:11:35,988 [DEBUG]  - Spawned 'Ruin' with ID 3
-2025-04-19 18:11:35,988 [DEBUG]  - Reset all piece IDs
-2025-04-19 18:11:35,988 [DEBUG] No Message Available
+2025-04-19 22:31:15,228 [DEBUG] Loaded backend Agg version v2.2.
+2025-04-19 22:31:15,597 [DEBUG] Attempting to acquire lock 2811546918160 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\node_ip_address.json.lock
+2025-04-19 22:31:15,608 [DEBUG] Lock 2811546918160 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\node_ip_address.json.lock
+2025-04-19 22:31:15,609 [DEBUG] Attempting to release lock 2811546918160 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\node_ip_address.json.lock
+2025-04-19 22:31:15,609 [DEBUG] Lock 2811546918160 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\node_ip_address.json.lock
+2025-04-19 22:31:15,609 [DEBUG] Attempting to acquire lock 2811546459088 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,610 [DEBUG] Lock 2811546459088 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,610 [DEBUG] Attempting to release lock 2811546459088 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,610 [DEBUG] Lock 2811546459088 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,610 [DEBUG] Attempting to acquire lock 2811524986064 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,610 [DEBUG] Lock 2811524986064 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,616 [DEBUG] Attempting to release lock 2811524986064 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,616 [DEBUG] Lock 2811524986064 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,616 [DEBUG] Attempting to acquire lock 2811546028432 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,617 [DEBUG] Lock 2811546028432 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,620 [DEBUG] Attempting to release lock 2811546028432 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,620 [DEBUG] Lock 2811546028432 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,620 [DEBUG] Attempting to acquire lock 2811545978320 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,621 [DEBUG] Lock 2811545978320 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,624 [DEBUG] Attempting to release lock 2811545978320 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,624 [DEBUG] Lock 2811545978320 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,624 [DEBUG] Attempting to acquire lock 2811546029776 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,624 [DEBUG] Lock 2811546029776 acquired on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,627 [DEBUG] Attempting to release lock 2811546029776 on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:15,627 [DEBUG] Lock 2811546029776 released on C:\Users\connc\AppData\Local\Temp\ray\session_2025-04-19_22-31-15_595833_33732\ports_by_node.json.lock
+2025-04-19 22:31:17,455 [DEBUG] Reset Called
+2025-04-19 22:31:17,455 [DEBUG] ID: 0: Dominance
+2025-04-19 22:31:17,455 [DEBUG] ID: 1: Birdsong-Start
+2025-04-19 22:31:17,455 [DEBUG] ID: 2: Daylight-Start
+2025-04-19 22:31:17,455 [DEBUG] ID: 3: Evening-Start
+2025-04-19 22:31:17,455 [DEBUG] ID: 4: Birdsong
+2025-04-19 22:31:17,455 [DEBUG] ID: 5: Daylight-1
+2025-04-19 22:31:17,455 [DEBUG] ID: 6: Daylight-2
+2025-04-19 22:31:17,455 [DEBUG] ID: 7: Daylight-3
+2025-04-19 22:31:17,455 [DEBUG] ID: 8: Evening
+2025-04-19 22:31:17,455 [DEBUG] ID: 9: Dominance
+2025-04-19 22:31:17,456 [DEBUG] ID: 10: Birdsong-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 11: Daylight-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 12: Evening-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 13: Daylight-Craft
+2025-04-19 22:31:17,456 [DEBUG] ID: 14: Daylight-Decree-Recruit
+2025-04-19 22:31:17,456 [DEBUG] ID: 15: Daylight-Decree-Move
+2025-04-19 22:31:17,456 [DEBUG] ID: 16: Daylight-Decree-Battle
+2025-04-19 22:31:17,456 [DEBUG] ID: 17: Daylight-Decree-Build
+2025-04-19 22:31:17,456 [DEBUG] ID: 18: Daylight-End
+2025-04-19 22:31:17,456 [DEBUG] ID: 19: Birdsong
+2025-04-19 22:31:17,456 [DEBUG] ID: 20: Evening
+2025-04-19 22:31:17,456 [DEBUG] ID: 21: Dominance
+2025-04-19 22:31:17,456 [DEBUG] ID: 22: Birdsong-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 23: Daylight-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 24: Evening-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 25: Birdsong-1
+2025-04-19 22:31:17,456 [DEBUG] ID: 26: Birdsong-2
+2025-04-19 22:31:17,456 [DEBUG] ID: 27: Daylight
+2025-04-19 22:31:17,456 [DEBUG] ID: 28: Evening-Officer-Count
+2025-04-19 22:31:17,456 [DEBUG] ID: 29: Evening-1
+2025-04-19 22:31:17,456 [DEBUG] ID: 30: Evening-2
+2025-04-19 22:31:17,456 [DEBUG] ID: 31: Dominance
+2025-04-19 22:31:17,456 [DEBUG] ID: 32: Birdsong-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 33: Daylight-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 34: Evening-Start
+2025-04-19 22:31:17,456 [DEBUG] ID: 35: Birdsong-1
+2025-04-19 22:31:17,456 [DEBUG] ID: 36: Birdsong-2
+2025-04-19 22:31:17,456 [DEBUG] ID: 37: Daylight
+2025-04-19 22:31:17,456 [DEBUG] ID: 38: Evening-1
+2025-04-19 22:31:17,456 [DEBUG] ID: 39: Evening-2
+2025-04-19 22:31:17,456 [DEBUG] ID: 40: Evening-3
+2025-04-19 22:31:17,456 [DEBUG]  - Spawned 'Ruin' with ID 0
+2025-04-19 22:31:17,456 [DEBUG]  - Spawned 'Ruin' with ID 1
+2025-04-19 22:31:17,456 [DEBUG]  - Spawned 'Ruin' with ID 2
+2025-04-19 22:31:17,456 [DEBUG]  - Spawned 'Ruin' with ID 3
+2025-04-19 22:31:17,457 [DEBUG]  - Reset all piece IDs
+2025-04-19 22:31:17,457 [DEBUG] No Message Available
+2025-04-19 22:31:33,239 [WARNING] Episode: 0
+2025-04-19 22:31:33,239 [DEBUG]   Marquise - Steps: 128.00, Reward: 300.00, per‑step Rwd: 2.3438
+2025-04-19 22:31:33,239 [DEBUG]   Eyrie - Steps: 128.00, Reward: 0.00, per‑step Rwd: 0.0000
+2025-04-19 22:31:33,239 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 39.00, per‑step Rwd: 0.3047
+2025-04-19 22:31:33,239 [DEBUG]   Vagabond - Steps: 128.00, Reward: 0.00, per‑step Rwd: 0.0000
+2025-04-19 22:31:44,981 [WARNING] Episode: 1
+2025-04-19 22:31:44,981 [DEBUG]   Marquise - Steps: 128.00, Reward: 230.55, per‑step Rwd: 1.8012
+2025-04-19 22:31:44,981 [DEBUG]   Eyrie - Steps: 128.00, Reward: 4.75, per‑step Rwd: 0.0371
+2025-04-19 22:31:44,981 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 69.95, per‑step Rwd: 0.5465
+2025-04-19 22:31:44,981 [DEBUG]   Vagabond - Steps: 128.00, Reward: 100.15, per‑step Rwd: 0.7824
+2025-04-19 22:31:56,528 [WARNING] Episode: 2
+2025-04-19 22:31:56,528 [DEBUG]   Marquise - Steps: 128.00, Reward: 348.28, per‑step Rwd: 2.7209
+2025-04-19 22:31:56,528 [DEBUG]   Eyrie - Steps: 128.00, Reward: 2.64, per‑step Rwd: 0.0206
+2025-04-19 22:31:56,528 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 310.78, per‑step Rwd: 2.4280
+2025-04-19 22:31:56,528 [DEBUG]   Vagabond - Steps: 128.00, Reward: 77.03, per‑step Rwd: 0.6018
+2025-04-19 22:32:08,664 [WARNING] Episode: 3
+2025-04-19 22:32:08,664 [DEBUG]   Marquise - Steps: 128.00, Reward: 568.63, per‑step Rwd: 4.4425
+2025-04-19 22:32:08,665 [DEBUG]   Eyrie - Steps: 128.00, Reward: -13.98, per‑step Rwd: -0.1092
+2025-04-19 22:32:08,665 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 603.65, per‑step Rwd: 4.7160
+2025-04-19 22:32:08,665 [DEBUG]   Vagabond - Steps: 128.00, Reward: 95.08, per‑step Rwd: 0.7428
+2025-04-19 22:32:20,060 [WARNING] Episode: 4
+2025-04-19 22:32:20,060 [DEBUG]   Marquise - Steps: 128.00, Reward: 720.10, per‑step Rwd: 5.6258
+2025-04-19 22:32:20,060 [DEBUG]   Eyrie - Steps: 128.00, Reward: -15.15, per‑step Rwd: -0.1183
+2025-04-19 22:32:20,060 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 685.88, per‑step Rwd: 5.3584
+2025-04-19 22:32:20,060 [DEBUG]   Vagabond - Steps: 128.00, Reward: 122.85, per‑step Rwd: 0.9598
+2025-04-19 22:32:31,847 [WARNING] Episode: 5
+2025-04-19 22:32:31,847 [DEBUG]   Marquise - Steps: 128.00, Reward: 586.19, per‑step Rwd: 4.5796
+2025-04-19 22:32:31,847 [DEBUG]   Eyrie - Steps: 128.00, Reward: -16.23, per‑step Rwd: -0.1268
+2025-04-19 22:32:31,847 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 651.11, per‑step Rwd: 5.0868
+2025-04-19 22:32:31,847 [DEBUG]   Vagabond - Steps: 128.00, Reward: 108.24, per‑step Rwd: 0.8456
+2025-04-19 22:32:44,002 [WARNING] Episode: 6
+2025-04-19 22:32:44,002 [DEBUG]   Marquise - Steps: 128.00, Reward: 561.90, per‑step Rwd: 4.3898
+2025-04-19 22:32:44,003 [DEBUG]   Eyrie - Steps: 128.00, Reward: -12.22, per‑step Rwd: -0.0955
+2025-04-19 22:32:44,003 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 427.25, per‑step Rwd: 3.3379
+2025-04-19 22:32:44,003 [DEBUG]   Vagabond - Steps: 128.00, Reward: 68.47, per‑step Rwd: 0.5349
+2025-04-19 22:32:55,961 [WARNING] Episode: 7
+2025-04-19 22:32:55,962 [DEBUG]   Marquise - Steps: 128.00, Reward: 914.60, per‑step Rwd: 7.1453
+2025-04-19 22:32:55,962 [DEBUG]   Eyrie - Steps: 128.00, Reward: -19.77, per‑step Rwd: -0.1545
+2025-04-19 22:32:55,962 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 674.49, per‑step Rwd: 5.2695
+2025-04-19 22:32:55,962 [DEBUG]   Vagabond - Steps: 128.00, Reward: 129.25, per‑step Rwd: 1.0098
+2025-04-19 22:33:07,233 [WARNING] Episode: 8
+2025-04-19 22:33:07,233 [DEBUG]   Marquise - Steps: 128.00, Reward: 899.27, per‑step Rwd: 7.0256
+2025-04-19 22:33:07,233 [DEBUG]   Eyrie - Steps: 128.00, Reward: -18.04, per‑step Rwd: -0.1410
+2025-04-19 22:33:07,233 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 624.14, per‑step Rwd: 4.8761
+2025-04-19 22:33:07,233 [DEBUG]   Vagabond - Steps: 128.00, Reward: 126.46, per‑step Rwd: 0.9880
+2025-04-19 22:33:18,916 [WARNING] Episode: 9
+2025-04-19 22:33:18,916 [DEBUG]   Marquise - Steps: 128.00, Reward: 744.09, per‑step Rwd: 5.8132
+2025-04-19 22:33:18,916 [DEBUG]   Eyrie - Steps: 128.00, Reward: -16.97, per‑step Rwd: -0.1326
+2025-04-19 22:33:18,916 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 448.09, per‑step Rwd: 3.5007
+2025-04-19 22:33:18,916 [DEBUG]   Vagabond - Steps: 128.00, Reward: 89.55, per‑step Rwd: 0.6996
+2025-04-19 22:33:19,303 [WARNING] Checkpoint saved at iteration 10: training/checkpoints/
+2025-04-19 22:33:19,305 [DEBUG] findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0.
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-Oblique.ttf', name='DejaVu Sans Mono', style='oblique', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniBol.ttf', name='STIXNonUnicode', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerifDisplay.ttf', name='DejaVu Serif Display', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFiveSymReg.ttf', name='STIXSizeFiveSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmsy10.ttf', name='cmsy10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFourSymReg.ttf', name='STIXSizeFourSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono.ttf', name='DejaVu Sans Mono', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmr10.ttf', name='cmr10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-Italic.ttf', name='DejaVu Serif', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-Bold.ttf', name='DejaVu Sans Mono', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-BoldOblique.ttf', name='DejaVu Sans Mono', style='oblique', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmss10.ttf', name='cmss10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmmi10.ttf', name='cmmi10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmb10.ttf', name='cmb10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizTwoSymReg.ttf', name='STIXSizeTwoSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizThreeSymReg.ttf', name='STIXSizeThreeSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-BoldOblique.ttf', name='DejaVu Sans', style='oblique', variant='normal', weight=700, stretch='normal', size='scalable')) = 1.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmtt10.ttf', name='cmtt10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif.ttf', name='DejaVu Serif', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansDisplay.ttf', name='DejaVu Sans Display', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-BoldItalic.ttf', name='DejaVu Serif', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralItalic.ttf', name='STIXGeneral', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralBolIta.ttf', name='STIXGeneral', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizTwoSymBol.ttf', name='STIXSizeTwoSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniBolIta.ttf', name='STIXNonUnicode', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizOneSymBol.ttf', name='STIXSizeOneSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFourSymBol.ttf', name='STIXSizeFourSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf', name='DejaVu Sans', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 0.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizOneSymReg.ttf', name='STIXSizeOneSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-Oblique.ttf', name='DejaVu Sans', style='oblique', variant='normal', weight=400, stretch='normal', size='scalable')) = 1.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizThreeSymBol.ttf', name='STIXSizeThreeSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUni.ttf', name='STIXNonUnicode', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniIta.ttf', name='STIXNonUnicode', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-Bold.ttf', name='DejaVu Serif', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-Bold.ttf', name='DejaVu Sans', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 0.33499999999999996
+2025-04-19 22:33:19,305 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralBol.ttf', name='STIXGeneral', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmex10.ttf', name='cmex10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneral.ttf', name='STIXGeneral', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mmrtextb.ttf', name='Myanmar Text', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\monbaiti.ttf', name='Mongolian Baiti', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mvboli.ttf', name='MV Boli', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candaraz.ttf', name='Candara', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constan.ttf', name='Constantia', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\couri.ttf', name='Courier New', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguili.ttf', name='Segoe UI', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbeli.ttf', name='Corbel', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comici.ttf', name='Comic Sans MS', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgunbd.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuiz.ttf', name='Segoe UI', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ebrima.ttf', name='Ebrima', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SegUIVar.ttf', name='Segoe UI Variable', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Gabriola.ttf', name='Gabriola', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuib.ttf', name='Segoe UI', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyhl.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=290, stretch='normal', size='scalable')) = 10.1545
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoescb.ttf', name='Segoe Script', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolaz.ttf', name='Consolas', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\wingding.ttf', name='Wingdings', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolai.ttf', name='Consolas', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mmrtext.ttf', name='Myanmar Text', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segmdl2.ttf', name='Segoe MDL2 Assets', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\phagspab.ttf', name='Microsoft PhagsPa', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SimsunExtG.ttf', name='SimSun-ExtG', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisb.ttf', name='Segoe UI', style='normal', variant='normal', weight=600, stretch='normal', size='scalable')) = 10.24
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candaral.ttf', name='Candara', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constanb.ttf', name='Constantia', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucbd.ttf', name='Trebuchet MS', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguibl.ttf', name='Segoe UI', style='normal', variant='normal', weight=900, stretch='normal', size='scalable')) = 10.525
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothL.ttc', name='Yu Gothic', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjh.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucbi.ttf', name='Trebuchet MS', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\gadugib.ttf', name='Gadugi', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyhbd.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrib.ttf', name='Calibri', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palab.ttf', name='Palatino Linotype', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\symbol.ttf', name='Symbol', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguibli.ttf', name='Segoe UI', style='italic', variant='normal', weight=900, stretch='normal', size='scalable')) = 11.525
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comicz.ttf', name='Comic Sans MS', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyi.ttf', name='Microsoft Yi Baiti', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,306 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ntailu.ttf', name='Microsoft New Tai Lue', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguiemj.ttf', name='Segoe UI Emoji', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrii.ttf', name='Calibri', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\taileb.ttf', name='Microsoft Tai Le', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\himalaya.ttf', name='Microsoft Himalaya', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiab.ttf', name='Georgia', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constanz.ttf', name='Constantia', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constani.ttf', name='Constantia', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelaUIb.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\taile.ttf', name='Microsoft Tai Le', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanai.ttf', name='Verdana', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 4.6863636363636365
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbel.ttf', name='Corbel', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebuc.ttf', name='Trebuchet MS', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\simsun.ttc', name='SimSun', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriaz.ttf', name='Cambria', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgia.ttf', name='Georgia', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comic.ttf', name='Comic Sans MS', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consola.ttf', name='Consolas', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeprb.ttf', name='Segoe Print', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiaz.ttf', name='Georgia', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SitkaVF.ttf', name='Sitka', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\pala.ttf', name='Palatino Linotype', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\framdit.ttf', name='Franklin Gothic Medium', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjhl.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=290, stretch='normal', size='scalable')) = 10.1545
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\l_10646.ttf', name='Lucida Sans Unicode', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuii.ttf', name='Segoe UI', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambria.ttc', name='Cambria', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyh.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriai.ttf', name='Cambria', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Inkfree.ttf', name='Ink Free', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\webdings.ttf', name='Webdings', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeui.ttf', name='Segoe UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ntailub.ttf', name='Microsoft New Tai Lue', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ebrimabd.ttf', name='Ebrima', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\tahomabd.ttf', name='Tahoma', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SegoeIcons.ttf', name='Segoe Fluent Icons', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrili.ttf', name='Calibri', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\gadugi.ttf', name='Gadugi', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanab.ttf', name='Verdana', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 3.9713636363636367
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoesc.ttf', name='Segoe Script', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\courbd.ttf', name='Courier New', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,307 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SitkaVF-Italic.ttf', name='Sitka', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesbd.ttf', name='Times New Roman', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothR.ttc', name='Yu Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuil.ttf', name='Segoe UI', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msgothic.ttc', name='MS Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\impact.ttf', name='Impact', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelUIsl.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=350, stretch='normal', size='scalable')) = 10.0975
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgunsl.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriab.ttf', name='Cambria', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothB.ttc', name='Yu Gothic', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothM.ttc', name='Yu Gothic', style='normal', variant='normal', weight=500, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\courbi.ttf', name='Courier New', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mingliub.ttc', name='MingLiU-ExtB', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarai.ttf', name='Candara', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibril.ttf', name='Calibri', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdana.ttf', name='Verdana', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 3.6863636363636365
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelb.ttf', name='Corbel', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolab.ttf', name='Consolas', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisbi.ttf', name='Segoe UI', style='italic', variant='normal', weight=600, stretch='normal', size='scalable')) = 11.24
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\phagspa.ttf', name='Microsoft PhagsPa', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanaz.ttf', name='Verdana', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 4.971363636363637
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\times.ttf', name='Times New Roman', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucit.ttf', name='Trebuchet MS', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\sylfaen.ttf', name='Sylfaen', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comicbd.ttf', name='Comic Sans MS', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arial.ttf', name='Arial', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 6.413636363636363
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\simsunb.ttf', name='SimSun-ExtB', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cour.ttf', name='Courier New', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\bahnschrift.ttf', name='Bahnschrift', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiai.ttf', name='Georgia', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibri.ttf', name='Calibri', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palabi.ttf', name='Palatino Linotype', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\javatext.ttf', name='Javanese Text', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelz.ttf', name='Corbel', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelli.ttf', name='Corbel', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarali.ttf', name='Candara', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjhbd.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgun.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisym.ttf', name='Segoe UI Symbol', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbell.ttf', name='Corbel', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ariali.ttf', name='Arial', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 7.413636363636363
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\framd.ttf', name='Franklin Gothic Medium', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuisl.ttf', name='Segoe UI', style='normal', variant='normal', weight=350, stretch='normal', size='scalable')) = 10.0975
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arialbd.ttf', name='Arial', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 6.698636363636363
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\lucon.ttf', name='Lucida Console', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelawUI.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoepr.ttf', name='Segoe Print', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ariblk.ttf', name='Arial', style='normal', variant='normal', weight=900, stretch='normal', size='scalable')) = 6.888636363636364
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\tahoma.ttf', name='Tahoma', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\micross.ttf', name='Microsoft Sans Serif', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesi.ttf', name='Times New Roman', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palai.ttf', name='Palatino Linotype', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguihis.ttf', name='Segoe UI Historic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SansSerifCollection.ttf', name='Sans Serif Collection', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibriz.ttf', name='Calibri', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,308 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisli.ttf', name='Segoe UI', style='italic', variant='normal', weight=350, stretch='normal', size='scalable')) = 11.0975
+2025-04-19 22:33:19,309 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesbi.ttf', name='Times New Roman', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,309 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Nirmala.ttc', name='Nirmala UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,309 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarab.ttf', name='Candara', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,309 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arialbi.ttf', name='Arial', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 7.698636363636363
+2025-04-19 22:33:19,309 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candara.ttf', name='Candara', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,309 [DEBUG] findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf') with score of 0.050000.
+2025-04-19 22:33:19,326 [DEBUG] findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=12.0.
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-Oblique.ttf', name='DejaVu Sans Mono', style='oblique', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniBol.ttf', name='STIXNonUnicode', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerifDisplay.ttf', name='DejaVu Serif Display', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFiveSymReg.ttf', name='STIXSizeFiveSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmsy10.ttf', name='cmsy10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFourSymReg.ttf', name='STIXSizeFourSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono.ttf', name='DejaVu Sans Mono', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmr10.ttf', name='cmr10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-Italic.ttf', name='DejaVu Serif', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-Bold.ttf', name='DejaVu Sans Mono', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansMono-BoldOblique.ttf', name='DejaVu Sans Mono', style='oblique', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmss10.ttf', name='cmss10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmmi10.ttf', name='cmmi10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmb10.ttf', name='cmb10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizTwoSymReg.ttf', name='STIXSizeTwoSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizThreeSymReg.ttf', name='STIXSizeThreeSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-BoldOblique.ttf', name='DejaVu Sans', style='oblique', variant='normal', weight=700, stretch='normal', size='scalable')) = 1.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmtt10.ttf', name='cmtt10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif.ttf', name='DejaVu Serif', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSansDisplay.ttf', name='DejaVu Sans Display', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-BoldItalic.ttf', name='DejaVu Serif', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralItalic.ttf', name='STIXGeneral', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralBolIta.ttf', name='STIXGeneral', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizTwoSymBol.ttf', name='STIXSizeTwoSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,326 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniBolIta.ttf', name='STIXNonUnicode', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizOneSymBol.ttf', name='STIXSizeOneSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizFourSymBol.ttf', name='STIXSizeFourSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf', name='DejaVu Sans', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 0.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizOneSymReg.ttf', name='STIXSizeOneSym', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-Oblique.ttf', name='DejaVu Sans', style='oblique', variant='normal', weight=400, stretch='normal', size='scalable')) = 1.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXSizThreeSymBol.ttf', name='STIXSizeThreeSym', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUni.ttf', name='STIXNonUnicode', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXNonUniIta.ttf', name='STIXNonUnicode', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSerif-Bold.ttf', name='DejaVu Serif', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans-Bold.ttf', name='DejaVu Sans', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 0.33499999999999996
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneralBol.ttf', name='STIXGeneral', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\cmex10.ttf', name='cmex10', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\STIXGeneral.ttf', name='STIXGeneral', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mmrtextb.ttf', name='Myanmar Text', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\monbaiti.ttf', name='Mongolian Baiti', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mvboli.ttf', name='MV Boli', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candaraz.ttf', name='Candara', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constan.ttf', name='Constantia', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\couri.ttf', name='Courier New', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguili.ttf', name='Segoe UI', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbeli.ttf', name='Corbel', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comici.ttf', name='Comic Sans MS', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgunbd.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuiz.ttf', name='Segoe UI', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ebrima.ttf', name='Ebrima', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SegUIVar.ttf', name='Segoe UI Variable', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Gabriola.ttf', name='Gabriola', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuib.ttf', name='Segoe UI', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyhl.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=290, stretch='normal', size='scalable')) = 10.1545
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoescb.ttf', name='Segoe Script', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolaz.ttf', name='Consolas', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\wingding.ttf', name='Wingdings', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolai.ttf', name='Consolas', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mmrtext.ttf', name='Myanmar Text', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segmdl2.ttf', name='Segoe MDL2 Assets', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\phagspab.ttf', name='Microsoft PhagsPa', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SimsunExtG.ttf', name='SimSun-ExtG', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisb.ttf', name='Segoe UI', style='normal', variant='normal', weight=600, stretch='normal', size='scalable')) = 10.24
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candaral.ttf', name='Candara', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constanb.ttf', name='Constantia', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,327 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucbd.ttf', name='Trebuchet MS', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguibl.ttf', name='Segoe UI', style='normal', variant='normal', weight=900, stretch='normal', size='scalable')) = 10.525
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothL.ttc', name='Yu Gothic', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjh.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucbi.ttf', name='Trebuchet MS', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\gadugib.ttf', name='Gadugi', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyhbd.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrib.ttf', name='Calibri', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palab.ttf', name='Palatino Linotype', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\symbol.ttf', name='Symbol', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguibli.ttf', name='Segoe UI', style='italic', variant='normal', weight=900, stretch='normal', size='scalable')) = 11.525
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comicz.ttf', name='Comic Sans MS', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyi.ttf', name='Microsoft Yi Baiti', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ntailu.ttf', name='Microsoft New Tai Lue', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguiemj.ttf', name='Segoe UI Emoji', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrii.ttf', name='Calibri', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\taileb.ttf', name='Microsoft Tai Le', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\himalaya.ttf', name='Microsoft Himalaya', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiab.ttf', name='Georgia', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constanz.ttf', name='Constantia', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\constani.ttf', name='Constantia', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelaUIb.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\taile.ttf', name='Microsoft Tai Le', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanai.ttf', name='Verdana', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 4.6863636363636365
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbel.ttf', name='Corbel', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebuc.ttf', name='Trebuchet MS', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\simsun.ttc', name='SimSun', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriaz.ttf', name='Cambria', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgia.ttf', name='Georgia', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comic.ttf', name='Comic Sans MS', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consola.ttf', name='Consolas', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeprb.ttf', name='Segoe Print', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiaz.ttf', name='Georgia', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SitkaVF.ttf', name='Sitka', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\pala.ttf', name='Palatino Linotype', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\framdit.ttf', name='Franklin Gothic Medium', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjhl.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=290, stretch='normal', size='scalable')) = 10.1545
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\l_10646.ttf', name='Lucida Sans Unicode', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuii.ttf', name='Segoe UI', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambria.ttc', name='Cambria', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msyh.ttc', name='Microsoft YaHei', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriai.ttf', name='Cambria', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Inkfree.ttf', name='Ink Free', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\webdings.ttf', name='Webdings', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeui.ttf', name='Segoe UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ntailub.ttf', name='Microsoft New Tai Lue', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ebrimabd.ttf', name='Ebrima', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\tahomabd.ttf', name='Tahoma', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SegoeIcons.ttf', name='Segoe Fluent Icons', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibrili.ttf', name='Calibri', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\gadugi.ttf', name='Gadugi', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanab.ttf', name='Verdana', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 3.9713636363636367
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoesc.ttf', name='Segoe Script', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\courbd.ttf', name='Courier New', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SitkaVF-Italic.ttf', name='Sitka', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesbd.ttf', name='Times New Roman', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothR.ttc', name='Yu Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuil.ttf', name='Segoe UI', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msgothic.ttc', name='MS Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\impact.ttf', name='Impact', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelUIsl.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=350, stretch='normal', size='scalable')) = 10.0975
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgunsl.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cambriab.ttf', name='Cambria', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothB.ttc', name='Yu Gothic', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\YuGothM.ttc', name='Yu Gothic', style='normal', variant='normal', weight=500, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\courbi.ttf', name='Courier New', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\mingliub.ttc', name='MingLiU-ExtB', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarai.ttf', name='Candara', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibril.ttf', name='Calibri', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,328 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdana.ttf', name='Verdana', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 3.6863636363636365
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelb.ttf', name='Corbel', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\consolab.ttf', name='Consolas', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisbi.ttf', name='Segoe UI', style='italic', variant='normal', weight=600, stretch='normal', size='scalable')) = 11.24
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\phagspa.ttf', name='Microsoft PhagsPa', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\verdanaz.ttf', name='Verdana', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 4.971363636363637
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\times.ttf', name='Times New Roman', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\trebucit.ttf', name='Trebuchet MS', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\sylfaen.ttf', name='Sylfaen', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\comicbd.ttf', name='Comic Sans MS', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arial.ttf', name='Arial', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 6.413636363636363
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\simsunb.ttf', name='SimSun-ExtB', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\cour.ttf', name='Courier New', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\bahnschrift.ttf', name='Bahnschrift', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\georgiai.ttf', name='Georgia', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibri.ttf', name='Calibri', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palabi.ttf', name='Palatino Linotype', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\javatext.ttf', name='Javanese Text', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelz.ttf', name='Corbel', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbelli.ttf', name='Corbel', style='italic', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarali.ttf', name='Candara', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\msjhbd.ttc', name='Microsoft JhengHei', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\malgun.ttf', name='Malgun Gothic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisym.ttf', name='Segoe UI Symbol', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\corbell.ttf', name='Corbel', style='normal', variant='normal', weight=300, stretch='normal', size='scalable')) = 10.145
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ariali.ttf', name='Arial', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 7.413636363636363
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\framd.ttf', name='Franklin Gothic Medium', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoeuisl.ttf', name='Segoe UI', style='normal', variant='normal', weight=350, stretch='normal', size='scalable')) = 10.0975
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arialbd.ttf', name='Arial', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 6.698636363636363
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\lucon.ttf', name='Lucida Console', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\LeelawUI.ttf', name='Leelawadee UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\segoepr.ttf', name='Segoe Print', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\ariblk.ttf', name='Arial', style='normal', variant='normal', weight=900, stretch='normal', size='scalable')) = 6.888636363636364
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\tahoma.ttf', name='Tahoma', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\micross.ttf', name='Microsoft Sans Serif', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesi.ttf', name='Times New Roman', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\palai.ttf', name='Palatino Linotype', style='italic', variant='normal', weight=400, stretch='normal', size='scalable')) = 11.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguihis.ttf', name='Segoe UI Historic', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\SansSerifCollection.ttf', name='Sans Serif Collection', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\calibriz.ttf', name='Calibri', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\seguisli.ttf', name='Segoe UI', style='italic', variant='normal', weight=350, stretch='normal', size='scalable')) = 11.0975
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\timesbi.ttf', name='Times New Roman', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 11.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Nirmala.ttc', name='Nirmala UI', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candarab.ttf', name='Candara', style='normal', variant='normal', weight=700, stretch='normal', size='scalable')) = 10.335
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\arialbi.ttf', name='Arial', style='italic', variant='normal', weight=700, stretch='normal', size='scalable')) = 7.698636363636363
+2025-04-19 22:33:19,329 [DEBUG] findfont: score(FontEntry(fname='C:\\Windows\\Fonts\\Candara.ttf', name='Candara', style='normal', variant='normal', weight=400, stretch='normal', size='scalable')) = 10.05
+2025-04-19 22:33:19,329 [DEBUG] findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=12.0 to DejaVu Sans ('C:\\Users\\connc\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\matplotlib\\mpl-data\\fonts\\ttf\\DejaVuSans.ttf') with score of 0.050000.
+2025-04-19 22:33:31,501 [WARNING] Episode: 10
+2025-04-19 22:33:31,501 [DEBUG]   Marquise - Steps: 128.00, Reward: 397.15, per‑step Rwd: 3.1027
+2025-04-19 22:33:31,501 [DEBUG]   Eyrie - Steps: 128.00, Reward: -7.97, per‑step Rwd: -0.0623
+2025-04-19 22:33:31,501 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 228.63, per‑step Rwd: 1.7862
+2025-04-19 22:33:31,501 [DEBUG]   Vagabond - Steps: 128.00, Reward: 59.42, per‑step Rwd: 0.4643
+2025-04-19 22:33:43,003 [WARNING] Episode: 11
+2025-04-19 22:33:43,003 [DEBUG]   Marquise - Steps: 128.00, Reward: 620.37, per‑step Rwd: 4.8466
+2025-04-19 22:33:43,003 [DEBUG]   Eyrie - Steps: 128.00, Reward: -12.64, per‑step Rwd: -0.0987
+2025-04-19 22:33:43,003 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 339.57, per‑step Rwd: 2.6529
+2025-04-19 22:33:43,003 [DEBUG]   Vagabond - Steps: 128.00, Reward: 95.89, per‑step Rwd: 0.7491
+2025-04-19 22:33:54,996 [WARNING] Episode: 12
+2025-04-19 22:33:54,996 [DEBUG]   Marquise - Steps: 128.00, Reward: 593.43, per‑step Rwd: 4.6362
+2025-04-19 22:33:54,997 [DEBUG]   Eyrie - Steps: 128.00, Reward: -12.01, per‑step Rwd: -0.0939
+2025-04-19 22:33:54,997 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 312.96, per‑step Rwd: 2.4450
+2025-04-19 22:33:54,997 [DEBUG]   Vagabond - Steps: 128.00, Reward: 95.46, per‑step Rwd: 0.7458
+2025-04-19 22:34:07,437 [WARNING] Episode: 13
+2025-04-19 22:34:07,437 [DEBUG]   Marquise - Steps: 128.00, Reward: 478.08, per‑step Rwd: 3.7350
+2025-04-19 22:34:07,437 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.08, per‑step Rwd: -0.0788
+2025-04-19 22:34:07,437 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 271.06, per‑step Rwd: 2.1177
+2025-04-19 22:34:07,437 [DEBUG]   Vagabond - Steps: 128.00, Reward: 85.34, per‑step Rwd: 0.6667
+2025-04-19 22:34:20,102 [WARNING] Episode: 14
+2025-04-19 22:34:20,102 [DEBUG]   Marquise - Steps: 128.00, Reward: 1091.92, per‑step Rwd: 8.5306
+2025-04-19 22:34:20,103 [DEBUG]   Eyrie - Steps: 128.00, Reward: -22.53, per‑step Rwd: -0.1760
+2025-04-19 22:34:20,103 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 609.69, per‑step Rwd: 4.7632
+2025-04-19 22:34:20,103 [DEBUG]   Vagabond - Steps: 128.00, Reward: 192.29, per‑step Rwd: 1.5022
+2025-04-19 22:34:31,934 [WARNING] Episode: 15
+2025-04-19 22:34:31,934 [DEBUG]   Marquise - Steps: 128.00, Reward: 818.47, per‑step Rwd: 6.3943
+2025-04-19 22:34:31,934 [DEBUG]   Eyrie - Steps: 128.00, Reward: -15.91, per‑step Rwd: -0.1243
+2025-04-19 22:34:31,935 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 441.49, per‑step Rwd: 3.4492
+2025-04-19 22:34:31,935 [DEBUG]   Vagabond - Steps: 128.00, Reward: 141.17, per‑step Rwd: 1.1029
+2025-04-19 22:34:43,489 [WARNING] Episode: 16
+2025-04-19 22:34:43,489 [DEBUG]   Marquise - Steps: 128.00, Reward: 849.45, per‑step Rwd: 6.6363
+2025-04-19 22:34:43,489 [DEBUG]   Eyrie - Steps: 128.00, Reward: -15.22, per‑step Rwd: -0.1189
+2025-04-19 22:34:43,489 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 426.51, per‑step Rwd: 3.3321
+2025-04-19 22:34:43,489 [DEBUG]   Vagabond - Steps: 128.00, Reward: 151.34, per‑step Rwd: 1.1823
+2025-04-19 22:34:55,246 [WARNING] Episode: 17
+2025-04-19 22:34:55,246 [DEBUG]   Marquise - Steps: 128.00, Reward: 571.07, per‑step Rwd: 4.4615
+2025-04-19 22:34:55,246 [DEBUG]   Eyrie - Steps: 128.00, Reward: -9.43, per‑step Rwd: -0.0737
+2025-04-19 22:34:55,246 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 272.14, per‑step Rwd: 2.1261
+2025-04-19 22:34:55,246 [DEBUG]   Vagabond - Steps: 128.00, Reward: 103.75, per‑step Rwd: 0.8105
+2025-04-19 22:35:07,244 [WARNING] Episode: 18
+2025-04-19 22:35:07,244 [DEBUG]   Marquise - Steps: 128.00, Reward: 737.12, per‑step Rwd: 5.7588
+2025-04-19 22:35:07,244 [DEBUG]   Eyrie - Steps: 128.00, Reward: -11.68, per‑step Rwd: -0.0912
+2025-04-19 22:35:07,244 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 309.18, per‑step Rwd: 2.4155
+2025-04-19 22:35:07,244 [DEBUG]   Vagabond - Steps: 128.00, Reward: 129.70, per‑step Rwd: 1.0133
+2025-04-19 22:35:19,008 [WARNING] Episode: 19
+2025-04-19 22:35:19,008 [DEBUG]   Marquise - Steps: 128.00, Reward: 638.82, per‑step Rwd: 4.9908
+2025-04-19 22:35:19,009 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.89, per‑step Rwd: -0.0851
+2025-04-19 22:35:19,009 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 250.10, per‑step Rwd: 1.9539
+2025-04-19 22:35:19,009 [DEBUG]   Vagabond - Steps: 128.00, Reward: 111.35, per‑step Rwd: 0.8699
+2025-04-19 22:35:19,397 [WARNING] Checkpoint saved at iteration 20: training/checkpoints/
+2025-04-19 22:35:32,263 [WARNING] Episode: 20
+2025-04-19 22:35:32,263 [DEBUG]   Marquise - Steps: 128.00, Reward: 941.55, per‑step Rwd: 7.3558
+2025-04-19 22:35:32,263 [DEBUG]   Eyrie - Steps: 128.00, Reward: -15.68, per‑step Rwd: -0.1225
+2025-04-19 22:35:32,263 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 360.90, per‑step Rwd: 2.8196
+2025-04-19 22:35:32,263 [DEBUG]   Vagabond - Steps: 128.00, Reward: 163.16, per‑step Rwd: 1.2747
+2025-04-19 22:35:44,236 [WARNING] Episode: 21
+2025-04-19 22:35:44,236 [DEBUG]   Marquise - Steps: 128.00, Reward: 644.32, per‑step Rwd: 5.0338
+2025-04-19 22:35:44,237 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.66, per‑step Rwd: -0.0833
+2025-04-19 22:35:44,237 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 239.77, per‑step Rwd: 1.8732
+2025-04-19 22:35:44,237 [DEBUG]   Vagabond - Steps: 128.00, Reward: 110.50, per‑step Rwd: 0.8633
+2025-04-19 22:35:56,136 [WARNING] Episode: 22
+2025-04-19 22:35:56,136 [DEBUG]   Marquise - Steps: 128.00, Reward: 990.65, per‑step Rwd: 7.7394
+2025-04-19 22:35:56,136 [DEBUG]   Eyrie - Steps: 128.00, Reward: -16.65, per‑step Rwd: -0.1301
+2025-04-19 22:35:56,137 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 366.82, per‑step Rwd: 2.8658
+2025-04-19 22:35:56,137 [DEBUG]   Vagabond - Steps: 128.00, Reward: 175.75, per‑step Rwd: 1.3731
+2025-04-19 22:36:07,946 [WARNING] Episode: 23
+2025-04-19 22:36:07,946 [DEBUG]   Marquise - Steps: 128.00, Reward: 436.53, per‑step Rwd: 3.4104
+2025-04-19 22:36:07,946 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.47, per‑step Rwd: -0.0427
+2025-04-19 22:36:07,946 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 129.38, per‑step Rwd: 1.0108
+2025-04-19 22:36:07,946 [DEBUG]   Vagabond - Steps: 128.00, Reward: 81.55, per‑step Rwd: 0.6371
+2025-04-19 22:36:20,025 [WARNING] Episode: 24
+2025-04-19 22:36:20,025 [DEBUG]   Marquise - Steps: 128.00, Reward: 497.67, per‑step Rwd: 3.8880
+2025-04-19 22:36:20,025 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.65, per‑step Rwd: -0.0442
+2025-04-19 22:36:20,025 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 127.22, per‑step Rwd: 0.9939
+2025-04-19 22:36:20,025 [DEBUG]   Vagabond - Steps: 128.00, Reward: 101.96, per‑step Rwd: 0.7965
+2025-04-19 22:36:31,895 [WARNING] Episode: 25
+2025-04-19 22:36:31,895 [DEBUG]   Marquise - Steps: 128.00, Reward: 1001.40, per‑step Rwd: 7.8235
+2025-04-19 22:36:31,895 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.98, per‑step Rwd: -0.0858
+2025-04-19 22:36:31,895 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 246.18, per‑step Rwd: 1.9233
+2025-04-19 22:36:31,895 [DEBUG]   Vagabond - Steps: 128.00, Reward: 197.22, per‑step Rwd: 1.5408
+2025-04-19 22:36:43,619 [WARNING] Episode: 26
+2025-04-19 22:36:43,619 [DEBUG]   Marquise - Steps: 128.00, Reward: 1013.86, per‑step Rwd: 7.9207
+2025-04-19 22:36:43,619 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.60, per‑step Rwd: -0.0828
+2025-04-19 22:36:43,620 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 241.93, per‑step Rwd: 1.8901
+2025-04-19 22:36:43,620 [DEBUG]   Vagabond - Steps: 128.00, Reward: 204.75, per‑step Rwd: 1.5996
+2025-04-19 22:36:55,276 [WARNING] Episode: 27
+2025-04-19 22:36:55,276 [DEBUG]   Marquise - Steps: 128.00, Reward: 1011.12, per‑step Rwd: 7.8994
+2025-04-19 22:36:55,276 [DEBUG]   Eyrie - Steps: 128.00, Reward: -8.68, per‑step Rwd: -0.0678
+2025-04-19 22:36:55,276 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 250.61, per‑step Rwd: 1.9579
+2025-04-19 22:36:55,276 [DEBUG]   Vagabond - Steps: 128.00, Reward: 220.56, per‑step Rwd: 1.7231
+2025-04-19 22:37:07,334 [WARNING] Episode: 28
+2025-04-19 22:37:07,334 [DEBUG]   Marquise - Steps: 128.00, Reward: 836.09, per‑step Rwd: 6.5320
+2025-04-19 22:37:07,335 [DEBUG]   Eyrie - Steps: 128.00, Reward: -7.11, per‑step Rwd: -0.0555
+2025-04-19 22:37:07,335 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 178.62, per‑step Rwd: 1.3954
+2025-04-19 22:37:07,335 [DEBUG]   Vagabond - Steps: 128.00, Reward: 163.25, per‑step Rwd: 1.2754
+2025-04-19 22:37:19,210 [WARNING] Episode: 29
+2025-04-19 22:37:19,210 [DEBUG]   Marquise - Steps: 128.00, Reward: 628.38, per‑step Rwd: 4.9092
+2025-04-19 22:37:19,210 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.20, per‑step Rwd: -0.0407
+2025-04-19 22:37:19,210 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 135.81, per‑step Rwd: 1.0610
+2025-04-19 22:37:19,211 [DEBUG]   Vagabond - Steps: 128.00, Reward: 125.29, per‑step Rwd: 0.9789
+2025-04-19 22:37:19,583 [WARNING] Checkpoint saved at iteration 30: training/checkpoints/
+2025-04-19 22:37:32,475 [WARNING] Episode: 30
+2025-04-19 22:37:32,475 [DEBUG]   Marquise - Steps: 128.00, Reward: 604.95, per‑step Rwd: 4.7262
+2025-04-19 22:37:32,475 [DEBUG]   Eyrie - Steps: 128.00, Reward: -4.27, per‑step Rwd: -0.0334
+2025-04-19 22:37:32,475 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 119.91, per‑step Rwd: 0.9368
+2025-04-19 22:37:32,475 [DEBUG]   Vagabond - Steps: 128.00, Reward: 117.47, per‑step Rwd: 0.9177
+2025-04-19 22:37:44,149 [WARNING] Episode: 31
+2025-04-19 22:37:44,149 [DEBUG]   Marquise - Steps: 128.00, Reward: 707.30, per‑step Rwd: 5.5258
+2025-04-19 22:37:44,149 [DEBUG]   Eyrie - Steps: 128.00, Reward: -4.12, per‑step Rwd: -0.0322
+2025-04-19 22:37:44,149 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 123.33, per‑step Rwd: 0.9636
+2025-04-19 22:37:44,149 [DEBUG]   Vagabond - Steps: 128.00, Reward: 130.25, per‑step Rwd: 1.0176
+2025-04-19 22:37:56,115 [WARNING] Episode: 32
+2025-04-19 22:37:56,115 [DEBUG]   Marquise - Steps: 128.00, Reward: 616.10, per‑step Rwd: 4.8133
+2025-04-19 22:37:56,115 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.49, per‑step Rwd: -0.0273
+2025-04-19 22:37:56,115 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 103.72, per‑step Rwd: 0.8103
+2025-04-19 22:37:56,115 [DEBUG]   Vagabond - Steps: 128.00, Reward: 115.83, per‑step Rwd: 0.9049
+2025-04-19 22:38:08,258 [WARNING] Episode: 33
+2025-04-19 22:38:08,258 [DEBUG]   Marquise - Steps: 128.00, Reward: 410.95, per‑step Rwd: 3.2105
+2025-04-19 22:38:08,258 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.44, per‑step Rwd: -0.0191
+2025-04-19 22:38:08,258 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 68.65, per‑step Rwd: 0.5363
+2025-04-19 22:38:08,258 [DEBUG]   Vagabond - Steps: 128.00, Reward: 74.13, per‑step Rwd: 0.5791
+2025-04-19 22:38:20,190 [WARNING] Episode: 34
+2025-04-19 22:38:20,190 [DEBUG]   Marquise - Steps: 128.00, Reward: 1351.87, per‑step Rwd: 10.5615
+2025-04-19 22:38:20,190 [DEBUG]   Eyrie - Steps: 128.00, Reward: -8.14, per‑step Rwd: -0.0636
+2025-04-19 22:38:20,190 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 224.04, per‑step Rwd: 1.7503
+2025-04-19 22:38:20,190 [DEBUG]   Vagabond - Steps: 128.00, Reward: 243.34, per‑step Rwd: 1.9011
+2025-04-19 22:38:31,700 [WARNING] Episode: 35
+2025-04-19 22:38:31,700 [DEBUG]   Marquise - Steps: 128.00, Reward: 503.83, per‑step Rwd: 3.9362
+2025-04-19 22:38:31,700 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.43, per‑step Rwd: -0.0111
+2025-04-19 22:38:31,700 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 91.70, per‑step Rwd: 0.7164
+2025-04-19 22:38:31,700 [DEBUG]   Vagabond - Steps: 128.00, Reward: 102.51, per‑step Rwd: 0.8008
+2025-04-19 22:38:43,813 [WARNING] Episode: 36
+2025-04-19 22:38:43,813 [DEBUG]   Marquise - Steps: 128.00, Reward: 1155.96, per‑step Rwd: 9.0310
+2025-04-19 22:38:43,813 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.26, per‑step Rwd: -0.0255
+2025-04-19 22:38:43,813 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 213.30, per‑step Rwd: 1.6664
+2025-04-19 22:38:43,813 [DEBUG]   Vagabond - Steps: 128.00, Reward: 229.88, per‑step Rwd: 1.7959
+2025-04-19 22:38:55,954 [WARNING] Episode: 37
+2025-04-19 22:38:55,955 [DEBUG]   Marquise - Steps: 128.00, Reward: 721.48, per‑step Rwd: 5.6365
+2025-04-19 22:38:55,955 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.39, per‑step Rwd: -0.0187
+2025-04-19 22:38:55,955 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 132.84, per‑step Rwd: 1.0378
+2025-04-19 22:38:55,955 [DEBUG]   Vagabond - Steps: 128.00, Reward: 146.23, per‑step Rwd: 1.1424
+2025-04-19 22:39:07,989 [WARNING] Episode: 38
+2025-04-19 22:39:07,989 [DEBUG]   Marquise - Steps: 128.00, Reward: 1812.05, per‑step Rwd: 14.1566
+2025-04-19 22:39:07,989 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.98, per‑step Rwd: -0.0467
+2025-04-19 22:39:07,989 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 330.23, per‑step Rwd: 2.5799
+2025-04-19 22:39:07,989 [DEBUG]   Vagabond - Steps: 128.00, Reward: 371.86, per‑step Rwd: 2.9052
+2025-04-19 22:39:20,259 [WARNING] Episode: 39
+2025-04-19 22:39:20,259 [DEBUG]   Marquise - Steps: 128.00, Reward: 2689.20, per‑step Rwd: 21.0094
+2025-04-19 22:39:20,259 [DEBUG]   Eyrie - Steps: 128.00, Reward: -49.01, per‑step Rwd: -0.3829
+2025-04-19 22:39:20,259 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 355.07, per‑step Rwd: 2.7740
+2025-04-19 22:39:20,259 [DEBUG]   Vagabond - Steps: 128.00, Reward: 407.56, per‑step Rwd: 3.1841
+2025-04-19 22:39:20,660 [WARNING] Checkpoint saved at iteration 40: training/checkpoints/
+2025-04-19 22:39:33,789 [WARNING] Episode: 40
+2025-04-19 22:39:33,789 [DEBUG]   Marquise - Steps: 128.00, Reward: 1271.50, per‑step Rwd: 9.9336
+2025-04-19 22:39:33,789 [DEBUG]   Eyrie - Steps: 128.00, Reward: -55.00, per‑step Rwd: -0.4297
+2025-04-19 22:39:33,789 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -56.35, per‑step Rwd: -0.4402
+2025-04-19 22:39:33,789 [DEBUG]   Vagabond - Steps: 128.00, Reward: 165.76, per‑step Rwd: 1.2950
+2025-04-19 22:39:45,417 [WARNING] Episode: 41
+2025-04-19 22:39:45,417 [DEBUG]   Marquise - Steps: 128.00, Reward: 1261.06, per‑step Rwd: 9.8520
+2025-04-19 22:39:45,417 [DEBUG]   Eyrie - Steps: 128.00, Reward: -54.89, per‑step Rwd: -0.4288
+2025-04-19 22:39:45,417 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -81.87, per‑step Rwd: -0.6396
+2025-04-19 22:39:45,417 [DEBUG]   Vagabond - Steps: 128.00, Reward: 153.46, per‑step Rwd: 1.1989
+2025-04-19 22:39:57,552 [WARNING] Episode: 42
+2025-04-19 22:39:57,552 [DEBUG]   Marquise - Steps: 128.00, Reward: 961.06, per‑step Rwd: 7.5083
+2025-04-19 22:39:57,552 [DEBUG]   Eyrie - Steps: 128.00, Reward: -40.92, per‑step Rwd: -0.3197
+2025-04-19 22:39:57,552 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -51.72, per‑step Rwd: -0.4040
+2025-04-19 22:39:57,552 [DEBUG]   Vagabond - Steps: 128.00, Reward: 117.34, per‑step Rwd: 0.9168
+2025-04-19 22:40:09,396 [WARNING] Episode: 43
+2025-04-19 22:40:09,396 [DEBUG]   Marquise - Steps: 128.00, Reward: 1109.37, per‑step Rwd: 8.6670
+2025-04-19 22:40:09,396 [DEBUG]   Eyrie - Steps: 128.00, Reward: -46.77, per‑step Rwd: -0.3654
+2025-04-19 22:40:09,396 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -56.23, per‑step Rwd: -0.4393
+2025-04-19 22:40:09,396 [DEBUG]   Vagabond - Steps: 128.00, Reward: 135.45, per‑step Rwd: 1.0582
+2025-04-19 22:40:22,084 [WARNING] Episode: 44
+2025-04-19 22:40:22,084 [DEBUG]   Marquise - Steps: 128.00, Reward: 955.20, per‑step Rwd: 7.4625
+2025-04-19 22:40:22,084 [DEBUG]   Eyrie - Steps: 128.00, Reward: -40.88, per‑step Rwd: -0.3194
+2025-04-19 22:40:22,084 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -55.20, per‑step Rwd: -0.4312
+2025-04-19 22:40:22,084 [DEBUG]   Vagabond - Steps: 128.00, Reward: 111.51, per‑step Rwd: 0.8712
+2025-04-19 22:40:34,051 [WARNING] Episode: 45
+2025-04-19 22:40:34,051 [DEBUG]   Marquise - Steps: 128.00, Reward: 1065.68, per‑step Rwd: 8.3256
+2025-04-19 22:40:34,051 [DEBUG]   Eyrie - Steps: 128.00, Reward: -46.91, per‑step Rwd: -0.3665
+2025-04-19 22:40:34,051 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -57.15, per‑step Rwd: -0.4465
+2025-04-19 22:40:34,051 [DEBUG]   Vagabond - Steps: 128.00, Reward: 130.62, per‑step Rwd: 1.0205
+2025-04-19 22:40:45,920 [WARNING] Episode: 46
+2025-04-19 22:40:45,920 [DEBUG]   Marquise - Steps: 128.00, Reward: 811.82, per‑step Rwd: 6.3423
+2025-04-19 22:40:45,920 [DEBUG]   Eyrie - Steps: 128.00, Reward: -36.43, per‑step Rwd: -0.2846
+2025-04-19 22:40:45,920 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -51.98, per‑step Rwd: -0.4061
+2025-04-19 22:40:45,920 [DEBUG]   Vagabond - Steps: 128.00, Reward: 97.46, per‑step Rwd: 0.7614
+2025-04-19 22:40:58,123 [WARNING] Episode: 47
+2025-04-19 22:40:58,123 [DEBUG]   Marquise - Steps: 128.00, Reward: 1851.82, per‑step Rwd: 14.4673
+2025-04-19 22:40:58,123 [DEBUG]   Eyrie - Steps: 128.00, Reward: -81.89, per‑step Rwd: -0.6397
+2025-04-19 22:40:58,123 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -116.95, per‑step Rwd: -0.9137
+2025-04-19 22:40:58,123 [DEBUG]   Vagabond - Steps: 128.00, Reward: 218.72, per‑step Rwd: 1.7087
+2025-04-19 22:41:10,257 [WARNING] Episode: 48
+2025-04-19 22:41:10,257 [DEBUG]   Marquise - Steps: 128.00, Reward: 719.23, per‑step Rwd: 5.6190
+2025-04-19 22:41:10,257 [DEBUG]   Eyrie - Steps: 128.00, Reward: -29.73, per‑step Rwd: -0.2322
+2025-04-19 22:41:10,257 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -33.42, per‑step Rwd: -0.2611
+2025-04-19 22:41:10,257 [DEBUG]   Vagabond - Steps: 128.00, Reward: 81.74, per‑step Rwd: 0.6386
+2025-04-19 22:41:22,396 [WARNING] Episode: 49
+2025-04-19 22:41:22,396 [DEBUG]   Marquise - Steps: 128.00, Reward: 605.27, per‑step Rwd: 4.7286
+2025-04-19 22:41:22,396 [DEBUG]   Eyrie - Steps: 128.00, Reward: -25.15, per‑step Rwd: -0.1965
+2025-04-19 22:41:22,396 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -28.93, per‑step Rwd: -0.2260
+2025-04-19 22:41:22,396 [DEBUG]   Vagabond - Steps: 128.00, Reward: 67.76, per‑step Rwd: 0.5294
+2025-04-19 22:41:22,833 [WARNING] Checkpoint saved at iteration 50: training/checkpoints/
+2025-04-19 22:41:35,644 [WARNING] Episode: 50
+2025-04-19 22:41:35,644 [DEBUG]   Marquise - Steps: 128.00, Reward: 986.62, per‑step Rwd: 7.7079
+2025-04-19 22:41:35,644 [DEBUG]   Eyrie - Steps: 128.00, Reward: -40.87, per‑step Rwd: -0.3193
+2025-04-19 22:41:35,644 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -48.11, per‑step Rwd: -0.3759
+2025-04-19 22:41:35,644 [DEBUG]   Vagabond - Steps: 128.00, Reward: 108.77, per‑step Rwd: 0.8497
+2025-04-19 22:41:47,584 [WARNING] Episode: 51
+2025-04-19 22:41:47,584 [DEBUG]   Marquise - Steps: 128.00, Reward: 496.65, per‑step Rwd: 3.8801
+2025-04-19 22:41:47,584 [DEBUG]   Eyrie - Steps: 128.00, Reward: -19.89, per‑step Rwd: -0.1554
+2025-04-19 22:41:47,584 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: -37.48, per‑step Rwd: -0.2928
+2025-04-19 22:41:47,584 [DEBUG]   Vagabond - Steps: 128.00, Reward: 65.23, per‑step Rwd: 0.5096
+2025-04-19 22:41:59,757 [WARNING] Episode: 52
+2025-04-19 22:41:59,757 [DEBUG]   Marquise - Steps: 128.00, Reward: 408.32, per‑step Rwd: 3.1900
+2025-04-19 22:41:59,757 [DEBUG]   Eyrie - Steps: 128.00, Reward: -0.52, per‑step Rwd: -0.0040
+2025-04-19 22:41:59,757 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 53.46, per‑step Rwd: 0.4176
+2025-04-19 22:41:59,757 [DEBUG]   Vagabond - Steps: 128.00, Reward: 64.55, per‑step Rwd: 0.5043
+2025-04-19 22:42:12,196 [WARNING] Episode: 53
+2025-04-19 22:42:12,196 [DEBUG]   Marquise - Steps: 128.00, Reward: 430.98, per‑step Rwd: 3.3671
+2025-04-19 22:42:12,196 [DEBUG]   Eyrie - Steps: 128.00, Reward: -0.69, per‑step Rwd: -0.0054
+2025-04-19 22:42:12,196 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 47.12, per‑step Rwd: 0.3681
+2025-04-19 22:42:12,196 [DEBUG]   Vagabond - Steps: 128.00, Reward: 65.22, per‑step Rwd: 0.5095
+2025-04-19 22:42:24,870 [WARNING] Episode: 54
+2025-04-19 22:42:24,870 [DEBUG]   Marquise - Steps: 128.00, Reward: 412.51, per‑step Rwd: 3.2227
+2025-04-19 22:42:24,870 [DEBUG]   Eyrie - Steps: 128.00, Reward: -0.77, per‑step Rwd: -0.0060
+2025-04-19 22:42:24,870 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 43.68, per‑step Rwd: 0.3413
+2025-04-19 22:42:24,870 [DEBUG]   Vagabond - Steps: 128.00, Reward: 62.56, per‑step Rwd: 0.4888
+2025-04-19 22:42:37,256 [WARNING] Episode: 55
+2025-04-19 22:42:37,256 [DEBUG]   Marquise - Steps: 128.00, Reward: 339.04, per‑step Rwd: 2.6487
+2025-04-19 22:42:37,256 [DEBUG]   Eyrie - Steps: 128.00, Reward: -0.67, per‑step Rwd: -0.0052
+2025-04-19 22:42:37,256 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 38.65, per‑step Rwd: 0.3020
+2025-04-19 22:42:37,256 [DEBUG]   Vagabond - Steps: 128.00, Reward: 50.87, per‑step Rwd: 0.3974
+2025-04-19 22:42:50,113 [WARNING] Episode: 56
+2025-04-19 22:42:50,114 [DEBUG]   Marquise - Steps: 128.00, Reward: 284.73, per‑step Rwd: 2.2244
+2025-04-19 22:42:50,114 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.75, per‑step Rwd: -0.0137
+2025-04-19 22:42:50,114 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 38.88, per‑step Rwd: 0.3038
+2025-04-19 22:42:50,114 [DEBUG]   Vagabond - Steps: 128.00, Reward: 45.89, per‑step Rwd: 0.3585
+2025-04-19 22:43:02,506 [WARNING] Episode: 57
+2025-04-19 22:43:02,506 [DEBUG]   Marquise - Steps: 128.00, Reward: 286.28, per‑step Rwd: 2.2365
+2025-04-19 22:43:02,506 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.66, per‑step Rwd: -0.0129
+2025-04-19 22:43:02,506 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 39.55, per‑step Rwd: 0.3090
+2025-04-19 22:43:02,506 [DEBUG]   Vagabond - Steps: 128.00, Reward: 47.43, per‑step Rwd: 0.3706
+2025-04-19 22:43:14,496 [WARNING] Episode: 58
+2025-04-19 22:43:14,496 [DEBUG]   Marquise - Steps: 128.00, Reward: 283.33, per‑step Rwd: 2.2135
+2025-04-19 22:43:14,496 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.82, per‑step Rwd: -0.0142
+2025-04-19 22:43:14,496 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 40.13, per‑step Rwd: 0.3135
+2025-04-19 22:43:14,496 [DEBUG]   Vagabond - Steps: 128.00, Reward: 53.50, per‑step Rwd: 0.4180
+2025-04-19 22:43:26,482 [WARNING] Episode: 59
+2025-04-19 22:43:26,482 [DEBUG]   Marquise - Steps: 128.00, Reward: 240.46, per‑step Rwd: 1.8786
+2025-04-19 22:43:26,482 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.83, per‑step Rwd: -0.0143
+2025-04-19 22:43:26,483 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 28.94, per‑step Rwd: 0.2261
+2025-04-19 22:43:26,483 [DEBUG]   Vagabond - Steps: 128.00, Reward: 51.06, per‑step Rwd: 0.3989
+2025-04-19 22:43:26,863 [WARNING] Checkpoint saved at iteration 60: training/checkpoints/
+2025-04-19 22:43:39,378 [WARNING] Episode: 60
+2025-04-19 22:43:39,378 [DEBUG]   Marquise - Steps: 128.00, Reward: 253.59, per‑step Rwd: 1.9812
+2025-04-19 22:43:39,378 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.87, per‑step Rwd: -0.0146
+2025-04-19 22:43:39,378 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 39.17, per‑step Rwd: 0.3060
+2025-04-19 22:43:39,378 [DEBUG]   Vagabond - Steps: 128.00, Reward: 52.79, per‑step Rwd: 0.4124
+2025-04-19 22:43:51,215 [WARNING] Episode: 61
+2025-04-19 22:43:51,215 [DEBUG]   Marquise - Steps: 128.00, Reward: 285.14, per‑step Rwd: 2.2276
+2025-04-19 22:43:51,215 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.08, per‑step Rwd: -0.0163
+2025-04-19 22:43:51,215 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 43.98, per‑step Rwd: 0.3436
+2025-04-19 22:43:51,215 [DEBUG]   Vagabond - Steps: 128.00, Reward: 60.53, per‑step Rwd: 0.4729
+2025-04-19 22:44:02,993 [WARNING] Episode: 62
+2025-04-19 22:44:02,994 [DEBUG]   Marquise - Steps: 128.00, Reward: 383.23, per‑step Rwd: 2.9940
+2025-04-19 22:44:02,994 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.63, per‑step Rwd: -0.0205
+2025-04-19 22:44:02,994 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 56.81, per‑step Rwd: 0.4439
+2025-04-19 22:44:02,994 [DEBUG]   Vagabond - Steps: 128.00, Reward: 78.76, per‑step Rwd: 0.6153
+2025-04-19 22:44:14,574 [WARNING] Episode: 63
+2025-04-19 22:44:14,574 [DEBUG]   Marquise - Steps: 128.00, Reward: 383.61, per‑step Rwd: 2.9969
+2025-04-19 22:44:14,574 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.63, per‑step Rwd: -0.0205
+2025-04-19 22:44:14,574 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 57.39, per‑step Rwd: 0.4483
+2025-04-19 22:44:14,574 [DEBUG]   Vagabond - Steps: 128.00, Reward: 78.21, per‑step Rwd: 0.6110
+2025-04-19 22:44:26,252 [WARNING] Episode: 64
+2025-04-19 22:44:26,252 [DEBUG]   Marquise - Steps: 128.00, Reward: 590.87, per‑step Rwd: 4.6162
+2025-04-19 22:44:26,252 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.69, per‑step Rwd: -0.0288
+2025-04-19 22:44:26,252 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 80.45, per‑step Rwd: 0.6285
+2025-04-19 22:44:26,252 [DEBUG]   Vagabond - Steps: 128.00, Reward: 113.59, per‑step Rwd: 0.8874
+2025-04-19 22:44:37,735 [WARNING] Episode: 65
+2025-04-19 22:44:37,735 [DEBUG]   Marquise - Steps: 128.00, Reward: 999.54, per‑step Rwd: 7.8089
+2025-04-19 22:44:37,735 [DEBUG]   Eyrie - Steps: 128.00, Reward: -6.09, per‑step Rwd: -0.0476
+2025-04-19 22:44:37,735 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 137.74, per‑step Rwd: 1.0761
+2025-04-19 22:44:37,735 [DEBUG]   Vagabond - Steps: 128.00, Reward: 194.12, per‑step Rwd: 1.5165
+2025-04-19 22:44:49,196 [WARNING] Episode: 66
+2025-04-19 22:44:49,196 [DEBUG]   Marquise - Steps: 128.00, Reward: 1018.86, per‑step Rwd: 7.9598
+2025-04-19 22:44:49,196 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.90, per‑step Rwd: -0.0461
+2025-04-19 22:44:49,196 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 140.82, per‑step Rwd: 1.1001
+2025-04-19 22:44:49,196 [DEBUG]   Vagabond - Steps: 128.00, Reward: 200.29, per‑step Rwd: 1.5648
+2025-04-19 22:45:01,130 [WARNING] Episode: 67
+2025-04-19 22:45:01,130 [DEBUG]   Marquise - Steps: 128.00, Reward: 582.23, per‑step Rwd: 4.5486
+2025-04-19 22:45:01,130 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.01, per‑step Rwd: -0.0235
+2025-04-19 22:45:01,130 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 99.74, per‑step Rwd: 0.7792
+2025-04-19 22:45:01,130 [DEBUG]   Vagabond - Steps: 128.00, Reward: 104.65, per‑step Rwd: 0.8176
+2025-04-19 22:45:12,801 [WARNING] Episode: 68
+2025-04-19 22:45:12,801 [DEBUG]   Marquise - Steps: 128.00, Reward: 720.65, per‑step Rwd: 5.6301
+2025-04-19 22:45:12,801 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.61, per‑step Rwd: -0.0282
+2025-04-19 22:45:12,801 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 120.47, per‑step Rwd: 0.9412
+2025-04-19 22:45:12,801 [DEBUG]   Vagabond - Steps: 128.00, Reward: 122.67, per‑step Rwd: 0.9584
+2025-04-19 22:45:24,976 [WARNING] Episode: 69
+2025-04-19 22:45:24,976 [DEBUG]   Marquise - Steps: 128.00, Reward: 1803.89, per‑step Rwd: 14.0929
+2025-04-19 22:45:24,976 [DEBUG]   Eyrie - Steps: 128.00, Reward: -9.02, per‑step Rwd: -0.0704
+2025-04-19 22:45:24,976 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 311.73, per‑step Rwd: 2.4354
+2025-04-19 22:45:24,976 [DEBUG]   Vagabond - Steps: 128.00, Reward: 310.24, per‑step Rwd: 2.4238
+2025-04-19 22:45:25,362 [WARNING] Checkpoint saved at iteration 70: training/checkpoints/
+2025-04-19 22:45:37,886 [WARNING] Episode: 70
+2025-04-19 22:45:37,887 [DEBUG]   Marquise - Steps: 128.00, Reward: 3607.79, per‑step Rwd: 28.1859
+2025-04-19 22:45:37,887 [DEBUG]   Eyrie - Steps: 128.00, Reward: -18.03, per‑step Rwd: -0.1409
+2025-04-19 22:45:37,887 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 623.46, per‑step Rwd: 4.8708
+2025-04-19 22:45:37,887 [DEBUG]   Vagabond - Steps: 128.00, Reward: 620.48, per‑step Rwd: 4.8475
+2025-04-19 22:45:49,848 [WARNING] Episode: 71
+2025-04-19 22:45:49,849 [DEBUG]   Marquise - Steps: 128.00, Reward: 1006.38, per‑step Rwd: 7.8624
+2025-04-19 22:45:49,849 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.01, per‑step Rwd: -0.0391
+2025-04-19 22:45:49,849 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 174.30, per‑step Rwd: 1.3617
+2025-04-19 22:45:49,849 [DEBUG]   Vagabond - Steps: 128.00, Reward: 159.42, per‑step Rwd: 1.2455
+2025-04-19 22:46:01,843 [WARNING] Episode: 72
+2025-04-19 22:46:01,843 [DEBUG]   Marquise - Steps: 128.00, Reward: 1029.66, per‑step Rwd: 8.0442
+2025-04-19 22:46:01,843 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.00, per‑step Rwd: -0.0078
+2025-04-19 22:46:01,843 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 152.71, per‑step Rwd: 1.1931
+2025-04-19 22:46:01,844 [DEBUG]   Vagabond - Steps: 128.00, Reward: 156.97, per‑step Rwd: 1.2263
+2025-04-19 22:46:14,062 [WARNING] Episode: 73
+2025-04-19 22:46:14,063 [DEBUG]   Marquise - Steps: 128.00, Reward: 4106.27, per‑step Rwd: 32.0802
+2025-04-19 22:46:14,063 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.99, per‑step Rwd: -0.0312
+2025-04-19 22:46:14,063 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 610.55, per‑step Rwd: 4.7699
+2025-04-19 22:46:14,063 [DEBUG]   Vagabond - Steps: 128.00, Reward: 629.83, per‑step Rwd: 4.9205
+2025-04-19 22:46:26,229 [WARNING] Episode: 74
+2025-04-19 22:46:26,229 [DEBUG]   Marquise - Steps: 128.00, Reward: 1340.20, per‑step Rwd: 10.4703
+2025-04-19 22:46:26,229 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.29, per‑step Rwd: -0.0101
+2025-04-19 22:46:26,229 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 243.59, per‑step Rwd: 1.9030
+2025-04-19 22:46:26,229 [DEBUG]   Vagabond - Steps: 128.00, Reward: 176.25, per‑step Rwd: 1.3770
+2025-04-19 22:46:38,277 [WARNING] Episode: 75
+2025-04-19 22:46:38,277 [DEBUG]   Marquise - Steps: 128.00, Reward: 1105.08, per‑step Rwd: 8.6335
+2025-04-19 22:46:38,277 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.87, per‑step Rwd: -0.0146
+2025-04-19 22:46:38,277 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 223.02, per‑step Rwd: 1.7424
+2025-04-19 22:46:38,277 [DEBUG]   Vagabond - Steps: 128.00, Reward: 151.66, per‑step Rwd: 1.1849
+2025-04-19 22:46:49,851 [WARNING] Episode: 76
+2025-04-19 22:46:49,851 [DEBUG]   Marquise - Steps: 128.00, Reward: 917.14, per‑step Rwd: 7.1651
+2025-04-19 22:46:49,851 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.60, per‑step Rwd: -0.0125
+2025-04-19 22:46:49,851 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 187.13, per‑step Rwd: 1.4619
+2025-04-19 22:46:49,851 [DEBUG]   Vagabond - Steps: 128.00, Reward: 129.82, per‑step Rwd: 1.0142
+2025-04-19 22:47:01,815 [WARNING] Episode: 77
+2025-04-19 22:47:01,815 [DEBUG]   Marquise - Steps: 128.00, Reward: 1382.49, per‑step Rwd: 10.8007
+2025-04-19 22:47:01,815 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.42, per‑step Rwd: -0.0189
+2025-04-19 22:47:01,815 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 289.94, per‑step Rwd: 2.2652
+2025-04-19 22:47:01,816 [DEBUG]   Vagabond - Steps: 128.00, Reward: 193.52, per‑step Rwd: 1.5119
+2025-04-19 22:47:13,273 [WARNING] Episode: 78
+2025-04-19 22:47:13,273 [DEBUG]   Marquise - Steps: 128.00, Reward: 1844.74, per‑step Rwd: 14.4120
+2025-04-19 22:47:13,273 [DEBUG]   Eyrie - Steps: 128.00, Reward: -3.22, per‑step Rwd: -0.0252
+2025-04-19 22:47:13,273 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 407.00, per‑step Rwd: 3.1797
+2025-04-19 22:47:13,273 [DEBUG]   Vagabond - Steps: 128.00, Reward: 260.32, per‑step Rwd: 2.0337
+2025-04-19 22:47:24,534 [WARNING] Episode: 79
+2025-04-19 22:47:24,534 [DEBUG]   Marquise - Steps: 128.00, Reward: 5591.01, per‑step Rwd: 43.6798
+2025-04-19 22:47:24,534 [DEBUG]   Eyrie - Steps: 128.00, Reward: -10.23, per‑step Rwd: -0.0799
+2025-04-19 22:47:24,534 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1286.67, per‑step Rwd: 10.0521
+2025-04-19 22:47:24,534 [DEBUG]   Vagabond - Steps: 128.00, Reward: 795.56, per‑step Rwd: 6.2153
+2025-04-19 22:47:24,919 [WARNING] Checkpoint saved at iteration 80: training/checkpoints/
+2025-04-19 22:47:36,945 [WARNING] Episode: 80
+2025-04-19 22:47:36,945 [DEBUG]   Marquise - Steps: 128.00, Reward: 2889.97, per‑step Rwd: 22.5779
+2025-04-19 22:47:36,945 [DEBUG]   Eyrie - Steps: 128.00, Reward: -5.12, per‑step Rwd: -0.0400
+2025-04-19 22:47:36,945 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 700.72, per‑step Rwd: 5.4743
+2025-04-19 22:47:36,945 [DEBUG]   Vagabond - Steps: 128.00, Reward: 403.58, per‑step Rwd: 3.1530
+2025-04-19 22:47:48,343 [WARNING] Episode: 81
+2025-04-19 22:47:48,343 [DEBUG]   Marquise - Steps: 128.00, Reward: 866.66, per‑step Rwd: 6.7708
+2025-04-19 22:47:48,343 [DEBUG]   Eyrie - Steps: 128.00, Reward: -1.50, per‑step Rwd: -0.0118
+2025-04-19 22:47:48,343 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 235.45, per‑step Rwd: 1.8395
+2025-04-19 22:47:48,343 [DEBUG]   Vagabond - Steps: 128.00, Reward: 130.27, per‑step Rwd: 1.0177
+2025-04-19 22:47:59,868 [WARNING] Episode: 82
+2025-04-19 22:47:59,869 [DEBUG]   Marquise - Steps: 128.00, Reward: 1501.60, per‑step Rwd: 11.7313
+2025-04-19 22:47:59,869 [DEBUG]   Eyrie - Steps: 128.00, Reward: -2.63, per‑step Rwd: -0.0206
+2025-04-19 22:47:59,869 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 409.92, per‑step Rwd: 3.2025
+2025-04-19 22:47:59,869 [DEBUG]   Vagabond - Steps: 128.00, Reward: 224.29, per‑step Rwd: 1.7523
+2025-04-19 22:48:11,823 [WARNING] Episode: 83
+2025-04-19 22:48:11,823 [DEBUG]   Marquise - Steps: 128.00, Reward: 1693.83, per‑step Rwd: 13.2330
+2025-04-19 22:48:11,823 [DEBUG]   Eyrie - Steps: 128.00, Reward: -15.63, per‑step Rwd: -0.1221
+2025-04-19 22:48:11,823 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 454.22, per‑step Rwd: 3.5486
+2025-04-19 22:48:11,823 [DEBUG]   Vagabond - Steps: 128.00, Reward: 193.30, per‑step Rwd: 1.5102
+2025-04-19 22:48:23,724 [WARNING] Episode: 84
+2025-04-19 22:48:23,724 [DEBUG]   Marquise - Steps: 128.00, Reward: 2109.49, per‑step Rwd: 16.4804
+2025-04-19 22:48:23,724 [DEBUG]   Eyrie - Steps: 128.00, Reward: -19.54, per‑step Rwd: -0.1527
+2025-04-19 22:48:23,724 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 570.65, per‑step Rwd: 4.4582
+2025-04-19 22:48:23,724 [DEBUG]   Vagabond - Steps: 128.00, Reward: 240.91, per‑step Rwd: 1.8821
+2025-04-19 22:48:35,766 [WARNING] Episode: 85
+2025-04-19 22:48:35,766 [DEBUG]   Marquise - Steps: 128.00, Reward: 4222.23, per‑step Rwd: 32.9861
+2025-04-19 22:48:35,766 [DEBUG]   Eyrie - Steps: 128.00, Reward: -39.08, per‑step Rwd: -0.3053
+2025-04-19 22:48:35,766 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1142.92, per‑step Rwd: 8.9291
+2025-04-19 22:48:35,766 [DEBUG]   Vagabond - Steps: 128.00, Reward: 480.49, per‑step Rwd: 3.7538
+2025-04-19 22:48:47,891 [WARNING] Episode: 86
+2025-04-19 22:48:47,891 [DEBUG]   Marquise - Steps: 128.00, Reward: 2102.38, per‑step Rwd: 16.4248
+2025-04-19 22:48:47,891 [DEBUG]   Eyrie - Steps: 128.00, Reward: -19.49, per‑step Rwd: -0.1523
+2025-04-19 22:48:47,891 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 583.11, per‑step Rwd: 4.5556
+2025-04-19 22:48:47,891 [DEBUG]   Vagabond - Steps: 128.00, Reward: 241.35, per‑step Rwd: 1.8856
+2025-04-19 22:49:00,079 [WARNING] Episode: 87
+2025-04-19 22:49:00,079 [DEBUG]   Marquise - Steps: 128.00, Reward: 2110.22, per‑step Rwd: 16.4861
+2025-04-19 22:49:00,079 [DEBUG]   Eyrie - Steps: 128.00, Reward: -19.63, per‑step Rwd: -0.1533
+2025-04-19 22:49:00,079 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 594.25, per‑step Rwd: 4.6426
+2025-04-19 22:49:00,079 [DEBUG]   Vagabond - Steps: 128.00, Reward: 247.07, per‑step Rwd: 1.9302
+2025-04-19 22:49:11,876 [WARNING] Episode: 88
+2025-04-19 22:49:11,876 [DEBUG]   Marquise - Steps: 128.00, Reward: 4225.44, per‑step Rwd: 33.0112
+2025-04-19 22:49:11,876 [DEBUG]   Eyrie - Steps: 128.00, Reward: -39.26, per‑step Rwd: -0.3067
+2025-04-19 22:49:11,876 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1192.40, per‑step Rwd: 9.3157
+2025-04-19 22:49:11,876 [DEBUG]   Vagabond - Steps: 128.00, Reward: 493.11, per‑step Rwd: 3.8524
+2025-04-19 22:49:23,716 [WARNING] Episode: 89
+2025-04-19 22:49:23,716 [DEBUG]   Marquise - Steps: 128.00, Reward: 2863.73, per‑step Rwd: 22.3729
+2025-04-19 22:49:23,716 [DEBUG]   Eyrie - Steps: 128.00, Reward: -26.17, per‑step Rwd: -0.2045
+2025-04-19 22:49:23,716 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 760.53, per‑step Rwd: 5.9416
+2025-04-19 22:49:23,716 [DEBUG]   Vagabond - Steps: 128.00, Reward: 325.76, per‑step Rwd: 2.5450
+2025-04-19 22:49:24,111 [WARNING] Checkpoint saved at iteration 90: training/checkpoints/
+2025-04-19 22:49:36,363 [WARNING] Episode: 90
+2025-04-19 22:49:36,363 [DEBUG]   Marquise - Steps: 128.00, Reward: 8542.51, per‑step Rwd: 66.7384
+2025-04-19 22:49:36,363 [DEBUG]   Eyrie - Steps: 128.00, Reward: -78.51, per‑step Rwd: -0.6134
+2025-04-19 22:49:36,363 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 2282.39, per‑step Rwd: 17.8312
+2025-04-19 22:49:36,363 [DEBUG]   Vagabond - Steps: 128.00, Reward: 978.32, per‑step Rwd: 7.6431
+2025-04-19 22:49:48,150 [WARNING] Episode: 91
+2025-04-19 22:49:48,150 [DEBUG]   Marquise - Steps: 128.00, Reward: 3015.21, per‑step Rwd: 23.5564
+2025-04-19 22:49:48,150 [DEBUG]   Eyrie - Steps: 128.00, Reward: -26.54, per‑step Rwd: -0.2073
+2025-04-19 22:49:48,150 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1037.88, per‑step Rwd: 8.1084
+2025-04-19 22:49:48,150 [DEBUG]   Vagabond - Steps: 128.00, Reward: 338.71, per‑step Rwd: 2.6461
+2025-04-19 22:50:01,629 [WARNING] Episode: 92
+2025-04-19 22:50:01,629 [DEBUG]   Marquise - Steps: 128.00, Reward: 1292.97, per‑step Rwd: 10.1013
+2025-04-19 22:50:01,629 [DEBUG]   Eyrie - Steps: 128.00, Reward: -11.75, per‑step Rwd: -0.0918
+2025-04-19 22:50:01,629 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 449.96, per‑step Rwd: 3.5153
+2025-04-19 22:50:01,629 [DEBUG]   Vagabond - Steps: 128.00, Reward: 150.87, per‑step Rwd: 1.1787
+2025-04-19 22:50:13,731 [WARNING] Episode: 93
+2025-04-19 22:50:13,731 [DEBUG]   Marquise - Steps: 128.00, Reward: 4506.22, per‑step Rwd: 35.2048
+2025-04-19 22:50:13,731 [DEBUG]   Eyrie - Steps: 128.00, Reward: -40.80, per‑step Rwd: -0.3187
+2025-04-19 22:50:13,731 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1579.24, per‑step Rwd: 12.3378
+2025-04-19 22:50:13,732 [DEBUG]   Vagabond - Steps: 128.00, Reward: 527.08, per‑step Rwd: 4.1178
+2025-04-19 22:50:25,475 [WARNING] Episode: 94
+2025-04-19 22:50:25,475 [DEBUG]   Marquise - Steps: 128.00, Reward: 2987.09, per‑step Rwd: 23.3366
+2025-04-19 22:50:25,475 [DEBUG]   Eyrie - Steps: 128.00, Reward: -27.20, per‑step Rwd: -0.2125
+2025-04-19 22:50:25,475 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1048.19, per‑step Rwd: 8.1890
+2025-04-19 22:50:25,476 [DEBUG]   Vagabond - Steps: 128.00, Reward: 348.29, per‑step Rwd: 2.7210
+2025-04-19 22:50:37,152 [WARNING] Episode: 95
+2025-04-19 22:50:37,153 [DEBUG]   Marquise - Steps: 128.00, Reward: 8961.26, per‑step Rwd: 70.0098
+2025-04-19 22:50:37,153 [DEBUG]   Eyrie - Steps: 128.00, Reward: -81.59, per‑step Rwd: -0.6374
+2025-04-19 22:50:37,153 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 3144.58, per‑step Rwd: 24.5670
+2025-04-19 22:50:37,153 [DEBUG]   Vagabond - Steps: 128.00, Reward: 1044.87, per‑step Rwd: 8.1630
+2025-04-19 22:50:49,130 [WARNING] Episode: 96
+2025-04-19 22:50:49,130 [DEBUG]   Marquise - Steps: 128.00, Reward: 4461.60, per‑step Rwd: 34.8563
+2025-04-19 22:50:49,130 [DEBUG]   Eyrie - Steps: 128.00, Reward: -41.76, per‑step Rwd: -0.3262
+2025-04-19 22:50:49,130 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1638.04, per‑step Rwd: 12.7971
+2025-04-19 22:50:49,130 [DEBUG]   Vagabond - Steps: 128.00, Reward: 536.46, per‑step Rwd: 4.1911
+2025-04-19 22:51:01,763 [WARNING] Episode: 97
+2025-04-19 22:51:01,763 [DEBUG]   Marquise - Steps: 128.00, Reward: 2891.91, per‑step Rwd: 22.5930
+2025-04-19 22:51:01,763 [DEBUG]   Eyrie - Steps: 128.00, Reward: -27.85, per‑step Rwd: -0.2176
+2025-04-19 22:51:01,763 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1050.92, per‑step Rwd: 8.2103
+2025-04-19 22:51:01,763 [DEBUG]   Vagabond - Steps: 128.00, Reward: 345.58, per‑step Rwd: 2.6998
+2025-04-19 22:51:13,897 [WARNING] Episode: 98
+2025-04-19 22:51:13,897 [DEBUG]   Marquise - Steps: 128.00, Reward: 2980.76, per‑step Rwd: 23.2872
+2025-04-19 22:51:13,897 [DEBUG]   Eyrie - Steps: 128.00, Reward: -29.09, per‑step Rwd: -0.2273
+2025-04-19 22:51:13,897 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 1116.99, per‑step Rwd: 8.7265
+2025-04-19 22:51:13,897 [DEBUG]   Vagabond - Steps: 128.00, Reward: 386.14, per‑step Rwd: 3.0167
+2025-04-19 22:51:25,875 [WARNING] Episode: 99
+2025-04-19 22:51:25,875 [DEBUG]   Marquise - Steps: 128.00, Reward: 2215.55, per‑step Rwd: 17.3090
+2025-04-19 22:51:25,875 [DEBUG]   Eyrie - Steps: 128.00, Reward: -22.09, per‑step Rwd: -0.1726
+2025-04-19 22:51:25,875 [DEBUG]   Woodland_alliance - Steps: 128.00, Reward: 846.12, per‑step Rwd: 6.6103
+2025-04-19 22:51:25,875 [DEBUG]   Vagabond - Steps: 128.00, Reward: 289.34, per‑step Rwd: 2.2605
