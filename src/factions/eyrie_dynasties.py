@@ -18,6 +18,7 @@ from src.actions.eyrie_dynasties.decree_build_action import DecreeBuildAction
 from src.actions.factionless.play_dominance_action import PlayDominanceAction
 from src.controllers.messages.game_messages import RoostSetupMessage, LeaderSetupMessage, TurmoilLeaderMessage
 from src.board.map import Map
+from src.board.clearing import Clearing
 from src.pieces.pawn import Pawn
 from enum import Enum
 from src.cards.cards import ROYAL_VIZIER_1, ROYAL_VIZIER_2
@@ -162,3 +163,42 @@ class EyrieDynasties(Faction):
         # 4. End Daylight immediately and begin evening
         for action_group in self.actions[CallbackTimes.IN_DAYLIGHT][1:]:
             action_group.cancel_action_group()
+
+    def get_potential_vp(self, game_state):
+        potential_vp = 0
+
+        # Decree Availability Potential Rewards
+        available_clearings = []
+        roostless_clearings = []
+        fighting_clearings = []
+        for warrior in self.units:
+            assert isinstance(warrior.space, Clearing)
+            # Number of available clearings to move to
+            available_clearings.extend(warrior.space.adjacent_clearings)
+            # Number of ruled clearings without a roost
+            if warrior.space.get_owner() == self.faction_id and not any(slot and slot.name == "Roost" for slot in warrior.space.slots) and warrior.space not in roostless_clearings:
+                roostless_clearings.append(warrior.space)
+
+            for faction in game_state.faction_list:
+                if faction.faction_id == self.faction_id:
+                    continue
+                # Number of clearings occupied with other factions in them
+                if warrior.space.get_faction_piece_count(faction.faction_id) > 0 and warrior.space not in fighting_clearings:
+                    fighting_clearings.append(warrior.space)
+
+        available_clearings = list(set(available_clearings))
+
+        potential_vp += len(available_clearings) * 0.5
+        potential_vp += len(roostless_clearings) * 0.5
+        potential_vp += len(fighting_clearings) * 0.5
+
+        # Suit Diversity Rewards
+
+        def suit_diversity_bonus(clearings): return len(
+            set(c.get_suit() for c in clearings)) * 0.5
+
+        potential_vp += suit_diversity_bonus(available_clearings)
+        potential_vp += suit_diversity_bonus(roostless_clearings)
+        potential_vp += suit_diversity_bonus(fighting_clearings)
+
+        return potential_vp + super().get_potential_vp(game_state)

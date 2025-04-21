@@ -74,12 +74,16 @@ class BattleAction(Action):
         # 1. Choose clearing to battle on and who to battle against
         response = yield BattleClearingChoiceMessage(game_state, self.action_group, self._get_valid_battle_clearings(game_state, executor))
         clearing = response.chosen_clearing
+        game_state.selected_clearing = clearing
 
         response = yield BattleTargetChoiceMessage(game_state, self.action_group, self._get_valid_battle_targets(clearing, executor, game_state))
         target = response.chosen_target
+        game_state.selected_faction = target
         # 2. battle
         yield from self.battle(clearing, target, executor, game_state)
         self.times_used += 1
+        game_state.selected_clearing = None
+        game_state.selected_faction = None
 
     def battle(self, clearing: Clearing, defender: Faction, attacker: Faction, game_state: GameState):
         battle_modifier = BattleModifiers(attacker, defender, clearing)

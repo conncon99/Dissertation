@@ -45,7 +45,9 @@ class OverworkAction(Action):
         overwork_clearing_response: OverworkClearingResponse = yield OverworkClearingMessage(game_state, self.action_group, valid_clearings)
         available_cards = [card for card in executor.hand if card.suit ==
                            Suits.BIRD or card.suit == overwork_clearing_response.chosen_clearing.get_suit()]
+        game_state.selected_clearing = overwork_clearing_response.chosen_clearing
         overwork_discard_response: OverworkDiscardResponse = yield OverworkDiscardMessage(game_state, self.action_group, available_cards)
         executor.discard_card(overwork_discard_response.discard_choice)
         Wood(overwork_clearing_response.chosen_clearing, executor)
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)

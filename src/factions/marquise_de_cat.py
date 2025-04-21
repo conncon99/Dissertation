@@ -167,3 +167,23 @@ class Marquise(Faction):
             self.logger.info(" - No valid cards for Field Hospital")
         return
         yield
+
+    def get_potential_vp(self, game_state):
+        potential_vp = 0
+
+        wood_count = len(self.wood)
+        # Workshop then Sawmill then Recruiter in order of potential VP rewards
+
+        if len(self.workshops) < self.max_workshops and wood_count > self.workshop_track[len(self.workshops)][0]:
+            wood_count -= self.workshop_track[len(self.workshops)][0]
+            potential_vp += self.workshop_track[len(self.workshops)][1]
+
+        if len(self.sawmills) < self.max_sawmills and wood_count > self.sawmill_track[len(self.sawmills)][0]:
+            wood_count -= self.sawmill_track[len(self.sawmills)][0]
+            potential_vp += self.sawmill_track[len(self.sawmills)][1]
+
+        if len(self.recruiters) < self.max_recruiters and wood_count > self.recruiter_track[len(self.recruiters)][0]:
+            wood_count -= self.recruiter_track[len(self.recruiters)][0]
+            potential_vp += self.recruiter_track[len(self.recruiters)][1]
+
+        return potential_vp + super().get_potential_vp(game_state)

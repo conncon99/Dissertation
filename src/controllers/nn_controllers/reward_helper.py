@@ -1,10 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from src.utils.root_types import Factions
+from src.utils.root_types import Factions, Suits
+from src.cards.card import ItemCard, RoyalClaimCard
+
 import math
 
 if TYPE_CHECKING:
     from src.utils.game_state import GameState
+    from src.factions.faction import Faction
 
 
 def sigmoid(x):
@@ -12,38 +15,77 @@ def sigmoid(x):
 
 
 class RewardHelper:
-    def __init__(self):
-        self.prev_vp = 0
-        self.prev_warriors = 0
-        self.prev_actives = 0
-        self.prev_clearings_ruled = 0
-        self.turn_penalty = 0.1
 
-    def calculate_reward(self, game_state: GameState):
-        if game_state.marquise.dominance is None:
-            vp_diff = (game_state.marquise.victory_points - self.prev_vp)
-            reward = vp_diff - self.turn_penalty
-        else:
-            reward = self.get_dominance_reward(game_state) - self.turn_penalty
-        self.update_values(game_state)
-        return reward
+    @classmethod
+    def get_crafting_reward(cls, executor: Faction, game_state: GameState):
+        # This is a heuristic, not the knapsack problem so just take the best vp value that they can craft instead of totaling
+        potential_vp = 0
+        for card in executor.hand:
+            if isinstance(card, ItemCard):
+                if cls._can_craft(card, executor, game_state):
+                    if card.vp_bonus > potential_vp:
+                        potential_vp = card.vp_bonus
+            elif isinstance(card, RoyalClaimCard):
+                if cls._can_craft(card, executor, game_state):
+                    bonus = 0
+                    for clearing in game_state.board.clearings:
+                        if clearing.get_owner() == executor.faction_id:
+                            bonus += 1
+                    if bonus > potential_vp:
+                        potential_vp = bonus
+        return potential_vp
 
-    def update_values(self, game_state: GameState):
-        self.prev_vp = game_state.marquise.victory_points
-        self.prev_warriors = len(game_state.marquise.units)
-        self.prev_actives = len(game_state.marquise.active_cards)
-        self.prev_clearings_ruled = self.get_clearings_ruled(game_state)
+    @classmethod
+    def _can_craft(cls, card, executor: Faction, game_state: GameState) -> bool:
+        if not card.is_craftable:
+            return False
 
-    def get_clearings_ruled(self, game_state: GameState):
-        total = 0
+        # Can't Craft Duplicate Persistent Cards
+        if card.name in [card.name for card in executor.active_cards]:
+            return False
+
+        # # Can't craft if there is no item available
+        if isinstance(card, ItemCard):
+            if card.item_bonus not in game_state.craftable_items:
+                return False
+
+        # Needs necessary resources
+        crafting_resources = executor.get_crafting_resources()
+        remaining_fox = crafting_resources[Suits.FOX] - \
+            card.crafting_recipe[Suits.FOX]
+        remaining_mouse = crafting_resources[Suits.MOUSE] - \
+            card.crafting_recipe[Suits.MOUSE]
+        remaining_rabbit = crafting_resources[Suits.RABBIT] - \
+            card.crafting_recipe[Suits.RABBIT]
+
+        if remaining_fox < 0 or remaining_mouse < 0 or remaining_rabbit < 0:
+            return False
+
+        # Finally Handle Wild Suits
+        remaining_wild = remaining_rabbit + remaining_fox + remaining_mouse
+        if remaining_wild < card.crafting_recipe[Suits.BIRD]:
+            return False
+
+        return True
+
+    @classmethod
+    def get_battle_rewards(cls, executor: Faction, game_state: GameState):
+        potential_vp = 0
+
         for clearing in game_state.board.clearings:
-            if clearing.get_owner() == Factions.MARQUISE_DE_CAT.value:
-                total += 1
-        return total
+            cardboard_available = 0
+            if clearing.get_faction_warrior_count(executor.faction_id) == 0:
+                continue
+            for faction in game_state.faction_list:
+                if faction.faction_id == executor.faction_id:
+                    continue
+                cardboard_available += sum(
+                    1 for building in clearing.slots if building is not None and building.faction and building.faction.faction_id == faction.faction_id)
+                cardboard_available += sum(
+                    1 for token in clearing.tokens[faction.faction_id])
+                true_availability = max(
+                    (cardboard_available - clearing.get_faction_warrior_count(faction.faction_id)) + 1, 0)  # + 1 just to reward a little bit, even if it is innaccessible
+                potential_vp += min(true_availability,
+                                    clearing.get_faction_warrior_count(executor.faction_id))
 
-    def get_dominance_reward(self, game_state: GameState):
-        total = 0
-        for clearing in game_state.board.clearings:
-            if clearing.get_owner() == Factions.MARQUISE_DE_CAT.value and clearing.get_suit() == game_state.marquise.dominance:
-                total += 1
-        return total / 2
+        return potential_vp

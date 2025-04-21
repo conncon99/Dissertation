@@ -22,13 +22,12 @@ import logging
 
 class GameManager:
 
-    def __init__(self, settings: GameSettings, turn_limit: int, training_faction: Optional[Faction] = None) -> None:
+    def __init__(self, settings: GameSettings, turn_limit: int) -> None:
         self._initialized = True
         self.settings = settings
         self.winner = None
         self.done = False
         self.masker = Mask()
-        self.training_faction = training_faction
         self.game_phase = GamePhase.BIRDSONG
         self.game_state = GameState()
         self.game_state.turn_limit = turn_limit
@@ -109,7 +108,6 @@ class GameManager:
 # For each action group, iterate through each action (where an ActionChoiceMessage counts as a distinct step)
 # For each action, iterate through each step of it (whenever send_game_message() is called)
 
-
     def get_observation(self):
         obs = {}
         if self.current_message is None:
@@ -150,7 +148,6 @@ class GameManager:
         if not player.dominance:
             vp_diff = player.victory_points - player.prev_vp
             player.prev_vp = player.victory_points
-            vp_diff *= 2
             reward += vp_diff
             player.last_vp_change = vp_diff
         elif player.faction_id == Factions.VAGABOND.value:
@@ -162,95 +159,56 @@ class GameManager:
             if player.dominance != Suits.BIRD:
                 dominance_clearings_ruled = sum(1 if clearing.get_owner() == player.faction_id and clearing.get_suit(
                 ) == player.dominance else 0 for clearing in self.game_state.board.clearings)
-                dominance_diff = dominance_clearings_ruled - \
-                    player.prev_dominance_clearings_controlled
+                dominance_diff = (dominance_clearings_ruled -
+                                  player.prev_dominance_clearings_controlled) * 10
                 reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
                 player.last_dominance_change = dominance_diff
             else:
+
                 dominance_clearings_ruled = sum(1 if clearing.get_owner(
                 ) == player.faction_id and clearing in self.game_state.board.corner_clearings else 0 for clearing in self.game_state.board.clearings)
-                dominance_diff = dominance_clearings_ruled - \
-                    player.prev_dominance_clearings_controlled
+                dominance_diff = (
+                    dominance_clearings_ruled - player.prev_dominance_clearings_controlled) * 10
                 reward += dominance_diff
                 player.prev_dominance_clearings_controlled = dominance_clearings_ruled
                 player.last_dominance_change = dominance_diff
 
-        # # Clearing Owned Reward
-        # owned_clearing_count = sum(1 if clearing.get_owner(
-        # ) == player.faction_id else 0 for clearing in self.game_state.board.clearings)
+        # Potential VP Rewards
 
-        # reward += owned_clearing_count - player.prev_clearings_controlled
-        # player.prev_clearings_controlled = owned_clearing_count
-
-        # # Number of warriors gained this turn
-        # reward += (len(player.units) - player.prev_unit_count) * 0.2
-        # player.prev_unit_count = len(player.units)
-
-        # # Crafted Active Card reward
-        # reward += (len(player.active_cards) -
-        #            player.prev_active_cards_count) * 0.5
-        # player.prev_active_cards_count = len(player.active_cards)
-
-        # # Vagabond Rewards
-        # if player.faction_id == Factions.VAGABOND.value:
-        #     assert isinstance(player, Vagabond)
-
-        #     # Item Track Rewards
-        #     reward += (player.active_coin_count - player.prev_coin_track_count)
-        #     reward += (player.active_tea_count - player.prev_tea_track_count)
-        #     reward += (player.active_bag_count - player.prev_bag_track_count)
-        #     player.prev_coin_track_count = player.active_coin_count
-        #     player.prev_tea_track_count = player.active_tea_count
-        #     player.prev_bag_track_count = player.active_bag_count
-
-        #     # Satchel
-        #     # Available, Exhausted, Damaged
-
-        #     available_item_count = sum(
-        #         1 for item, amount in player.satchel.available_items.items() for _ in range(amount))
-        #     exhausted_item_count = sum(
-        #         1 for item, amount in player.satchel.exhausted_items.items() for _ in range(amount))
-        #     exhausted_damaged_item_count = sum(
-        #         1 for item, amount in player.satchel.exhausted_damaged_items.items() for _ in range(amount))
-        #     damaged_item_count = sum(
-        #         1 for item, amount in player.satchel.available_damaged_items.items() for _ in range(amount))
-
-        #     total_exhausted_count = exhausted_damaged_item_count + exhausted_item_count
-        #     total_damaged_count = exhausted_damaged_item_count + damaged_item_count
-
-        #     reward += (available_item_count -
-        #                player.prev_available_items) * 0.25
-        #     # reward += (player.prev_exhausted_items -
-        #     #            total_exhausted_count) * 0.25
-        #     # reward += (player.prev_damaged_items - total_damaged_count) * 0.25
-
-        #     player.prev_available_items = available_item_count
-        #     player.prev_exhausted_items = total_exhausted_count
-        #     player.prev_damaged_items = total_damaged_count
-
-        # Turn Penalty
-        # reward -= self.turn_count * 0.005
+        if not player.dominance or player.dominance and player.faction_id == Factions.VAGABOND.value:
+            DISCOUNT_FACTOR = 0.02
+            REMAINING_TURN_MULTIPLIER = (
+                len(CallbackTimes) - self.current_time_index)  # Potential is higher the earlier in your turn you are
+            potential_reward = player.get_potential_vp(
+                self.game_state) * DISCOUNT_FACTOR * REMAINING_TURN_MULTIPLIER
+            self.logger.info(
+                f"{player} has earned a potential reward of {potential_reward}")
+            reward += potential_reward
 
         if isinstance(self.winner, list):
             if player in self.winner:
-                reward += 10
+                reward += 20
             else:
                 reward -= 5
         elif self.winner is not None:
             if player == self.winner:
-                reward += 10
+                reward += 20
             else:
-                reward -= 1
+                reward -= 5
         self.logger.debug(
             f"{self.game_state.active_player} gained reward of {reward}")
-        return reward
+
+        if self.turn_count >= self.turn_limit:
+            reward -= 5
+
+        return np.clip(reward, -50, 50)
 
     def _check_win_conditions(self):
         winners = []
 
         for faction in self.settings.faction_list:
-            if faction.dominance and not faction.faction_id == Factions.VAGABOND:
+            if faction.dominance and faction.faction_id != Factions.VAGABOND:
                 needed_clearings = 2 if faction.dominance == Suits.BIRD else 3
                 if faction.dominance == Suits.BIRD:
                     current_clearings = sum(1 if clearing.get_owner(
@@ -288,7 +246,7 @@ class GameManager:
 
     def step(self, action=None):
         self.logger.debug("GM STEP")
-        if self.done:  # If the game is already done, just return
+        if self.done or self.turn_count >= self.turn_limit:  # If the game is already done, just return
             self.done = True
             return self.get_observation(), self._calculate_reward(), True, {}
 
@@ -347,9 +305,6 @@ class GameManager:
         self.faction_setup_iter = None
         if self.current_faction_setup_index >= len(self.setup_order):
             self.setup_complete = True
-
-    def _is_training_faction(self, current_faction: Faction):
-        return self.training_faction and self.training_faction.faction_id == current_faction.faction_id
 
     def _run_game_step(self, action):
         starting_faction_index = self.current_faction_index

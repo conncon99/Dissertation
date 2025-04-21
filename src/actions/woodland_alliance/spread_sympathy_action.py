@@ -41,14 +41,11 @@ class SpreadSympathyAction(Action):
         cost = executor.sympathy_track[len(executor.sympathy)][0]
 
         # If there are 3 or more enemy warriors on a clearing, the cost increases by 1
-        enemy_count = 0
         for faction in game_state.faction_list:
             if faction.faction_id != executor.faction_id:
-                enemy_count += clearing.get_faction_warrior_count(
-                    faction.faction_id)
-
-        if enemy_count >= 3:
-            cost += 1
+                if clearing.get_faction_warrior_count(faction.faction_id) >= 3:
+                    cost += 1
+                    break
 
         total = 0
         for supporter in executor.supporters:
@@ -68,6 +65,7 @@ class SpreadSympathyAction(Action):
 
         response = yield SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)
         chosen_clearing = response.chosen_clearing
+        game_state.selected_clearing = chosen_clearing
 
         self.logger.info(
             f" - Spread sympathy to clearing {chosen_clearing.index}")
@@ -87,5 +85,5 @@ class SpreadSympathyAction(Action):
         # 3. Place sympathy on chosen clearing
 
         Sympathy(chosen_clearing, executor)
-
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)

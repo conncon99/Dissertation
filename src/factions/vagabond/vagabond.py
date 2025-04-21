@@ -26,7 +26,6 @@ from src.actions.vagabond.strike_action import StrikeAction
 from src.actions.vagabond.vagabond_battle_action import VagabondBattleAction
 from src.actions.vagabond.aid_action import AidAction
 from src.actions.factionless.play_dominance_action import PlayDominanceAction
-import logging
 
 if TYPE_CHECKING:
     from src.board.map import Map
@@ -82,7 +81,7 @@ class Vagabond(Faction):
 
     def get_crafting_resources(self):
         crafting_resources = {suit: 0 for suit in Suits}
-        if isinstance(self.vagabond_pawn.space, Clearing):
+        if self.vagabond_pawn and isinstance(self.vagabond_pawn.space, Clearing):
             crafting_resources[self.vagabond_pawn.space.get_suit(
             )] += self.satchel.available_items[Items.HAMMER]
         return crafting_resources
@@ -123,3 +122,58 @@ class Vagabond(Faction):
             if self.relationship_track.relationship_level[faction.faction_id] == ALLIED:
                 available_allies.append(faction)
         return available_allies
+
+    def get_potential_vp(self, game_state):
+        potential_vp = 0
+
+        if self.dominance:
+            return self.dominance.get_potential_vp(game_state)
+
+        if not self.vagabond_pawn or not isinstance(self.vagabond_pawn.space, Clearing):
+            return super().get_potential_vp(game_state)
+
+        # Exploring
+
+        if self.satchel.available_items[Items.TORCH]:
+            for slot in self.vagabond_pawn.space.slots:
+                if slot and slot.name == "Ruin":
+                    potential_vp += 1
+                    break
+
+        # Questing
+
+        for card in self.quest_cards:
+            if self.vagabond_pawn.space.get_suit() == card.suit:
+                if self.satchel.available_items[card.items[0]] > 0 and self.satchel.available_items[card.items[1]] > 0:
+                    potential_vp += self.completed_quests[card.suit] + 1
+
+        # Aiding
+            ALLIED = 4
+            HOSTILE = 0
+            available_cards = len(
+                [card for card in self.hand if card.suit == self.vagabond_pawn.space.get_suit()])
+            for faction in game_state.faction_list:
+                if faction.faction_id == self.faction_id or self.relationship_track.relationship_level[faction.faction_id] == HOSTILE or self.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) == 0:
+                    continue
+                if self.relationship_track.relationship_level[faction.faction_id] == ALLIED:
+                    potential_vp += available_cards
+                    available_cards = 0
+                else:
+                    if available_cards >= self.relationship_track.aids_per_level_up[faction.faction_id]:
+                        potential_vp += self.relationship_track.level_up_rewards[
+                            self.relationship_track.relationship_level[faction.faction_id] + 1]
+                        available_cards -= self.relationship_track.aids_per_level_up[faction.faction_id]
+
+        # Hostile
+
+        remaining_attacks = self.satchel.available_items[Items.SWORD]**2 + \
+            self.satchel.available_items[Items.CROSSBOW]
+        for faction in game_state.faction_list:
+            if faction.faction_id == self.faction_id or self.relationship_track.relationship_level[faction.faction_id] != HOSTILE or remaining_attacks <= 0:
+                continue
+            potential_vp += min(self.vagabond_pawn.space.get_faction_piece_count(
+                faction.faction_id), remaining_attacks)
+            remaining_attacks -= self.vagabond_pawn.space.get_faction_piece_count(
+                faction.faction_id)
+
+        return potential_vp + super().get_potential_vp(game_state)

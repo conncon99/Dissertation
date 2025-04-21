@@ -10,8 +10,10 @@ if TYPE_CHECKING:
     from src.factions.woodland_alliance import WoodlandAlliance
     from src.factions.vagabond.vagabond import Vagabond
     from src.cards.deck import Deck
-    from src.utils.root_types import Items
+    from src.utils.root_types import Items, Suits
     from src.controllers.nn_controllers.battle_data import BattleData
+    from src.board.clearing import Clearing
+    from src.cards.card import Card
 
 
 class GameState:
@@ -41,3 +43,8 @@ class GameState:
         self.use_manual_rolling = False
         self.use_manual_card_draw = False
         self.active_player: Faction = None
+        self.selected_clearing: Clearing = None
+        self.selected_to_clearing: Clearing = None
+        self.selected_faction: Faction = None
+        self.selected_card: Card = None
+        self.selected_suit: Suits = None
