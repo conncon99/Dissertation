@@ -12,6 +12,8 @@ from tqdm import tqdm
 import logging
 import torch
 from pathlib import Path
+import numpy as np
+import gymnasium as gym
 
 
 LOG_DIR = Path("training/logs")
@@ -35,7 +37,7 @@ def new_file_handler(iter_idx: int) -> logging.FileHandler:
     fh = logging.FileHandler(fname, mode="w", encoding="utf‑8")
     fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
     fh.setFormatter(fmt)
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.WARNING)
     return fh
 
 
@@ -53,6 +55,11 @@ def plot_metric(data_dict, episodes, title, ylabel, filename, plot_dir, colors=N
     plt.tight_layout()
     plt.savefig(os.path.join(plot_dir, filename))
     plt.close()
+
+
+def feature_dim_from(space, obs_key="observations") -> int:
+    subspace = space[obs_key] if isinstance(space, gym.spaces.Dict) else space
+    return int(np.prod(subspace.shape))
 
 
 if __name__ == "__main__":
@@ -79,6 +86,11 @@ if __name__ == "__main__":
     # Initialize Ray
     ray.init()
 
+    gpu_num = ray.cluster_resources()['GPU']
+    cpu_num = int(ray.cluster_resources()['CPU'])
+    print(gpu_num)
+    print(cpu_num)
+
     # Environment and Model setup
     env_name = "root_v0"
     register_env(env_name, lambda _: PettingZooEnv(RootEnv()))
@@ -89,23 +101,23 @@ if __name__ == "__main__":
     obs_space = test_env.observation_space["marquise"]
     act_space = test_env.action_space["marquise"]
 
+    policies = {
+        name: (None, obs_space, act_space, {})
+        for name in ["marquise", "eyrie", "woodland_alliance", "vagabond"]
+    }
+
     # Trainer setup
     config = (
         PPOConfig()
         .environment(env=env_name, disable_env_checking=True)
         .api_stack(enable_rl_module_and_learner=False,
                    enable_env_runner_and_connector_v2=False)
-        .env_runners(num_env_runners=8)
+        .env_runners(num_env_runners=cpu_num - 3)
         .framework(framework="torch")
         .checkpointing(export_native_model_files=True)
         .multi_agent(
-            policies={
-                "marquise": (None, obs_space, act_space, {}),
-                "eyrie": (None, obs_space, act_space, {}),
-                "woodland_alliance": (None, obs_space, act_space, {}),
-                "vagabond": (None, obs_space, act_space, {}),
-            },
-            policy_mapping_fn=lambda agent_id, *args, **kw: agent_id
+            policies=policies,
+            policy_mapping_fn=lambda agent_id, *a, **k: agent_id,
         )
         .resources(num_gpus=1)  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
         .debugging(log_level='WARN')  # INFO, DEBUG, WARN, ERROR
@@ -163,7 +175,7 @@ if __name__ == "__main__":
     os.makedirs(checkpoint_dir, exist_ok=True)
     os.makedirs(plot_dir, exist_ok=True)
 
-    iteration_num = 10_000
+    iteration_num = 100_000
 
     for i in tqdm(range(iteration_num)):
         result = algo.train()

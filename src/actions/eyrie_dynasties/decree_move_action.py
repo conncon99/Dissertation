@@ -42,10 +42,12 @@ class DecreeMoveAction(MoveAction):
         move_from_response: MoveFromResponse = yield MoveFromMessage(game_state, self.action_group, list(set([move[0] for move in valid_moves])))
 
         from_clearing: Clearing = move_from_response.from_clearing
+        game_state.selected_clearing = from_clearing
 
         move_to_response: MoveToResponse = yield MoveToMessage(game_state, self.action_group, list(set([move[1]
                                                                                                    for move in valid_moves if move[0] == from_clearing])))
         to_clearing: Clearing = move_to_response.to_clearing
+        game_state.selected_to_clearing = to_clearing
 
         move_units_response: MoveUnitsResponse = yield MoveUnitsMessage(game_state, self.action_group, from_clearing.units[executor.faction_id])
 
@@ -56,4 +58,6 @@ class DecreeMoveAction(MoveAction):
         self.logger.info(
             f" - Moving from clearing {from_clearing.index} to clearing {to_clearing.index} with {len(units)} units")
         yield from self.move(from_clearing, to_clearing, units, executor, game_state)
+        game_state.selected_clearing = None
+        game_state.selected_to_clearing = None
         return super(MoveAction, self).perform(game_state, executor)

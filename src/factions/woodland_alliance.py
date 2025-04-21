@@ -129,3 +129,48 @@ class WoodlandAlliance(Faction):
             self.logger.info(
                 f" - Reached Supporter Limit, unable to add '{card}'")
             self.discard_card(card)
+
+    def get_potential_vp(self, game_state):
+        potential_vp = 0
+        potentially_placed = 0
+
+        # NOTE: Innacurate as it does not take into account the clearings where we place potential sympathy
+
+        available_clearings = []
+        for token in self.sympathy:
+            available_clearings.extend(token.space.adjacent_clearings)
+
+        if available_clearings == []:
+            return 1 + super().get_potential_vp(game_state)
+
+        available_clearings = list(set(available_clearings))
+
+        remaining_supporters = self.supporters[:]
+        for clearing in available_clearings:
+            # Can't place any more sympathy
+            if len(clearing.tokens[self.faction_id]) > 0 or len(self.sympathy) + potentially_placed >= self.max_sympathy:
+                continue
+
+            cost = self.sympathy_track[len(
+                self.sympathy) + potentially_placed][0]
+            for faction in game_state.faction_list:
+                if faction.faction_id == self.faction_id:
+                    continue
+                if clearing.get_faction_warrior_count(faction.faction_id) > 3:
+                    cost += 1
+                    break
+            total = 0
+            used_cards = []
+            for card in remaining_supporters:
+                if card.suit == Suits.BIRD or card.suit == clearing.get_suit():
+                    total += 1
+                    used_cards.append(card)
+                if total == cost:
+                    potential_vp += self.sympathy_track[len(
+                        self.sympathy) + potentially_placed][1]
+                    potentially_placed += 1
+                    break
+            for card in used_cards:
+                remaining_supporters.remove(card)
+
+        return potential_vp + super().get_potential_vp(game_state)

@@ -59,21 +59,19 @@ class TorchActionMaskModel(TorchModelV2, nn.Module):
 
     @override(TorchModelV2)
     def forward(self, input_dict, state, seq_lens):
-
         obs_flat = input_dict["obs"]["observations"]
         action_mask = input_dict["obs"].get("action_mask", None)
-
         if action_mask is None:
             self.logger.warning("No Action Mask Found, May lead to errors")
 
-        B = len(seq_lens)
+        # build a proper CPU 1D int64 lengths tensor
+        lengths = torch.as_tensor(seq_lens, dtype=torch.int64, device="cpu")
+
+        B = len(lengths)
         T = obs_flat.size(0) // B
         obs_time = obs_flat.view(B, T, self.obs_size)
 
-        # Build packed sequence so LSTM skips padding efficiently.
-
-        lengths = torch.as_tensor(seq_lens, device="cpu", dtype=torch.int32)
-
+        # pack & run through LSTM
         packed = pack_padded_sequence(
             obs_time,
             lengths=lengths,
@@ -81,35 +79,37 @@ class TorchActionMaskModel(TorchModelV2, nn.Module):
             enforce_sorted=False,
         )
 
-        # Prepare previous hidden state: RLlib supplies [B, hidden]; need [1, B, hidden]
-        hx = state[0].unsqueeze(0).to(obs_flat.device)
-        cx = state[1].unsqueeze(0).to(obs_flat.device)
+        # RLlib/Curiosity sometimes calls you with state=[]
+        if len(state) == 2:
+            hx = state[0].unsqueeze(0).to(obs_flat.device)
+            cx = state[1].unsqueeze(0).to(obs_flat.device)
+        else:
+            # no previous state ⇒ start zeros
+            hx = torch.zeros(1, B, self.lstm_size, device=obs_flat.device)
+            cx = torch.zeros(1, B, self.lstm_size, device=obs_flat.device)
 
         packed_out, (h_n, c_n) = self.lstm(packed, (hx, cx))
-        unpacked, _ = pad_packed_sequence(
-            packed_out, batch_first=True)  # [B, T, hidden]
-        # Flatten back to [T*B, hidden]
+        unpacked, _ = pad_packed_sequence(packed_out, batch_first=True)
         lstm_out_flat = unpacked.reshape(-1, self.lstm_size)
 
-        # Policy logits and value predictions (also flattened)
+        # policy logits & value
         logits_flat = self.policy_net(lstm_out_flat)
         value_flat = self.value_net(lstm_out_flat).squeeze(1)
+        self._value_out = value_flat
 
-        self._value_out = value_flat  # store for value_function()
-
-        # Apply action mask if provided
+        # apply mask
         if not self.no_masking and action_mask is not None:
             logits_flat = torch.where(
                 action_mask > 0.5,
                 logits_flat,
                 torch.tensor(-float("inf"), device=logits_flat.device),
             )
-            # Fallback: if a row has no legal actions, use unmasked logits
-            invalid_rows = (action_mask > 0.5).sum(dim=1) == 0
-            logits_flat[invalid_rows] = self.policy_net(lstm_out_flat)[
-                invalid_rows]
+            # fallback if a row has no legal actions
+            invalid = (action_mask > 0.5).sum(dim=1) == 0
+            if invalid.any():
+                logits_flat[invalid] = self.policy_net(lstm_out_flat)[invalid]
 
-        # Return logits and the *next* state (last hidden for each sequence)
+        # return [T*B, num_outputs] and next LSTM state
         return logits_flat, [h_n.squeeze(0), c_n.squeeze(0)]
 
     @override(TorchModelV2)
@@ -122,3 +122,8 @@ class TorchActionMaskModel(TorchModelV2, nn.Module):
             torch.zeros(self.lstm_size, dtype=torch.float32),
             torch.zeros(self.lstm_size, dtype=torch.float32),
         ]
+
+    def _curiosity_feature_net(self, input_dict):
+        """Return features for ICM: just the raw observation vector."""
+        phi = input_dict["obs"]["observations"]
+        return phi,

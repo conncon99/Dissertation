@@ -22,6 +22,7 @@ class ClaimDominanceAction(Action):
 
         response = yield ClaimDominanceSuitMessage(game_state, self.action_group, available_dominances)
         chosen_dominance = response.chosen_dominance
+        game_state.selected_suit = chosen_dominance.suit
 
         # 2. Expend card matching it
 
@@ -29,7 +30,7 @@ class ClaimDominanceAction(Action):
             card for card in executor.hand if card.suit == chosen_dominance.suit]
         response = yield ClaimDominanceCardMessage(game_state, self.action_group, available_cards)
         chosen_discard = response.chosen_discard
-
+        game_state.selected_suit = None
         executor.discard_card(chosen_discard)
         executor.hand.append(chosen_dominance)
         game_state.board.available_dominance_cards.remove(chosen_dominance)

@@ -55,6 +55,7 @@ class RevoltAction(Action):
         valid_clearings = self.get_valid_clearings(executor)
         response = yield RevoltClearingMessage(game_state, self.action_group, valid_clearings)
         clearing: Clearing = response.chosen_clearing
+        game_state.selected_clearing = clearing
 
         self.logger.info(f" - Revolted on clearing {clearing.index}")
 
@@ -90,5 +91,5 @@ class RevoltAction(Action):
             executor.officers += 1
             self.logger.info(
                 f" - Increased Officer Count to {executor.officers}")
-
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)

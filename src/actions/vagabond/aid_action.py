@@ -33,6 +33,7 @@ class AidAction(Action):
         # 2. Choose player to aid
         response = yield AidFactionChoiceMessage(game_state, self.action_group, available_players)
         chosen_faction: Faction = response.chosen_faction
+        game_state.selected_faction = chosen_faction
 
         # 3. Choose and exhaust item
         available_items = [
@@ -76,6 +77,5 @@ class AidAction(Action):
             executor.satchel.add_item(taken_item)
         else:
             self.logger.info(f" - No item taken from {chosen_faction}")
-            pass
-
+        game_state.selected_faction = None
         return super().perform(game_state, executor)

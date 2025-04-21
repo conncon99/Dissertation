@@ -30,6 +30,7 @@ class StrikeAction(Action):
         # Choose Faction to target
         response = yield StrikeFactionChoiceMessage(game_state, self.action_group, available_factions)
         chosen_faction = response.chosen_faction
+        game_state.selected_faction = chosen_faction
         self.logger.info(
             f" - Targeting {chosen_faction} with strike on Clearing {executor.vagabond_pawn.space.index}")
 
@@ -65,6 +66,6 @@ class StrikeAction(Action):
 
         # Exhaust crossbow
         executor.satchel.exhaust_item(Items.CROSSBOW)
-
+        game_state.selected_faction = None
         return super().perform(game_state, executor)
         yield

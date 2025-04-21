@@ -28,14 +28,14 @@ logging.basicConfig(
 
 logger = logging.getLogger()
 
-NUM_RUNS = 1
-TURN_LIMIT = 100
+NUM_RUNS = 10
+TURN_LIMIT = 30
 
 for i in range(NUM_RUNS):
 
     marquise = Marquise(MarquiseRandomController())
     eyrie_dynasties = EyrieDynasties(EyrieRandomController())
-    # woodland_alliance = WoodlandAlliance(AllianceRandomController())
+    woodland_alliance = WoodlandAlliance(AllianceRandomController())
     vagabond = Vagabond(VagabondRandomController())
 
     # marquise = Marquise(MarquisePlayerController())
@@ -43,12 +43,12 @@ for i in range(NUM_RUNS):
     # woodland_alliance = WoodlandAlliance(AlliancePlayerController())
     # vagabond = Vagabond(VagabondPlayerController())
 
-    woodland_alliance = WoodlandAlliance(Alliance_NN_Controller)
-    Alliance_NN_Controller.reset_state()
+    # woodland_alliance = WoodlandAlliance(Alliance_NN_Controller)
+    # Alliance_NN_Controller.reset_state()
 
     settings = GameSettings(
         [marquise, eyrie_dynasties, woodland_alliance, vagabond])
-    gm = GameManager(settings, TURN_LIMIT, marquise)
+    gm = GameManager(settings, TURN_LIMIT)
     gm.reset_ids()
 
     while not gm.done:

@@ -134,6 +134,12 @@ class ObservationSpace:
         #### Battles ####
         observation_space.extend(cls._encode_battle(game_state))
 
+        ### Selected Objects ####
+        observation_space.extend(cls._encode_selected_faction(game_state))
+        observation_space.extend(cls._encode_selected_clearing(game_state))
+        observation_space.extend(cls._encode_to_clearing(game_state))
+        observation_space.extend(cls._encode_selected_suit(game_state))
+
         #### Action Groups ####
         if action_group:
             # Action Group ID
@@ -568,6 +574,10 @@ class ObservationSpace:
         # One hot encoded damaged satchel items
         vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.available_damaged_items))
+        vagabond_data.extend([1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.MARQUISE_DE_CAT.value else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.EYRIE_DYNASTY.value else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.WOODLAND_ALLIANCE.value else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.VAGABOND.value else 0,])
         return vagabond_data
 
     @classmethod
@@ -657,4 +667,36 @@ class ObservationSpace:
             (len(game_state.board.clearings) + 1),
             game_state.battle_data.attacker_damage_modifier,
             game_state.battle_data.defender_damage_modifier
+        ]
+
+    @classmethod
+    def _encode_selected_clearing(cls, game_state: GameState):
+        selected_list = []
+        for clearing in game_state.board.clearings:
+            selected_list.append(
+                1.0 if clearing == game_state.selected_clearing else 0.0)
+        return selected_list
+
+    @classmethod
+    def _encode_to_clearing(cls, game_state: GameState):
+        to_list = []
+        for clearing in game_state.board.clearings:
+            to_list.append(
+                1.0 if clearing == game_state.selected_to_clearing else 0.0)
+        return to_list
+
+    @classmethod
+    def _encode_selected_suit(cls, game_state: GameState):
+        return [1.0 if game_state.selected_suit == Suits.FOX else 0.0,
+                1.0 if game_state.selected_suit == Suits.RABBIT else 0.0,
+                1.0 if game_state.selected_suit == Suits.MOUSE else 0.0,
+                1.0 if game_state.selected_suit == Suits.BIRD else 0.0,]
+
+    @classmethod
+    def _encode_selected_faction(cls, game_state: GameState):
+        return [
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.MARQUISE_DE_CAT.value else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.EYRIE_DYNASTY.value else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.WOODLAND_ALLIANCE.value else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.VAGABOND.value else 0,
         ]

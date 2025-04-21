@@ -40,6 +40,7 @@ class VagabondMoveAction(Action):
         response: VagabondMoveResponse = yield VagabondMoveMessage(game_state, self.action_group, available_clearings)
         chosen_clearing: Clearing = response.chosen_clearing
         clearing_cost = available_clearings[chosen_clearing]
+        game_state.selected_clearing = chosen_clearing
 
         from_space = executor.vagabond_pawn.space
         to_clearing = chosen_clearing
@@ -57,6 +58,7 @@ class VagabondMoveAction(Action):
 
             ally_movement_faction_response: AllyMovementFactionResponse = yield AllyMovementFactionMessage(game_state, self.action_group, available_allies, from_space)
             if ally_movement_faction_response.chosen_ally is not None:
+                game_state.selected_faction = ally_movement_faction_response.chosen_ally
                 self.logger.debug(
                     f"Available Units: {len(from_space.units[ally_movement_faction_response.chosen_ally.faction_id])}")
                 ally_movement_units_response: AllyMovementUnitResponse = yield AllyMovementUnitMessage(game_state, self.action_group, ally_movement_faction_response.chosen_ally, from_space)
@@ -74,7 +76,8 @@ class VagabondMoveAction(Action):
 
         self.logger.info(
             f" - Vagabond has moved from {self._space_type(from_space)} {from_space.index} to Clearing {to_clearing.index} by exhausting {clearing_cost} Boots")
-
+        game_state.selected_clearing = None
+        game_state.selected_faction = None
         return super().perform(game_state, executor)
 
     def _space_type(self, space) -> str:

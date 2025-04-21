@@ -4,9 +4,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, TYPE_CHECKING, Optional, Callable, Generator, Any
 import logging
 
-from src.utils.root_types import Suits, Items
+from src.utils.root_types import Suits, Items, Factions
 from src.utils.callback_handler import CallbackTimes, BattleCallbackTimes
 from src.actions.action_handler import ActionGroup
+from src.controllers.nn_controllers.reward_helper import RewardHelper
 
 if TYPE_CHECKING:
     from src.actions.action_handler import Action
@@ -85,3 +86,12 @@ class Faction(ABC):
     def subtract_vp(self, amount: int) -> None:
         if self.dominance is None:
             self.victory_points -= amount
+
+    def get_potential_vp(self, game_state: GameState) -> int:
+        potential_vp = 0
+        if self.dominance and self.faction_id != Factions.VAGABOND:
+            pass
+        elif not self.dominance:
+            potential_vp += RewardHelper.get_battle_rewards(self, game_state)
+            potential_vp += RewardHelper.get_crafting_reward(self, game_state)
+        return potential_vp

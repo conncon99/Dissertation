@@ -69,6 +69,7 @@ class MarquiseBuild(Action):
 
         building_clearing_response: MarquiseBuildingClearingResponse = yield MarquiseBuildingClearingMessage(game_state, self.action_group, clearing_building_options)
         clearing = building_clearing_response.chosen_clearing
+        game_state.selected_clearing = clearing
 
         building_type_response: MarquiseBuildingTypeResponse = yield MarquiseBuildingTypeMessage(game_state, self.action_group, clearing_building_options[clearing])
 
@@ -99,6 +100,7 @@ class MarquiseBuild(Action):
             clearing, executor, clearing.get_first_free_slot())
         self.logger.info(
             f" - Built {building} on clearing {clearing.index} for slot {building.slot_idx} for {cost} wood")
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)
 
     def _get_lowest_wood_cost(self, executor: Marquise, available_building_types):
