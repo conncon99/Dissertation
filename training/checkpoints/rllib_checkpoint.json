@@ -1,1 +1,0 @@
-{"type": "Algorithm", "checkpoint_version": "1.1", "format": "cloudpickle", "state_file": "training\\checkpoints\\algorithm_state.pkl", "policy_ids": ["woodland_alliance", "marquise", "eyrie", "vagabond"], "ray_version": "2.44.1", "ray_commit": "daca7b2b1a950dc7f731e34e74c76ae383794ffe"}

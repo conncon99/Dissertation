@@ -10,3 +10,4 @@ training/
 training/checkpoints/
 training/logs/
 *.png
+*.pkl
