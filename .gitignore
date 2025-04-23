@@ -6,9 +6,9 @@ replacement_script.py
 saved_models/
 *.pth
 .venv/
-training/
-training/checkpoints/
-training/logs/
-*.png
 *.pkl
 logs/root/
+training/logs/
+training/logs/
+training/
+*.png
