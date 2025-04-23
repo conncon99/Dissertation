@@ -77,7 +77,7 @@ class RootEnv(AECEnv):
         vagabond = Vagabond(controller=None)
 
         settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
-        self.gm = GameManager(settings, turn_limit=10)
+        self.gm = GameManager(settings, turn_limit=30)
         self.gm.reset_ids()
 
         self.agent_selection = self._faction_to_agent(
