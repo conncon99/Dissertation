@@ -18,26 +18,16 @@ class DecreeBuildAction(Action):
         id_dict = {Suits.FOX: ActionIDs.DECREE_BUILD_FOX, Suits.MOUSE: ActionIDs.DECREE_BUILD_MOUSE,
                    Suits.RABBIT: ActionIDs.DECREE_BUILD_RABBIT, Suits.BIRD: ActionIDs.DECREE_BUILD_BIRD}
         self.id = id_dict[self.suit]
+        self.turmoil_action = True
 
-    def can_perform(self, executor, game_state=None):
-        return True
+    def can_perform(self, executor: EyrieDynasties, game_state=None):
+        return len(executor.roosts < executor.max_roosts) and any(clearing.get_suit() == self.suit and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots) for clearing in game_state.board.clearings)
 
     def perform(self, game_state: GameState, executor: EyrieDynasties):
-        if len(executor.roosts) >= executor.max_roosts:
-            self.logger.info(
-                " - Cannot place any more roosts: TURMOIL TRIGGERED")
-            yield from executor.trigger_turmoil(self.action_group)
-            return
 
         # Make a list of clearings that the eyrie owns that matches the suit of this card
         available_clearings = [clearing for clearing in game_state.board.clearings if clearing.get_suit(
         ) == self.suit and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots)]
-
-        if not available_clearings:
-            self.logger.info(
-                f" - no available {self.suit.name.capitalize()} clearings for roosts: TURMOIL TRIGGERED")
-            yield from executor.trigger_turmoil(self.action_group)
-            return
 
         # Choose clearing
         response = yield DecreeBuildMessage(game_state, self.action_group, available_clearings)

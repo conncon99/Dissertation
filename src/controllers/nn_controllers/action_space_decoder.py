@@ -22,10 +22,13 @@ def decode_binary_choice(output):
 
 
 def decode_numerical_selection(output):
+    output -= 235
     return output
 
 
 def decode_action_output(output, action_size, action_group: ActionGroup):
+
+    output -= 2
     actions = [None] * action_size
     for action in action_group.actions:
         if action is not None:
@@ -35,6 +38,11 @@ def decode_action_output(output, action_size, action_group: ActionGroup):
 
 
 def decode_card_output(output):
+
+    if output == 339:
+        return None
+
+    output -= 78
     cards = [
         SWORD_MOUSE,  # 0
         TRAVEL_GEAR_FOX,  # 1
@@ -96,32 +104,32 @@ def decode_card_output(output):
         ROYAL_CLAIM  # 53
     ]
 
-    if output == 59:
-        logger.debug("Returning None")
-        return None
-
     logger.debug(cards[output])
     return cards[output]
 
 
 def decode_faction_output(output, game_state: GameState):
+
+    if output == 339:
+        return None
+
+    output -= 62
     factions = [
         game_state.marquise,
         game_state.eyrie_dynasties,
         game_state.woodland_alliance,
         game_state.vagabond
     ]
-    if output == 59:
-        return None
     return factions[output]
 
 
 def decode_clearing_output(output, game_state: GameState):
+    output -= 66
     return game_state.board.clearings[output]
 
 
 def decode_piece_output(output, game_state: GameState):
-
+    output -= 132
     pieces = []
     # 7 Roosts
     for i in range(7):
@@ -159,6 +167,7 @@ def decode_piece_output(output, game_state: GameState):
 
 
 def decode_warrior_output(output):
+    output -= 179
     warriors = []
 
     for i in range(25):
@@ -183,30 +192,39 @@ def decode_warrior_output(output):
 # Building Types
 
 def decode_marquise_building_types(output):
+    output -= 260
     building_types = [Sawmill, Recruiter, Workshop]
     return building_types[output]
 
 
 def decode_wood_output(output, game_state: GameState):
+    output -= 263
     return [wood for wood in game_state.marquise.wood if wood.id == output][0]
 
 # Eyrie Dynasty
 
 
 def decode_leader_output(output):
+    output -= 271
     leader_mapping = {0: EyrieLeaders.Despot, 1: EyrieLeaders.Commander,
                       2: EyrieLeaders.Charismatic, 3: EyrieLeaders.Builder}
     return leader_mapping[output]
 
 
 def decode_decree_type_output(output):
-    decree_type_mapping = {0: RECRUIT, 1: MOVE, 2: BATTLE, 3: BUILD, 59: None}
+
+    if output == 339:
+        return None
+
+    output -= 275
+    decree_type_mapping = {0: RECRUIT, 1: MOVE, 2: BATTLE, 3: BUILD}
     return decree_type_mapping[output]
 
 # Vagabond
 
 
 def decode_character_output(output):
+    output -= 279
     if output == 0:
         return Characters.THIEF
     elif output == 1:
@@ -216,26 +234,32 @@ def decode_character_output(output):
 
 
 def decode_forest_output(output, game_state: GameState):
+    output -= 282
     return game_state.board.forests[output]
 
 
 def decode_space_output(output, game_state: GameState):
-    # Clearings and then forests
-    spaces = []
-    spaces.extend(game_state.board.clearings)
-    spaces.extend(game_state.board.forests)
-    return spaces[output]
+
+    if 66 <= output <= 77:
+        return decode_clearing_output(output, game_state)
+    elif 282 <= output <= 288:
+        return decode_forest_output(output, game_state)
+    assert IndexError
 
 
 def decode_quest_output(output):
+    output -= 289
     quests = [RABBIT_ERRAND, FOX_ERRAND, MOUSE_ESCORT, RABBIT_EXPEL_BANDITS, MOUSE_EXPEL_BANDITS, RABBIT_FEND_BEAR, MOUSE_FEND_BEAR,
               FUNDRAISING, RABBIT_SPEECH, FOX_SPEECH, RABBIT_GUARD_DUTY, MOUSE_GUARD_DUTY, FOX_LOGISTICS_HELP, MOUSE_LOGISTICS_HELP, REPAIR_A_SHED]
     return quests[output]
 
 
 def decode_aid_take_item_output(output):
-    if output >= len(Items):
+
+    if output == 339:
         return None
+
+    output -= 304
     return list(Items)[output]
 
 
@@ -247,6 +271,8 @@ def decode_item_output(output):
     # 1. Exhausted Items
     # 2. Damaged Items
     # 3. Exhausted and Damaged Items
+
+    output -= 304
 
     num_item_types = len(Items)
 
@@ -270,27 +296,30 @@ def decode_strike_output(output, chosen_faction: Faction, game_state: GameState)
 
 
 def decode_aid_exhaust_item(output):
-    items = list(Items)
-    items.extend([Items.TEA, Items.BAG, Items.COINS])
-    use_item_track = output >= len(Items)
-    item = items[output]
-    return item, use_item_track
+    if 304 <= output <= 311:
+        items = list(Items)
+        return items[output - 304], False
+    elif output == 336:
+        return Items.TEA, True
+    elif output == 337:
+        return Items.COINS, True
+    elif output == 338:
+        return Items.BAG, True
 
 
 def decode_battle_damage_item(output):
     items_list = list(Items)
-    track_items = [Items.TEA, Items.BAG, Items.COINS]
 
-    n = len(items_list)
-
-    if output < n:
-        # Not exhausted, no track
-        return items_list[output], False, False
-
-    elif output < 2 * n:
+    if 304 <= output <= 311:
+        # Availalable, No Track
+        return items_list[output - 304], False, False
+    elif 312 <= output <= 319:
         # Exhausted, no track
-        return items_list[output - n], True, False
-
-    else:
-        # Use track items
-        return track_items[output - 2 * n], False, True
+        return items_list[output - 312], True, False
+# Track Items
+    elif output == 336:
+        return Items.TEA, False, True
+    elif output == 337:
+        return Items.COINS, False, True
+    elif output == 338:
+        return Items.BAG, False, True

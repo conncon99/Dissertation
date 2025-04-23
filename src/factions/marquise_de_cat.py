@@ -171,19 +171,47 @@ class Marquise(Faction):
     def get_potential_vp(self, game_state):
         potential_vp = 0
 
-        wood_count = len(self.wood)
-        # Workshop then Sawmill then Recruiter in order of potential VP rewards
+        # wood_count = len(self.wood)
+        # # Workshop then Sawmill then Recruiter in order of potential VP rewards
 
-        if len(self.workshops) < self.max_workshops and wood_count > self.workshop_track[len(self.workshops)][0]:
-            wood_count -= self.workshop_track[len(self.workshops)][0]
-            potential_vp += self.workshop_track[len(self.workshops)][1]
+        # if len(self.workshops) < self.max_workshops and wood_count > self.workshop_track[len(self.workshops)][0]:
+        #     wood_count -= self.workshop_track[len(self.workshops)][0]
+        #     potential_vp += self.workshop_track[len(self.workshops)][1]
 
-        if len(self.sawmills) < self.max_sawmills and wood_count > self.sawmill_track[len(self.sawmills)][0]:
-            wood_count -= self.sawmill_track[len(self.sawmills)][0]
-            potential_vp += self.sawmill_track[len(self.sawmills)][1]
+        # if len(self.sawmills) < self.max_sawmills and wood_count > self.sawmill_track[len(self.sawmills)][0]:
+        #     wood_count -= self.sawmill_track[len(self.sawmills)][0]
+        #     potential_vp += self.sawmill_track[len(self.sawmills)][1]
 
-        if len(self.recruiters) < self.max_recruiters and wood_count > self.recruiter_track[len(self.recruiters)][0]:
-            wood_count -= self.recruiter_track[len(self.recruiters)][0]
-            potential_vp += self.recruiter_track[len(self.recruiters)][1]
+        # if len(self.recruiters) < self.max_recruiters and wood_count > self.recruiter_track[len(self.recruiters)][0]:
+        #     wood_count -= self.recruiter_track[len(self.recruiters)][0]
+        #     potential_vp += self.recruiter_track[len(self.recruiters)][1]
+
+        potential_vp += sum(
+            v for k, v in self._generate_wood_availability_map(game_state).items())
 
         return potential_vp + super().get_potential_vp(game_state)
+
+    def _generate_wood_availability_map(self, game_state: GameState):
+        # Create a dict[Clearing: wood_count] - starting at 0
+        # For each wood token, we go through every clearing that can be traveled to on a path still owned by us
+        # We add one to that clearings wood count
+
+        clearing_wood_counts = {
+            clearing: 0 for clearing in game_state.board.clearings if clearing.get_owner() == self.faction_id and clearing.has_free_slots()}
+
+        for wood in self.wood:
+            current_clearing: Clearing = wood.space
+            visited = []
+            queued = [current_clearing]
+            while len(queued) > 0:
+                queued.remove(current_clearing)
+                visited.append(current_clearing)
+                if current_clearing.get_owner() == self.faction_id:
+                    if current_clearing.has_free_slots():
+                        clearing_wood_counts[current_clearing] += 1
+                    for adjacent_clearing in current_clearing.adjacent_clearings:
+                        if adjacent_clearing not in visited and adjacent_clearing not in queued:
+                            queued.append(adjacent_clearing)
+                if len(queued) > 0:
+                    current_clearing = queued[0]
+        return clearing_wood_counts

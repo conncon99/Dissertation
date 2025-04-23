@@ -17,9 +17,12 @@ class DecreeBattleAction(BattleAction):
         id_dict = {Suits.FOX: ActionIDs.DECREE_BATTLE_FOX, Suits.MOUSE: ActionIDs.DECREE_BATTLE_MOUSE,
                    Suits.RABBIT: ActionIDs.DECREE_BATTLE_RABBIT, Suits.BIRD: ActionIDs.DECREE_BATTLE_BIRD}
         self.id = id_dict[self.suit]
+        self.turmoil_action = True
 
     def can_perform(self, executor: EyrieDynasties, game_state=None):
-        return True
+        valid_clearings = self._get_valid_battle_clearings(
+            game_state, executor)
+        return len(valid_clearings) > 0 and any(len(self._get_valid_battle_targets(clearing, executor, game_state)) > 0 for clearing in valid_clearings)
 
     def _get_valid_battle_clearings(self, game_state: GameState, executor):
         valid_clearings = super()._get_valid_battle_clearings(game_state, executor)
@@ -31,24 +34,11 @@ class DecreeBattleAction(BattleAction):
         valid_clearings = self._get_valid_battle_clearings(
             game_state, executor)
 
-        if not valid_clearings:
-            self.logger.info(
-                f"No valid clearings found for suit {self.suit}: TURMOIL TRIGGERED")
-            yield from executor.trigger_turmoil(self.action_group)
-            return
-
         response = yield BattleClearingChoiceMessage(game_state, self.action_group, valid_clearings)
         clearing = response.chosen_clearing
         game_state.selected_clearing = clearing
         valid_targets = self._get_valid_battle_targets(
             clearing, executor, game_state)
-
-        if not valid_targets:
-            self.logger.info(
-                f"No valid targets found for suit {self.suit}: TURMOIL TRIGGERED")
-            yield from executor.trigger_turmoil(self.action_group)
-            game_state.selected_clearing = None
-            return
 
         response = yield BattleTargetChoiceMessage(game_state, self.action_group, valid_targets)
         target = response.chosen_target

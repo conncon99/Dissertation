@@ -103,16 +103,16 @@ def _get_agents():
 
         net = Net(state_shape=obs_shape,
                   action_shape=act_shape,
-                  hidden_sizes=[1024, 1024, 1024],
+                  hidden_sizes=[1024, 1024, 512],
                   device=device,
                   softmax=True,
-                  num_atoms=60,
+                  num_atoms=340,
                   ).to(device)
 
         optim = torch.optim.Adam(net.parameters(), lr=1e-4)
 
         base_policy = RainbowPolicy(model=net, optim=optim,
-                                    action_space=env.action_space, estimation_step=3, target_update_freq=320, num_atoms=60, v_max=25, v_min=-10).to(device)
+                                    action_space=env.action_space, estimation_step=3, target_update_freq=320, num_atoms=340, v_max=25, v_min=-10).to(device)
         # Feature extractor for ICM
         feature_net = Net(state_shape=obs_shape,
                           hidden_sizes=[256, 256], device=device)
@@ -173,7 +173,7 @@ if __name__ == "__main__":
     # Collector Setup
 
     train_collector = Collector(policy, train_envs, PrioritizedVectorReplayBuffer(
-        total_size=15_000,
+        total_size=30_000,
         buffer_num=len(train_envs),
         alpha=0.6,
         beta=0.4
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     def train_fn(epoch, env_step):
 
         for p in policy.policies.values():
-            p.set_eps(max(0.1, 1 - epoch / 200))
+            p.set_eps(max(0.05, 1 - epoch / 50))
         beta_start = 0.4
         beta_end = 1.0
         max_epochs = 500

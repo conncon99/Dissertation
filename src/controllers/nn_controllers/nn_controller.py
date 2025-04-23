@@ -5,10 +5,12 @@ from src.controllers.nn_controllers.observation_space_encoder import Observation
 from gymnasium import spaces
 from src.controllers.nn_controllers.mask import Mask
 import numpy as np
+from tianshou.data import Batch
 
 import torch
 import os
 from typing import TYPE_CHECKING
+from tianshou.utils.net.common import Net
 
 if TYPE_CHECKING:
     from src.controllers.messages.game_messages import GameMessage
@@ -18,45 +20,74 @@ class NN_Controller(Controller):
 
     def __init__(self, faction_name):
         super().__init__()
-        model_path = f"training/checkpoints/policies/{faction_name}/model/model.pt"
-        self.mask = Mask()
-        self.model = torch.load(
-            model_path, weights_only=False)
+
+        self.state_dim = 896
+        self.action_dim = 340
+        self.mask = Mask(self.action_dim)
+        V_MIN, V_MAX, N_ATOMS = -10.0, 25.0, 340
+        self.SUPPORT = torch.linspace(V_MIN, V_MAX, N_ATOMS)
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        model_path = f"log/root/rainbow/{faction_name}.pth"
+
+        self.model = Net(
+            state_shape=(self.state_dim,),
+            action_shape=self.action_dim,
+            hidden_sizes=[1024, 1024, 512],
+            softmax=True,
+            num_atoms=340,
+            device=device,
+        ).to(device)
+
+        try:
+            state_dict = torch.load(model_path, map_location=device)
+            missing, unused = self.model.load_state_dict(
+                state_dict, strict=False)
+            if missing:
+                print(f"[{faction_name}] checkpoint loaded "
+                      f"(missing: {missing}, unused: {unused})")
+            else:
+                print(f"[{faction_name}] checkpoint loaded successfully")
+        except Exception as err:
+            print(f"[{faction_name}] could not load checkpoint - "
+                  f"using random weights ({err})")
+        else:
+            print(f"[{faction_name}] no checkpoint found - network initialised")
+
         self.model.eval()
-        B = 1
-        self.h = torch.zeros(B, self.model.lstm_size)
-        self.c = torch.zeros(B, self.model.lstm_size)
+        self.mask = Mask()
 
-        self.state = [self.h, self.c]
-
-    def reset_state(self):
-        self.state = [torch.zeros_like(self.h), torch.zeros_like(self.c)]
-
+    @torch.no_grad()
     def send_game_message(self, msg: GameMessage):
-        obs = ObservationSpace.encode_game_state(
-            msg.game_state, msg.type, msg.action_group).clip(0, 1).astype(np.float32)
-        action_mask = np.array(self.mask.create_mask(
-            msg), dtype=np.float32).clip(0, 1)
+        # 1) flat observation tensor (1, 896)
+        obs_vec = ObservationSpace.encode_game_state(
+            msg.game_state, msg.type, msg.action_group
+        ).clip(0, 1).astype(np.float32)
 
-        obs_dict = {
-            "observations": obs,
-            "action_mask":  action_mask,
-        }
+        obs_t = torch.from_numpy(obs_vec).unsqueeze(0).to(self.model.device)
 
-        inputs = {"obs": {
-            k: torch.from_numpy(v).unsqueeze(0) for k, v in obs_dict.items()
-        }}
+        # 2) forward pass  -> logits shape (1, A, 60)
+        logits, _ = self.model(obs_t)
 
-        seq_lens = torch.tensor([1])
+        # if Net(softmax=True) already gave probabilities
+        #   (depends on Tianshou version) check with a quick sum.
+        probs = (
+            logits if torch.allclose(logits.sum(-1), torch.ones_like(logits[..., 0]))
+            else torch.softmax(logits, dim=-1)
+        )
 
-        with torch.no_grad():
-            logits, next_state = self.model(
-                inputs, self.state, seq_lens)
+        # 3) expected Q for each action:  Σ p(z_i) * z_i
+        support = self.SUPPORT.to(probs.device)
+        q_values = torch.sum(probs * support, dim=-1).squeeze(0)   # (A,)
 
-        self.state = next_state
+        # 4) mask out illegal actions
+        mask = np.asarray(self.mask.create_mask(msg), dtype=bool)
+        q_values[~torch.as_tensor(mask, device=q_values.device)] = -torch.inf
 
-        action_id = torch.argmax(logits, dim=1).item()
+        action_id = int(torch.argmax(q_values).item())
 
+        # 5) translate discrete id into a concrete game action
         return Decoder.decode(action_id, msg)
 
     # region Unimplemented Handlers

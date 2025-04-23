@@ -21,9 +21,10 @@ class DecreeMoveAction(MoveAction):
         id_dict = {Suits.FOX: ActionIDs.DECREE_MOVE_FOX, Suits.MOUSE: ActionIDs.DECREE_MOVE_MOUSE,
                    Suits.RABBIT: ActionIDs.DECREE_MOVE_RABBIT, Suits.BIRD: ActionIDs.DECREE_MOVE_BIRD}
         self.id = id_dict[self.suit]
+        self.turmoil_action = True
 
-    def can_perform(self, executor, game_state=None):
-        return True
+    def can_perform(self, executor, game_state: GameState):
+        return len(self.get_all_possible_moves(game_state, executor)) > 0
 
     def _valid_from_clearings(self, game_state, executor):
         return [
@@ -32,11 +33,6 @@ class DecreeMoveAction(MoveAction):
     def perform(self, game_state: GameState, executor: EyrieDynasties):
         # 1. Get all possible moves
         valid_moves = self.get_all_possible_moves(game_state, executor)
-
-        if not valid_moves:
-            self.logger.info(f" - No valid moves: TURMOIL TRIGGERED")
-            yield from executor.trigger_turmoil(self.action_group)
-            return
 
         # 2. Make a choice of which move to make and who to move
         move_from_response: MoveFromResponse = yield MoveFromMessage(game_state, self.action_group, list(set([move[0] for move in valid_moves])))

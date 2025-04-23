@@ -120,7 +120,6 @@ class GameManager:
         else:
             obs["action_mask"] = np.zeros(
                 self.masker.action_size, dtype=np.float32).clip(0, 1)
-            obs["action_mask"][59] = 1
         return obs
 
     def _calculate_reward(self):

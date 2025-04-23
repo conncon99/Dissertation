@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
 class Mask:
 
-    def __init__(self, action_size=60):  # 59 Action IDs and a None Output
+    def __init__(self, action_size=340):
         self.action_size = action_size
         self.logger = logging.getLogger()
 
@@ -282,6 +282,8 @@ class Mask:
 
     def numerical_mask(self, min, max):
         """Masks all but the values between min and max (inclusive)"""
+        min += 235
+        max += 235
         mask = [False] * self.action_size
         mask[min: max + 1] = [True] * ((max + 1) - min)
         return mask
@@ -290,7 +292,7 @@ class Mask:
         """Masks out all unavailable clearings or invalid outputs"""
         mask = [False] * self.action_size
         for clearing in available_clearings:
-            mask[clearing.index] = True
+            mask[clearing.index + 66] = True
         return mask
 
     def card_mask(self, available_cards: List[Card], allow_none=False):
@@ -358,7 +360,7 @@ class Mask:
             ROYAL_CLAIM  # 53
         ]
         for i, card in enumerate(cards):
-            mask[i] = card in available_cards
+            mask[i + 78] = card in available_cards
 
         return mask
 
@@ -366,11 +368,12 @@ class Mask:
             self, available_factions: List[Faction], game_state: GameState, allow_none=False):
         mask = [False] * self.action_size
         mask[-1] = allow_none
+        offset = 62
 
-        mask[0] = game_state.marquise in available_factions
-        mask[1] = game_state.eyrie_dynasties in available_factions
-        mask[2] = game_state.woodland_alliance in available_factions
-        mask[3] = game_state.vagabond in available_factions
+        mask[0 + offset] = game_state.marquise in available_factions
+        mask[1 + offset] = game_state.eyrie_dynasties in available_factions
+        mask[2 + offset] = game_state.woodland_alliance in available_factions
+        mask[3 + offset] = game_state.vagabond in available_factions
 
         return mask
 
@@ -380,19 +383,23 @@ class Mask:
 
         mask[-1] = allow_none
 
+        base_offset = 179
+
         faction_offsets = {Factions.MARQUISE_DE_CAT.value: 0, Factions.EYRIE_DYNASTY.value: 25,
                            Factions.WOODLAND_ALLIANCE.value: 45, Factions.VAGABOND.value: 55}
 
         for warrior in available_warriors:
-            mask[warrior.id + faction_offsets[warrior.faction.faction_id]] = True
+            mask[warrior.id + faction_offsets[warrior.faction.faction_id] +
+                 base_offset] = True
         return mask
 
     def piece_mask(self, available_pieces: List[Piece], allow_none=False):
         mask = [False] * self.action_size
         mask[-1] = allow_none
 
+        offset = 132
         for piece in available_pieces:
-            mask[self._get_piece_offset(piece) + piece.id] = True
+            mask[self._get_piece_offset(piece) + piece.id + offset] = True
         return mask
 
     def _get_piece_offset(self, piece) -> int:
@@ -421,10 +428,11 @@ class Mask:
             self, available_actions: List[Action], allow_none=False):
         mask = [False] * self.action_size
         mask[-1] = allow_none
+        offset = 2
 
         for action in available_actions:
             if action is not None:
-                mask[action.id.value - 1] = True
+                mask[action.id.value - 1 + offset] = True
 
         return mask
 
@@ -432,71 +440,80 @@ class Mask:
 
     def wood_mask(self, available_wood: List[Wood]):
         mask = [False] * self.action_size
+        offset = 263
         for wood in available_wood:
-            mask[wood.id] = True
+            mask[wood.id + offset] = True
         return mask
 
     def marquise_building_type_mask(self, available_building_types: List[Union[Type[Sawmill], Type[Recruiter], Type[Workshop]]]):
         mask = [False] * self.action_size
-        mask[0] = Sawmill in available_building_types
-        mask[1] = Recruiter in available_building_types
-        mask[2] = Workshop in available_building_types
+        offset = 260
+        mask[0 + offset] = Sawmill in available_building_types
+        mask[1 + offset] = Recruiter in available_building_types
+        mask[2 + offset] = Workshop in available_building_types
         return mask
 
     ### Eyrie Dynasty ###
 
     def eyrie_leader_mask(self, available_leaders: List[EyrieLeaders]):
         mask = [False] * self.action_size
-        mask[0] = EyrieLeaders.Despot in available_leaders
-        mask[1] = EyrieLeaders.Commander in available_leaders
-        mask[2] = EyrieLeaders.Charismatic in available_leaders
-        mask[3] = EyrieLeaders.Builder in available_leaders
+        offset = 271
+        mask[0 + offset] = EyrieLeaders.Despot in available_leaders
+        mask[1 + offset] = EyrieLeaders.Commander in available_leaders
+        mask[2 + offset] = EyrieLeaders.Charismatic in available_leaders
+        mask[3 + offset] = EyrieLeaders.Builder in available_leaders
         return mask
 
     def decree_type_mask(self, allow_none=False):
         mask = [False] * self.action_size
+        offset = 275
         mask[-1] = allow_none
-        mask[0:4] = [True] * 4
+        mask[0 + offset:4 + offset] = [True] * 4
         return mask
 
     ### Vagabond ###
 
     def vagabond_characters_mask(self):
         mask = [False] * self.action_size
-        mask[0:3] = [True] * 3
+        offset = 279
+        mask[0 + offset:3 + offset] = [True] * 3
         return mask
 
     def forest_mask(self, available_forest: List[Forest]):
         mask = [False] * self.action_size
+        offset = 282
         for forest in available_forest:
-            mask[forest.index] = True
+            mask[forest.index + offset] = True
         return mask
 
     def space_mask(self, available_spaces: List[Space]):
         mask = [False] * self.action_size
+        CLEARING_OFFSET = 66
+        FOREST_OFFSET = 282
         for space in available_spaces:
             if isinstance(space, Forest):
-                FOREST_OFFSET = 12
                 mask[space.index + FOREST_OFFSET] = True
             else:
-                mask[space.index] = True
+                mask[space.index + CLEARING_OFFSET] = True
 
         return mask
 
     def quest_mask(self, available_quests: List[QuestCard]):
         mask = [False] * self.action_size
+        offset = 289
         quests = [RABBIT_ERRAND, FOX_ERRAND, MOUSE_ESCORT, RABBIT_EXPEL_BANDITS, MOUSE_EXPEL_BANDITS, RABBIT_FEND_BEAR, MOUSE_FEND_BEAR,
                   FUNDRAISING, RABBIT_SPEECH, FOX_SPEECH, RABBIT_GUARD_DUTY, MOUSE_GUARD_DUTY, FOX_LOGISTICS_HELP, MOUSE_LOGISTICS_HELP, REPAIR_A_SHED]
         for i, card in enumerate(quests):
-            mask[i] = card in available_quests
+            mask[i + offset] = card in available_quests
         return mask
 
     def aid_take_item_mask(self, available_items: List[Items]):
         mask = [False] * self.action_size
+        offset = 304
         mask[-1] = True
 
         for i, item in enumerate(Items):
-            mask[i] = item in available_items
+            mask[i + offset] = item in available_items
 
         return mask
 
@@ -509,7 +526,7 @@ class Mask:
 
         for item_list in all_items:
             for item in list(Items):
-                mask[idx] = item in item_list
+                mask[idx + 304] = item in item_list
                 idx += 1
 
         return mask
@@ -522,29 +539,30 @@ class Mask:
     def aid_exhaust_item_mask(self, available_items: List[Items], bag_track: int, coin_track: int, tea_track: int):
         mask = [False] * self.action_size
 
-        num_items = len(Items)
+        offset = 304
 
         for i, item in enumerate(Items):
-            mask[i] = item in available_items
+            mask[i + offset] = item in available_items
 
-        mask[num_items] = tea_track > 0
-        mask[num_items + 1] = bag_track > 0
-        mask[num_items + 2] = coin_track > 0
+        mask[336] = tea_track > 0
+        mask[337] = coin_track > 0
+        mask[338] = bag_track > 0
 
         return mask
 
     def battle_damage_item(self, available_items: List[Items], exhausted_items: List[Items], bag_track: int, coin_track: int, tea_track: int):
         mask = [False] * self.action_size
         items_list = list(Items)
-        n = len(items_list)
 
+        available_offset = 304
         for i, item in enumerate(items_list):
-            mask[i] = item in available_items
+            mask[i + available_offset] = item in available_items
 
+        exhausted_offset = 312
         for i, item in enumerate(items_list):
-            mask[n + i] = item in exhausted_items
+            mask[exhausted_offset + i] = item in exhausted_items
 
-        mask[2 * n] = tea_track > 0
-        mask[(2 * n) + 1] = bag_track > 0
-        mask[(2 * n) + 2] = coin_track > 0
+        mask[336] = tea_track > 0
+        mask[337] = coin_track > 0
+        mask[338] = bag_track > 0
         return mask

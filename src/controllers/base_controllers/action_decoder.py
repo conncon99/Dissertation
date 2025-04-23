@@ -3,6 +3,48 @@ from src.controllers.messages.game_messages import *
 from src.controllers.nn_controllers.action_space_decoder import *
 
 
+# Structure of Outputs - 340
+
+# General - 260
+
+# Binary (2) 0-1
+# Actions (60) 2-61
+# Factions (4) 62-65
+# Clearings (12) 66-77
+# Cards (54) 78-131
+# Pieces (47) 132-178
+# Warriors (56) 179-234
+# Numerical Mask (25) 235-259
+
+# Marquise - 11
+
+# Building Types (3) 260-262
+# Wood (8) 263-270
+
+# Eyrie - 8
+
+# Eyrie Leader (4) 271-274
+# Decree Type (4) 275-278
+
+# Woodland Alliance - 0
+
+# Vagabond - 60
+
+# Character (3) 279-281
+# Forest (7) 282-288
+# Quest (15) 289-303
+# Available Items (8) 304-311
+# Exhausted Items (8) 312-319
+# Available Damaged Items (8) 320-327
+# Exhausted Damaged Items (8) 328-335
+# Tea Track (1) 336
+# Coin Track (1) 337
+# Bag Track (1) 338
+
+
+# None - 339
+
+
 class Decoder:
 
     @classmethod
@@ -10,7 +52,7 @@ class Decoder:
         logger.debug(f"Decoding {msg.type}")
         match msg.type:
             case GameMessages.ACTION_CHOICE_MESSAGE:
-                return ActionChoiceResponse(decode_action_output(action, 60, msg.action_group))
+                return ActionChoiceResponse(decode_action_output(action, 340, msg.action_group))
             case GameMessages.AMBUSH_MESSAGE:
                 return AmbushResponse(decode_card_output(action))
             case GameMessages.BATTLE_USE_CARD_MESSAGE:

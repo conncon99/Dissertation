@@ -18,7 +18,7 @@ log_file = "training/logs/setup_test.log"
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(log_file, mode='w'),
@@ -28,8 +28,8 @@ logging.basicConfig(
 
 logger = logging.getLogger()
 
-NUM_RUNS = 2
-TURN_LIMIT = 30
+NUM_RUNS = 100
+TURN_LIMIT = 50
 
 for i in range(NUM_RUNS):
 
@@ -44,7 +44,6 @@ for i in range(NUM_RUNS):
     # vagabond = Vagabond(VagabondPlayerController())
 
     # woodland_alliance = WoodlandAlliance(Alliance_NN_Controller)
-    # Alliance_NN_Controller.reset_state()
 
     settings = GameSettings(
         [marquise, eyrie_dynasties, woodland_alliance, vagabond])
@@ -59,14 +58,14 @@ for i in range(NUM_RUNS):
         else:
             gm.step()
 
-    logger.info("Game Over!")
+    logger.warning("Game Over!")
     if isinstance(gm.winner, list):
-        logger.info(f"Winners: {', '.join(str(f) for f in gm.winner)}")
+        logger.warning(f"Winners: {', '.join(str(f) for f in gm.winner)}")
     elif gm.winner:
-        logger.info(f"Winner: {gm.winner}")
+        logger.warning(f"Winner: {gm.winner}")
     else:
-        logger.info("No winner declared.")
+        logger.warning("No winner declared.")
 
     for faction in gm.turn_order:
         if not faction.dominance:
-            logger.info(f"{faction} VP: {faction.victory_points}")
+            logger.warning(f"{faction} VP: {faction.victory_points}")

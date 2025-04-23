@@ -38,6 +38,7 @@ class Action(ABC):
         self.id = -1
         self.action_group: ActionGroup = None
         self.action_complete = False
+        self.turmoil_action = False
 
     def __repr__(self):
         return self.name
@@ -200,8 +201,14 @@ class ActionGroup:
             available_actions = [
                 a for a in self._remaining_actions if a.can_perform(executor, game_state)]
             if not available_actions:
-                self.logger.debug("- No available actions left to perform.")
-                break
+                if any(action.turmoil_action for action in self._remaining_actions):
+                    self.logger.info(" - TURMOIL TRIGGERED")
+                    yield from executor.trigger_turmoil(self)
+                    break
+                else:
+                    self.logger.debug(
+                        "- No available actions left to perform.")
+                    break
 
             # Choose an action.
             if len(available_actions) == 1:

@@ -34,7 +34,7 @@ class RootEnv(AECEnv):
         self.agents = self.possible_agents[:]
         self.logger = logging.getLogger()
 
-        action_size = 60
+        action_size = 340
         obs_dim = 896
         self.action_spaces = {agent: Discrete(
             action_size) for agent in self.agents}
@@ -77,7 +77,7 @@ class RootEnv(AECEnv):
         vagabond = Vagabond(controller=None)
 
         settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
-        self.gm = GameManager(settings, turn_limit=30)
+        self.gm = GameManager(settings, turn_limit=10)
         self.gm.reset_ids()
 
         self.agent_selection = self._faction_to_agent(
