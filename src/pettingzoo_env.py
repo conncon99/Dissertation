@@ -40,7 +40,7 @@ class RootEnv(AECEnv):
             action_size) for agent in self.agents}
 
         agent_obs_space = Dict({
-            "observations": Box(low=0.0, high=1.0, shape=(obs_dim,), dtype=np.float32),
+            "observation": Box(low=0.0, high=1.0, shape=(obs_dim,), dtype=np.float32),
             "action_mask": Box(low=0.0, high=1.0, shape=(action_size,), dtype=np.float32)
         })
 
@@ -56,11 +56,7 @@ class RootEnv(AECEnv):
         return self.action_spaces[agent]
 
     def observe(self, agent):
-
-        if agent in self.observations.keys():
-            return self.observations[agent]
-        # self.logger.warning("Used Unsaved Observation")
-        return self.gm.get_observation()
+        return self.observations.get(agent, self.gm.get_observation())
 
     def reset(self, seed=None, options=None):
         if seed is not None:

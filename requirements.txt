@@ -15,4 +15,6 @@ gymnasium>=0.29
 matplotlib>=3.8
 tqdm>=4.66
 
+tianshou
+
 ray[rllib]        

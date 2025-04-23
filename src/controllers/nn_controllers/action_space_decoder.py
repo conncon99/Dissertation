@@ -154,7 +154,6 @@ def decode_piece_output(output, game_state: GameState):
     # 10 Sympathy
     for i in range(10):
         pieces.append(PieceWithID.get_by_id("Sympathy Token", i))
-
     assert pieces[output] is not None
     return pieces[output]
 

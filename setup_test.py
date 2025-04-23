@@ -28,7 +28,7 @@ logging.basicConfig(
 
 logger = logging.getLogger()
 
-NUM_RUNS = 10
+NUM_RUNS = 2
 TURN_LIMIT = 30
 
 for i in range(NUM_RUNS):

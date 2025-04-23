@@ -107,6 +107,7 @@ class DominanceCard(Card):
         self.make_action_adder(CallbackTimes.DOMINANCE_TIME, DominanceAction())
 
     def activate(self, game_state: GameState, action_group):
+        print("Played DOminance")
         super().activate(game_state, action_group)
         self.owner.dominance = self.suit
         self.owner.hand.remove(self)

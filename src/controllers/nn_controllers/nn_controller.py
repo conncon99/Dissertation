@@ -1,7 +1,6 @@
 from __future__ import annotations
 from src.controllers.base_controllers.controller import Controller
 from src.controllers.base_controllers.action_decoder import Decoder
-from src.controllers.nn_controllers.masked_policy_model import TorchActionMaskModel
 from src.controllers.nn_controllers.observation_space_encoder import ObservationSpace
 from gymnasium import spaces
 from src.controllers.nn_controllers.mask import Mask
@@ -21,7 +20,7 @@ class NN_Controller(Controller):
         super().__init__()
         model_path = f"training/checkpoints/policies/{faction_name}/model/model.pt"
         self.mask = Mask()
-        self.model: TorchActionMaskModel = torch.load(
+        self.model = torch.load(
             model_path, weights_only=False)
         self.model.eval()
         B = 1

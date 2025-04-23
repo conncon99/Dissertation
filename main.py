@@ -1,28 +1,61 @@
 import os
 import matplotlib
-import ray
-from ray.rllib.algorithms.ppo import PPOConfig
-from ray.tune.registry import register_env
-from ray.rllib.env import PettingZooEnv
 from src.pettingzoo_env import RootEnv
-from ray.rllib.models import ModelCatalog
-from src.controllers.nn_controllers.masked_policy_model import TorchActionMaskModel
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from typing import Optional, Tuple
 import logging
 import torch
 from pathlib import Path
 import numpy as np
 import gymnasium as gym
+from tianshou.env import PettingZooEnv, DummyVectorEnv, SubprocVectorEnv
+from tianshou.policy import MultiAgentPolicyManager, RainbowPolicy, BasePolicy, DQNPolicy, ICMPolicy
+from tianshou.trainer import OffpolicyTrainer
+from tianshou.utils.net.common import Net
+from tianshou.utils.net.discrete import IntrinsicCuriosityModule
+from tianshou.data import Collector, VectorReplayBuffer, PrioritizedVectorReplayBuffer
+from torch.utils.tensorboard import SummaryWriter
+from tianshou.utils import TensorboardLogger
+from tianshou.data import Batch
 
 
-LOG_DIR = Path("training/logs")
-LOG_DIR.mkdir(parents=True, exist_ok=True)
+# make sure we patch only once
+if not hasattr(MultiAgentPolicyManager, "_prio_patched"):
+    _old_process_fn = MultiAgentPolicyManager.process_fn
 
+    def _patched_process_fn(self, batch, buffer, indices):
+        # 1. let the original method do all the real work
+        processed = _old_process_fn(self, batch, buffer, indices)
 
-def env_creator(config=None):
-    return PettingZooEnv(RootEnv())
+        # 2. wherever the priority fields existed in the original batch,
+        #    copy them into every agent sub-batch that lost them
+        def _repair(sub):
+            for k in ("weight", "index"):
+                if k in batch and k not in sub:
+                    sub[k] = batch[k]
 
+        if isinstance(processed, dict):          # new-ish Ti­anshou
+            for sb in processed.values():
+                _repair(sb)
+        elif isinstance(processed, (list, tuple)):
+            for sb in processed:
+                _repair(sb)
+        else:                                    # single-agent fallback
+            _repair(processed)
+
+        # 3. also keep the keys in the returned (re-stacked) batch
+        for k in ("weight", "index"):
+            if k in batch and k not in processed:
+                processed[k] = batch[k]
+
+        return processed
+
+    MultiAgentPolicyManager.process_fn = _patched_process_fn
+    MultiAgentPolicyManager._prio_patched = True
+
+BATCH_SIZE = 64
+TRAINING_NUM = 10
 
 faction_color_map = {
     'marquise': 'orange',
@@ -31,35 +64,83 @@ faction_color_map = {
     'vagabond': 'gray'
 }
 
-
-def new_file_handler(iter_idx: int) -> logging.FileHandler:
-    fname = LOG_DIR / f"run-{iter_idx:05d}.log"
-    fh = logging.FileHandler(fname, mode="w", encoding="utf‑8")
-    fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-    fh.setFormatter(fmt)
-    fh.setLevel(logging.WARNING)
-    return fh
+agent_names = ['marquise', 'eyrie', 'woodland_alliance', 'vagabond']
+LOG_DIR = Path("logs/root")
 
 
-def plot_metric(data_dict, episodes, title, ylabel, filename, plot_dir, colors=None):
+def _get_env():
+    return PettingZooEnv(RootEnv())
+
+
+def plot_metric(data_dict, title, ylabel, filename, plot_dir, colors=None, log_scale=False):
     fig, ax = plt.subplots()
-    for i, (label, values) in enumerate(data_dict.items()):
+    for i, (agent_name, values) in enumerate(data_dict.items()):
         color = colors[i] if colors and i < len(colors) else None
-        ax.plot(episodes, values, label=label.capitalize(), color=color)
-
+        ax.plot(values, label=agent_name.capitalize(), color=color)
+    if log_scale:
+        plt.yscale('log')
     ax.set_title(title)
-    ax.set_xlabel("Training Iteration")
+    ax.set_xlabel("Episode")
     ax.set_ylabel(ylabel)
     ax.legend()
-    ax.grid()
+    ax.grid(True)
     plt.tight_layout()
+    os.makedirs(plot_dir, exist_ok=True)
     plt.savefig(os.path.join(plot_dir, filename))
     plt.close()
 
 
-def feature_dim_from(space, obs_key="observations") -> int:
-    subspace = space[obs_key] if isinstance(space, gym.spaces.Dict) else space
-    return int(np.prod(subspace.shape))
+def _get_agents():
+    env = _get_env()
+
+    obs_shape = env.observation_space["observation"].shape
+    act_shape = env.action_space.n
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    agents = []
+
+    for i in range(4):
+
+        net = Net(state_shape=obs_shape,
+                  action_shape=act_shape,
+                  hidden_sizes=[1024, 1024, 1024],
+                  device=device,
+                  softmax=True,
+                  num_atoms=60,
+                  ).to(device)
+
+        optim = torch.optim.Adam(net.parameters(), lr=1e-4)
+
+        base_policy = RainbowPolicy(model=net, optim=optim,
+                                    action_space=env.action_space, estimation_step=3, target_update_freq=320, num_atoms=60, v_max=25, v_min=-10).to(device)
+        # Feature extractor for ICM
+        feature_net = Net(state_shape=obs_shape,
+                          hidden_sizes=[256, 256], device=device)
+        feature_dim = feature_net.output_dim
+
+        # icm_module = IntrinsicCuriosityModule(
+        #     feature_net=feature_net,
+        #     feature_dim=feature_dim,
+        #     action_dim=act_shape,
+        #     hidden_sizes=[256, 256],
+        #     device=device
+        # )
+
+        # icm_policy = ICMPolicy(
+        #     policy=base_policy,
+        #     model=icm_module,
+        #     optim=torch.optim.Adam(
+        #         list(net.parameters()) + list(icm_module.parameters()), lr=1e-4
+        #     ),
+        #     lr_scale=1.0,
+        #     reward_scale=0.1,
+        #     forward_loss_weight=0.2,
+        #     action_space=env.action_space,
+        # ).to(device)
+
+        agents.append(base_policy)
+
+    return MultiAgentPolicyManager(policies=agents, env=env)
 
 
 if __name__ == "__main__":
@@ -68,243 +149,126 @@ if __name__ == "__main__":
     print("GPU Device:", torch.cuda.get_device_name(
         0) if torch.cuda.is_available() else "None")
 
-    # Set up Logging
+    # Environment setup
 
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    # ch = logging.StreamHandler()
-    # ch.setLevel(logging.WARNING)
-    # ch.setFormatter(logging.Formatter(
-    #     "%(asctime)s [%(levelname)s] %(message)s"))
-    # logger.addHandler(ch)
+    train_envs = SubprocVectorEnv([_get_env for _ in range(TRAINING_NUM)])
+    test_envs = SubprocVectorEnv([_get_env for _ in range(TRAINING_NUM)])
+    seed = 1
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    train_envs.seed(seed)
+    test_envs.seed(seed)
 
-    current_fh = new_file_handler(0)
-    logger.addHandler(current_fh)
+    # Agent Setup
 
-    matplotlib.use("Agg")
+    policy = _get_agents()
 
-    # Initialize Ray
-    ray.init()
+    # Logging
 
-    gpu_num = ray.cluster_resources()['GPU']
-    cpu_num = int(ray.cluster_resources()['CPU'])
-    print(gpu_num)
-    print(cpu_num)
+    # Prepare per-agent TensorBoard loggers
 
-    # Environment and Model setup
-    env_name = "root_v0"
-    register_env(env_name, lambda _: PettingZooEnv(RootEnv()))
-    ModelCatalog.register_custom_model(
-        "TorchActionMaskModel", TorchActionMaskModel)
+    writer = SummaryWriter(log_dir=LOG_DIR)
+    tb_logger = TensorboardLogger(writer)
 
-    test_env = env_creator()
-    obs_space = test_env.observation_space["marquise"]
-    act_space = test_env.action_space["marquise"]
+    # Collector Setup
 
-    policies = {
-        name: (None, obs_space, act_space, {})
-        for name in ["marquise", "eyrie", "woodland_alliance", "vagabond"]
-    }
+    train_collector = Collector(policy, train_envs, PrioritizedVectorReplayBuffer(
+        total_size=15_000,
+        buffer_num=len(train_envs),
+        alpha=0.6,
+        beta=0.4
+    ))
+    test_collector = Collector(policy, test_envs, exploration_noise=True)
+    # Batch Size *  training num
+    # train_collector.collect(
+    #     n_step=BATCH_SIZE * TRAINING_NUM, reset_before_collect=True)
 
-    # Trainer setup
-    config = (
-        PPOConfig()
-        .environment(env=env_name, disable_env_checking=True)
-        .api_stack(enable_rl_module_and_learner=False,
-                   enable_env_runner_and_connector_v2=False)
-        .env_runners(num_env_runners=cpu_num - 3)
-        .framework(framework="torch")
-        .checkpointing(export_native_model_files=True)
-        .multi_agent(
-            policies=policies,
-            policy_mapping_fn=lambda agent_id, *a, **k: agent_id,
-        )
-        .resources(num_gpus=1)  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
-        .debugging(log_level='WARN')  # INFO, DEBUG, WARN, ERROR
-        .training(
-            lr=2e-5,
-            gamma=0.99,
-            vf_clip_param=100.0,
-            model={
-                "custom_model": "TorchActionMaskModel",
-                "custom_model_config": {
-                    "no_masking": False,
-                    "lstm_hidden_size": 1024,
-                    "fc_layer_sizes": [1024, 1024, 512]
-                },
-            }
-        )
-    )
+    # Training Callbacks
 
-    algo = config.build_algo()
+    agent_rewards = {name: [] for name in agent_names}
+    agent_losses = {name: [] for name in agent_names}
+    vp_tracking = {name: [] for name in agent_names}
 
-    train_dict = {
-        'episode': [],
-        'episode_reward': [],
-        'step_num': [],
-        'total_episodes': [],
-        'total_steps': [],
-        'faction_losses': {
-            'marquise': [],
-            'eyrie': [],
-            'woodland_alliance': [],
-            'vagabond': []
-        },
-        'faction_rewards': {
-            'marquise': [],
-            'eyrie': [],
-            'woodland_alliance': [],
-            'vagabond': []
-        },
-        'faction_steps': {
-            'marquise': [],
-            'eyrie': [],
-            'woodland_alliance': [],
-            'vagabond': []
-        },
-        'faction_vf_losses': {
-            'marquise': [],
-            'eyrie': [],
-            'woodland_alliance': [],
-            'vagabond': []
-        }
-    }
+    agent_episodes = []
 
-    checkpoint_dir = "training/checkpoints/"
-    plot_dir = "training/plots/"
-    os.makedirs(checkpoint_dir, exist_ok=True)
-    os.makedirs(plot_dir, exist_ok=True)
+    def save_best_fn(policy):
+        os.makedirs("log/root/rainbow", exist_ok=True)
+        # save all agent nets
+        for agent, p in zip(agent_names, policy.policies.values()):
+            torch.save(p.state_dict(), f"log/root/rainbow/{agent}.pth")
 
-    iteration_num = 100_000
+    # stop when average reward across agents >= some threshold
+    def stop_fn(mean_rewards):
+        return False
 
-    for i in tqdm(range(iteration_num)):
-        result = algo.train()
+    # set exploration schedules
+    def train_fn(epoch, env_step):
 
-        train_dict['episode'].append(i)
-        train_dict['episode_reward'].append(
-            result['env_runners']['episode_reward_mean'])
-        train_dict['step_num'].append(result['timesteps_total'])
-        train_dict['total_episodes'].append(
-            result['env_runners']['episodes_this_iter'])
-        train_dict['total_steps'].append(result['num_env_steps_sampled'])
+        for p in policy.policies.values():
+            p.set_eps(max(0.1, 1 - epoch / 200))
+        beta_start = 0.4
+        beta_end = 1.0
+        max_epochs = 500
+        frac = min(epoch / max_epochs, 1.0)
+        beta = beta_start + frac * (beta_end - beta_start)
+        train_collector.buffer.set_beta(beta)
 
-        logger.warning(f"Episode: {i}")
-        for faction in train_dict['faction_losses'].keys():
-            learner_info = result["info"]["learner"].get(faction)
+    def test_fn(epoch, env_step):
+        for p in policy.policies.values():
+            p.set_eps(0.05)
 
-            if learner_info:
-                policy_loss = learner_info["learner_stats"]["policy_loss"]
-                vf_loss = learner_info["learner_stats"]["vf_loss"]
-            else:  # Take average of last 5 if they exist if no data found
-                recent_policy = train_dict["faction_losses"][faction][-5:]
-                recent_vf = train_dict["faction_vf_losses"][faction][-5:]
+    # reward metric: mean over all agents
+    def reward_metric(rews):
+        return rews.mean(axis=0)
 
-                policy_loss = (sum(recent_policy) /
-                               len(recent_policy)) if recent_policy else 0.0
-                vf_loss = (sum(recent_vf) / len(recent_vf)
-                           ) if recent_vf else 0.0
+    class CustomLogger(TensorboardLogger):
+        def log_update_data(self, data, step):
+            # print(data)
+            for name, agent in zip(agent_names, policy.policies.values()):
+                try:
+                    agent_loss = data['smoothed_loss'][f"{name}/loss"]
+                except:
+                    print("\nError: Used Previous Agent Loss")
+                    agent_loss = agent_losses[name][-1]
+                # print(agent_loss)
+                agent_losses[name].append(agent_loss)
 
-                logger.warning(
-                    f"No learner stats for {faction} in iter {i}; "
-                    f"using averaged fallback (policy={policy_loss:.4f}, vf={vf_loss:.4f})"
-                )
+        def log_test_data(self, data, step):
+            for idx, name in enumerate(agent_names):
+                try:
+                    reward = data["returns"][idx]
+                except:
+                    print("\nERROR: Used Previous Agent Reward")
+                    reward = agent_rewards[name][-1]
 
-            # bookkeeping exactly as before
-            train_dict['faction_losses'][faction].append(policy_loss)
-            train_dict['faction_vf_losses'][faction].append(vf_loss)
+                agent_rewards[name].append(reward)
 
-            faction_reward = result['env_runners']['policy_reward_mean'].get(
-                faction, 0.0)
-            faction_steps = learner_info['num_agent_steps_trained'] if learner_info else 0
-            train_dict['faction_rewards'][faction].append(faction_reward)
-            train_dict['faction_steps'][faction].append(faction_steps)
+            plot_metric(agent_losses, "Agent Loss",
+                        "Loss", "agent_loss.png", LOG_DIR, colors=list(faction_color_map.values()), log_scale=True)
+            plot_metric(agent_rewards, "Agent Reward",
+                        "Reward", "agent_reward.png", LOG_DIR, colors=list(faction_color_map.values()))
+            # plot_metric(vp_tracking, "Victory Points",
+            #             "Victory Points", "vp_graph.png", LOG_DIR)
 
-            average_reward = faction_reward / \
-                max(result['env_runners']['episodes_this_iter'], 1)
-            reward_per_step = average_reward / max(faction_steps, 1)
+    tb_logger = CustomLogger(writer)
 
-            logger.debug(
-                f"  {faction.capitalize()} - Steps: {faction_steps:.2f}, "
-                f"Reward: {average_reward:.2f}, per‑step Rwd: {reward_per_step:.4f}"
-            )
-
-        colors = [faction_color_map[faction]
-                  for faction in train_dict['faction_rewards']]
-
-        if (i + 1) % 100 == 0 and i != 0:
-            logger.removeHandler(current_fh)
-            current_fh.close()
-            current_fh = new_file_handler(i)
-            logger.addHandler(current_fh)
-
-        # Save checkpoint every 10 iterations
-        if (i + 1) % 10 == 0:
-
-            algo.save(checkpoint_dir)
-            logger.warning(
-                f"Checkpoint saved at iteration {i + 1}: {checkpoint_dir}")
-
-            plot_metric(
-                data_dict=train_dict['faction_rewards'],
-                episodes=train_dict['episode'],
-                title="Combined Episode Rewards",
-                ylabel="Episode Reward",
-                filename="combined_episode_reward_per_iteration.png",
-                plot_dir=plot_dir,
-                colors=colors
-            )
-
-            plot_metric(
-                data_dict=train_dict['faction_vf_losses'],
-                episodes=train_dict['episode'],
-                title="Combined Value Function Losses",
-                ylabel="VF Loss",
-                filename="combined_vf_loss_per_iteration.png",
-                plot_dir=plot_dir,
-                colors=colors
-            )
-
-            plot_metric(
-                data_dict=train_dict['faction_losses'],
-                episodes=train_dict['episode'],
-                title="Combined Policy Function Losses",
-                ylabel="Policy Loss",
-                filename="combined_policy_loss_per_iteration.png",
-                plot_dir=plot_dir,
-                colors=colors
-            )
-
-            for faction in train_dict['faction_rewards']:
-                plot_metric(
-                    data_dict={
-                        faction: train_dict['faction_rewards'][faction]},
-                    episodes=train_dict['episode'],
-                    title=f"{faction.capitalize()} Episode Reward per Iteration",
-                    ylabel="Episode Reward",
-                    filename=f"{faction}_episode_reward_per_iteration.png",
-                    plot_dir=plot_dir,
-                    colors=[faction_color_map[faction]]
-                )
-
-            for faction in train_dict['faction_vf_losses']:
-                plot_metric(
-                    data_dict={
-                        faction: train_dict['faction_vf_losses'][faction]},
-                    episodes=train_dict['episode'],
-                    title=f"{faction.capitalize()} VF Loss per Iteration",
-                    ylabel="VF Loss",
-                    filename=f"{faction}_vf_loss_per_iteration.png",
-                    plot_dir=plot_dir,
-                    colors=[faction_color_map[faction]]
-                )
-
-            for faction in train_dict['faction_vf_losses']:
-                plot_metric(
-                    data_dict={faction: train_dict['faction_losses'][faction]},
-                    episodes=train_dict['episode'],
-                    title=f"{faction.capitalize()} Policy Loss per Iteration",
-                    ylabel="Policy Loss",
-                    filename=f"{faction}_policy_loss_per_iteration.png",
-                    plot_dir=plot_dir,
-                    colors=[faction_color_map[faction]]
-                )
+    # Run Training
+    result = OffpolicyTrainer(
+        policy=policy,
+        train_collector=train_collector,
+        test_collector=test_collector,
+        max_epoch=500,
+        step_per_epoch=5000,
+        step_per_collect=200,
+        episode_per_test=10,
+        batch_size=BATCH_SIZE,
+        train_fn=train_fn,
+        test_fn=test_fn,
+        stop_fn=stop_fn,
+        save_best_fn=save_best_fn,
+        update_per_step=0.1,
+        test_in_train=False,
+        reward_metric=reward_metric,
+        logger=tb_logger
+    ).run(reset_prior_to_run=True)
+    print("finished: ", result)

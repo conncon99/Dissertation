@@ -195,10 +195,15 @@ class EyrieDynasties(Faction):
         # Suit Diversity Rewards
 
         def suit_diversity_bonus(clearings): return len(
-            set(c.get_suit() for c in clearings)) * 0.5
+            set(c.get_suit() for c in clearings))
 
         potential_vp += suit_diversity_bonus(available_clearings)
         potential_vp += suit_diversity_bonus(roostless_clearings)
         potential_vp += suit_diversity_bonus(fighting_clearings)
+
+        # Decree Length Rewards
+
+        potential_vp += len(self.decree_cards[BUILD]) + len(self.decree_cards[BATTLE]) + len(
+            self.decree_cards[MOVE]) + len(self.decree_cards[RECRUIT])
 
         return potential_vp + super().get_potential_vp(game_state)

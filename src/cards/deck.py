@@ -45,10 +45,10 @@ class Deck:
             MOUSE_AMBUSH,
             RABBIT_AMBUSH,
             # Dominance Cards
-            FOX_DOMINANCE,
-            MOUSE_DOMINANCE,
-            RABBIT_DOMINANCE,
-            BIRD_DOMINANCE,
+            # FOX_DOMINANCE,
+            # MOUSE_DOMINANCE,
+            # RABBIT_DOMINANCE,
+            # BIRD_DOMINANCE,
             # Favour Cards
             FAVOR_OF_THE_RABBITS,
             FAVOR_OF_THE_FOXES,

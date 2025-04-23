@@ -412,10 +412,9 @@ class Mask:
         KEEP_OFFSET = 33
         ALLIANCE_OFFSET = 34
         SYMPATHY_OFFSET = 37
-        RUIN_OFFSET = 47
 
         offset_types = {"Roost": ROOST_OFFSET, "Sawmill": SAWMILL_OFFSET, "Workshop": WORKSHOP_OFFSET, "Recruiter": RECRUITER_OFFSET, "Wood Token": WOOD_OFFSET, "Keep Token": KEEP_OFFSET,
-                        "Alliance Fox Base": ALLIANCE_OFFSET, "Alliance Mouse Base": ALLIANCE_OFFSET + 2, "Alliance Rabbit Base": ALLIANCE_OFFSET + 1, "Sympathy Token": SYMPATHY_OFFSET, "Ruin": RUIN_OFFSET}
+                        "Alliance Fox Base": ALLIANCE_OFFSET, "Alliance Mouse Base": ALLIANCE_OFFSET + 2, "Alliance Rabbit Base": ALLIANCE_OFFSET + 1, "Sympathy Token": SYMPATHY_OFFSET}
         return offset_types[piece.name]
 
     def action_mask(

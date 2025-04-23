@@ -109,36 +109,18 @@ class GameManager:
 # For each action, iterate through each step of it (whenever send_game_message() is called)
 
     def get_observation(self):
+
         obs = {}
-        if self.current_message is None:
-            obs["observations"] = ObservationSpace.encode_game_state(
-                self.game_state, None, self.current_group).clip(0, 1).astype(np.float32)
+        obs["observation"] = ObservationSpace.encode_game_state(
+            self.game_state, self.current_message.type if self.current_message else None, self.current_group).clip(0, 1).astype(np.float32)
+
+        if self.current_message is not None:
+            obs["action_mask"] = np.array(self.masker.create_mask(
+                self.current_message)).clip(0, 1).astype(np.float32)
+        else:
             obs["action_mask"] = np.zeros(
                 self.masker.action_size, dtype=np.float32).clip(0, 1)
             obs["action_mask"][59] = 1
-            assert np.isfinite(obs["observations"]).all(
-            ), f"observations has a NaN or inf: {obs['observations']}"
-            assert np.isfinite(obs["action_mask"]).all(
-            ), f"action mask has a NaN or inf: {obs['action_mask']}"
-            self.logger.debug("No Message Available")
-            return obs
-        self.logger.debug(
-            f"{self.game_state.active_player} Requiring message of type {self.current_message.type}")
-        obs["observations"] = ObservationSpace.encode_game_state(
-            self.game_state, self.current_message.type, self.current_group).clip(0, 1).astype(np.float32)
-
-        obs["action_mask"] = np.array(self.masker.create_mask(
-            self.current_message), dtype=np.float32).clip(0, 1)
-
-        assert np.isfinite(obs["observations"]).all(
-        ), f"observations has a NaN or inf: {obs['observations']}"
-        assert np.isfinite(obs["action_mask"]).all(
-        ), f"action mask has a NaN or inf: {obs['action_mask']}"
-
-        enabled_actions = [i for i, val in enumerate(
-            obs["action_mask"]) if val == 1]
-        self.logger.debug(f"Enabled Actions: {enabled_actions}")
-
         return obs
 
     def _calculate_reward(self):

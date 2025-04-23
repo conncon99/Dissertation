@@ -11,3 +11,4 @@ training/checkpoints/
 training/logs/
 *.png
 *.pkl
+logs/root/
