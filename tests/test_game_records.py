@@ -35,3 +35,16 @@ def test_game_is_independent_of_previous_games():
     again = _play(seed=123, action_seed=1)
     assert first == again
     replay(first)
+
+
+def test_writer_rotates_to_gzip_and_reader_reads_both(tmp_path):
+    from rl.records import GameRecordWriter
+    records = list(iter_records([GOLDEN]))
+    path = str(tmp_path / "worker_000.jsonl")
+    writer = GameRecordWriter(path, rotate_bytes=20_000)
+    for _, _, record in records:
+        writer.write(record)
+    writer.close()
+    files = sorted(p.name for p in tmp_path.iterdir())
+    assert any(f.endswith(".jsonl.gz") for f in files)
+    assert [r for _, _, r in iter_records([str(tmp_path)])] == [r for _, _, r in records]

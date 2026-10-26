@@ -18,3 +18,5 @@ tqdm>=4.66
 tianshou
 
 ray[rllib]        
+tensorboard
+pytest

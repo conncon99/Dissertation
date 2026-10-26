@@ -1,8 +1,10 @@
 """Writing, reading and replaying game records (one JSON object per line)."""
 from __future__ import annotations
 import glob
+import gzip
 import json
 import os
+import shutil
 from typing import Iterable, Iterator
 
 from rl.root_game import RootGame, RECORD_FORMAT
@@ -13,31 +15,63 @@ class ReplayMismatch(AssertionError):
 
 
 class GameRecordWriter:
-    """Appends records to a .jsonl file, flushing each line so a crash loses at most one game."""
+    """Appends records to a .jsonl file, flushing each line so a crash loses at most one game.
 
-    def __init__(self, path: str) -> None:
-        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    Once the file exceeds ``rotate_bytes`` it is compressed to ``<name>.<n>.jsonl.gz`` and a new
+    file is started, so finished chunks take ~5x less disk while the live file stays plain text.
+    The file is only created when the first record is written.
+    """
+
+    def __init__(self, path: str, rotate_bytes: int | None = 64 * 2**20) -> None:
         self.path = path
-        self._file = open(path, "a", encoding="utf-8")
+        self.rotate_bytes = rotate_bytes
+        self._file = None
 
     def write(self, record: dict) -> None:
+        if self._file is None:
+            os.makedirs(os.path.dirname(self.path) or ".", exist_ok=True)
+            self._file = open(self.path, "a", encoding="utf-8")
         self._file.write(json.dumps(record, separators=(",", ":")) + "\n")
         self._file.flush()
+        if self.rotate_bytes and self._file.tell() >= self.rotate_bytes:
+            self._rotate()
+
+    def _rotate(self) -> None:
+        self._file.close()
+        self._file = None
+        stem = self.path[:-len(".jsonl")] if self.path.endswith(".jsonl") else self.path
+        n = 1
+        while os.path.exists(f"{stem}.{n:05d}.jsonl.gz"):
+            n += 1
+        tmp = f"{stem}.{n:05d}.jsonl.gz.tmp"
+        with open(self.path, "rb") as src, gzip.open(tmp, "wb", compresslevel=6) as dst:
+            shutil.copyfileobj(src, dst)
+        os.replace(tmp, f"{stem}.{n:05d}.jsonl.gz")
+        os.remove(self.path)
 
     def close(self) -> None:
-        self._file.close()
+        if self._file is not None:
+            self._file.close()
+            self._file = None
 
 
 def iter_records(paths: Iterable[str]) -> Iterator[tuple[str, int, dict]]:
-    """Yields (file, line number, record) for every record in the given files/globs/directories."""
+    """Yields (file, line number, record) for every record in the given files/globs/directories.
+
+    Reads plain .jsonl and rotated .jsonl.gz files. Directories are searched recursively,
+    skipping their ``errors`` folders (records of games that crashed).
+    """
     files = []
     for p in paths:
         if os.path.isdir(p):
-            files.extend(sorted(glob.glob(os.path.join(p, "**", "*.jsonl"), recursive=True)))
+            found = glob.glob(os.path.join(p, "**", "*.jsonl"), recursive=True)
+            found += glob.glob(os.path.join(p, "**", "*.jsonl.gz"), recursive=True)
+            files.extend(sorted(f for f in found if "errors" not in os.path.relpath(f, p).split(os.sep)[:-1]))
         else:
             files.extend(sorted(glob.glob(p)) or [p])
     for path in files:
-        with open(path, encoding="utf-8") as f:
+        opener = gzip.open if path.endswith(".gz") else open
+        with opener(path, "rt", encoding="utf-8") as f:
             for line_no, line in enumerate(f, 1):
                 line = line.strip()
                 if line:
