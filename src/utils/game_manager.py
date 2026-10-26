@@ -187,7 +187,8 @@ class GameManager:
 
         # End-of-game rewards are given at most once per faction, however many times the
         # reward is computed after the game has been decided
-        if (self.winner is not None or self.turn_count >= self.turn_limit) and                 player.faction_id not in self._terminal_rewarded:
+        game_decided = self.winner is not None or self.turn_count >= self.turn_limit
+        if game_decided and player.faction_id not in self._terminal_rewarded:
             self._terminal_rewarded.add(player.faction_id)
             if isinstance(self.winner, list):
                 if player in self.winner:
