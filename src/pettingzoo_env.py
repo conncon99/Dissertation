@@ -5,12 +5,12 @@ from pettingzoo.utils import wrappers
 import numpy as np
 from gymnasium.spaces import Box, Dict, Discrete
 from src.utils.game_manager import GameManager
+from src.utils.global_state import reset_global_state
 from src.utils.game_settings import GameSettings
 from src.factions.marquise_de_cat import Marquise
 from src.factions.eyrie_dynasties import EyrieDynasties
 from src.factions.woodland_alliance import WoodlandAlliance
 from src.factions.vagabond.vagabond import Vagabond
-from src.utils.colour_utils import original_print
 from src.controllers.base_controllers.action_decoder import Decoder
 import logging
 
@@ -26,8 +26,15 @@ class RootEnv(AECEnv):
         "name": "root_v0",
     }
 
-    def __init__(self, render_mode=None):
+    def __init__(self, render_mode=None, turn_limit=30, settle_terminal_rewards=True):
+        """settle_terminal_rewards: when the game ends, every faction (not only the last one to
+        act) receives its final reward, so the win/loss bonus reaches all players"""
         super().__init__()
+        self.turn_limit = turn_limit
+        self.settle_terminal_rewards = settle_terminal_rewards
+        self._faction_id_to_agent = {
+            Factions.MARQUISE_DE_CAT.value: "marquise", Factions.EYRIE_DYNASTY.value: "eyrie",
+            Factions.WOODLAND_ALLIANCE.value: "woodland_alliance", Factions.VAGABOND.value: "vagabond"}
 
         self.possible_agents = ["marquise", "eyrie",
                                 "woodland_alliance", "vagabond"]
@@ -48,6 +55,10 @@ class RootEnv(AECEnv):
             agent: agent_obs_space for agent in self.agents}
 
         self.render_mode = render_mode
+        self._zero_mask = np.zeros(action_size, dtype=np.float32)
+        self._empty_observation = {"observation": np.zeros(obs_dim, dtype=np.float32),
+                                   "action_mask": self._zero_mask}
+        self.observations = {}
 
     def observation_space(self, agent):
         return self.observation_spaces[agent]
@@ -56,14 +67,19 @@ class RootEnv(AECEnv):
         return self.action_spaces[agent]
 
     def observe(self, agent):
-        # Only encode when there is no stored observation (a .get default is always evaluated)
-        if agent in self.observations:
-            return self.observations[agent]
-        return self.gm.get_observation()
+        """The observation for agent. Only agent_selection has a non-empty action mask; other
+        agents get the observation from their last decision with an all-zero mask"""
+        obs = self.observations.get(agent)
+        if obs is None:
+            return self._empty_observation
+        if agent == self.agent_selection and not self.gm.done:
+            return obs
+        return {"observation": obs["observation"], "action_mask": self._zero_mask}
 
     def reset(self, seed=None, options=None):
-        if seed is not None:
-            np.random.seed(seed)
+        # Restores module-level card singletons and ID registries, and reseeds numpy if a
+        # seed is given, so a game only depends on its seed and actions
+        reset_global_state(seed)
         self.logger.debug("Reset Called")
         self.agents = self.possible_agents[:]
         self.rewards = {agent: 0 for agent in self.agents}
@@ -80,14 +96,18 @@ class RootEnv(AECEnv):
         vagabond = Vagabond(controller=None)
 
         settings = GameSettings([marquise, eyrie, woodland_alliance, vagabond])
-        self.gm = GameManager(settings, turn_limit=30)
+        self.gm = GameManager(settings, turn_limit=self.turn_limit)
+        # Observations are only encoded for the faction that has to decide (in _advance)
+        self.gm.compute_observations = False
         self.gm.reset_ids()
 
         self.agent_selection = self._faction_to_agent(
             settings.get_setup_order()[0])
         self.gm.game_state.current_player = self.gm.setup_order[0]
         self.gm.game_state.active_player = self.gm.setup_order[0]
-        self.observations[self.agent_selection] = self.gm.get_observation()
+        # Rewards computed during setup (before the first decision) are credited too
+        self.rewards = self._rewards_dict(self._advance())
+        self._accumulate_rewards()
 
     def render(self):
         for faction in self.gm.settings.faction_list:
@@ -102,69 +122,72 @@ class RootEnv(AECEnv):
                 print(f"{faction} VP: {faction.victory_points}")
 
     def step(self, action):
-
-        if self.gm.game_state.active_player:
-            self._update_agent_selection_from_gm()
-        # Just means the program is done as all agents terminate at the same time
+        # All agents terminate at the same time, so the game is over
         if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
             self.agents = []
             return
 
-        self.logger.debug(f"Agent Selection: {self.agent_selection}")
-        # Play move
-        if not self.gm.current_message:
-            self.logger.debug("Performing None Step")
-            assert self._faction_to_agent(
-                self.gm.game_state.active_player) == self.agent_selection
-            obs, reward, done, info = self.gm.step(None)
-            self.observations[self.agent_selection] = obs
-            self.infos[self.agent_selection] = info
-            self.rewards[self.agent_selection] += reward
-            self._cumulative_rewards[self.agent_selection] += reward
+        agent = self.agent_selection
+        assert self._faction_to_agent(self.gm.game_state.active_player) == agent
+        self.logger.debug(f"Agent Selection: {agent} Action: {action}")
+        # The agent's earlier rewards were reported by the previous last()
+        self._cumulative_rewards[agent] = 0
+
+        if not self.observations[agent]["action_mask"][action]:
+            self.logger.warning(f"Chosen action not allowed by mask!")
+            rewards = np.zeros(len(self.possible_agents))
         else:
-            self.logger.debug(f"Action: {action}")
-            mask = self.gm.masker.create_mask(self.gm.current_message)
-            self.logger.debug(mask[action])
-            if mask[action] == 0:
-                self.logger.warning(f"Chosen action not allowed by mask!")
-            else:
-                assert self._faction_to_agent(
-                    self.gm.game_state.active_player) == self.agent_selection
-                # Convert move into correct format
-                self.logger.debug("Mask Allows action")
-                action = Decoder.decode(action, self.gm.current_message)
-                self.logger.debug(f"Decoded Action: {action}")
-                obs, reward, done, info = self.gm.step(action)
-                self.observations[self.agent_selection] = obs
-                self.infos[self.agent_selection] = info
-                self.rewards[self.agent_selection] += reward
-                self._cumulative_rewards[self.agent_selection] += reward
+            self.gm.step(Decoder.decode(action, self.gm.current_message))
+            rewards = self._advance()
+
+        # Rewards produced by this step (including the steps advanced internally), credited
+        # to the faction each one was computed for
+        self.rewards = self._rewards_dict(rewards)
+        self._accumulate_rewards()
 
         if self.render_mode == "human":
             self.render()
 
         if self.gm.done:
-            if self.gm.turn_count >= self.gm.turn_limit:
-                self.truncations = {
-                    agent: True for agent in self.possible_agents
-                }
-            else:
-                self.terminations = {
-                    agent: self.gm.done for agent in self.possible_agents}
             self.agents = []
             for agent in self.possible_agents:
                 self.logger.debug(
                     f"{agent} Cumulative Rewards: {self._cumulative_rewards[agent]}")
-            return None
+
+    def _advance(self) -> np.ndarray:
+        """Run the game until a faction must make a decision (which becomes agent_selection)
+        or the game ends, and return the rewards computed on the way (index faction_id - 1).
+
+        Steps where no decision is needed (current_message is None) are played here instead of
+        being handed to an agent whose action would be ignored."""
+        gm = self.gm
+        while not gm.done:
+            # Past the turn limit the next step ends the game, ignoring the action
+            if gm.current_message is None or gm.turn_count >= gm.turn_limit:
+                gm.step(None)
+            else:
+                break
+        rewards = gm.pop_rewards()
+
+        if gm.done:
+            if self.settle_terminal_rewards:
+                gm.settle_terminal_rewards()
+                rewards += gm.pop_rewards()
+            if gm.turn_count >= gm.turn_limit:
+                self.truncations = {agent: True for agent in self.possible_agents}
+            else:
+                self.terminations = {agent: True for agent in self.possible_agents}
+            return rewards
+
+        self.agent_selection = self._faction_to_agent(gm.game_state.active_player)
+        self.observations[self.agent_selection] = gm.get_observation()
+        return rewards
+
+    def _rewards_dict(self, rewards: np.ndarray):
+        return {self._faction_id_to_agent[i + 1]: float(r) for i, r in enumerate(rewards)}
 
     def close(self):
         pass
 
-    def _update_agent_selection_from_gm(self):
-        active_faction = self.gm.game_state.active_player
-        self.agent_selection = self._faction_to_agent(active_faction)
-
     def _faction_to_agent(self, faction: Faction):
-        faction_ids = {Factions.MARQUISE_DE_CAT.value: "marquise", Factions.EYRIE_DYNASTY.value: "eyrie",
-                       Factions.WOODLAND_ALLIANCE.value: "woodland_alliance", Factions.VAGABOND.value: "vagabond"}
-        return faction_ids[faction.faction_id]
+        return self._faction_id_to_agent[faction.faction_id]
