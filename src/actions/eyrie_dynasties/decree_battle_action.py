@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from src.utils.root_types import Suits
+from src.utils.root_types import Suits, suit_matches
 from src.actions.factionless.battle_action import BattleAction
 from src.controllers.messages.game_messages import BattleClearingChoiceMessage, BattleTargetChoiceMessage
 from src.actions.action_group_registry import ActionIDs
@@ -26,7 +26,7 @@ class DecreeBattleAction(BattleAction):
 
     def _get_valid_battle_clearings(self, game_state: GameState, executor):
         valid_clearings = super()._get_valid_battle_clearings(game_state, executor)
-        return [clearing for clearing in valid_clearings if clearing.get_suit() == self.suit]
+        return [clearing for clearing in valid_clearings if suit_matches(self.suit, clearing.get_suit())]
 
     def perform(self, game_state: GameState, executor: EyrieDynasties):
         # 1. Choose clearing to battle on and who to battle against
@@ -44,5 +44,5 @@ class DecreeBattleAction(BattleAction):
         target = response.chosen_target
         game_state.selected_clearing = None
         # 2. battle
-        self.battle(clearing, target, executor, game_state)
+        yield from self.battle(clearing, target, executor, game_state)
         super(BattleAction, self).perform(game_state, executor)

@@ -262,7 +262,7 @@ class GameManager:
                         self.current_message = next(self.faction_setup_iter)
                         if self.current_message is not None:
                             return self._step_observation(), self._calculate_reward(), False, {}
-                    except:
+                    except StopIteration:
                         # Faction setup completed immediately
                         self._advance_setup_index()
                         if self.setup_complete:
@@ -321,7 +321,7 @@ class GameManager:
                             return self._step_observation(), self._calculate_reward(), False, {}
                         else:
                             continue
-                    except:
+                    except StopIteration:
                         self._check_win_conditions()
                         reward = self._calculate_reward()
                         self._advance_step_indexes()

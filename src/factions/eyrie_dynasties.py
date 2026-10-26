@@ -144,6 +144,11 @@ class EyrieDynasties(Faction):
                     self.discard_card(card)
         self.decree_cards: Dict[int, List[Card]] = {
             RECRUIT: [], MOVE: [], BATTLE: [], BUILD: []}
+        # The decree's actions live in the daylight decree groups and must be purged with the
+        # cards; otherwise every card ever added stays on the decree and turmoil becomes certain
+        daylight_groups = self.actions[CallbackTimes.IN_DAYLIGHT]
+        for decree_type in (RECRUIT, MOVE, BATTLE, BUILD):
+            daylight_groups[decree_type].actions.clear()
         self.subtract_vp(victory_points_removed)
         if self.victory_points < 0:
             self.victory_points = 0
@@ -160,9 +165,13 @@ class EyrieDynasties(Faction):
             f" - Chose {self.eyrie_leader.name.capitalize()} as new eyrie leader")
         self.assign_leader_viziers()
 
-        # 4. End Daylight immediately and begin evening
-        for action_group in self.actions[CallbackTimes.IN_DAYLIGHT][1:]:
-            action_group.cancel_action_group()
+        # 4. End Daylight immediately and begin evening. Only the current group and the ones
+        # after it are cancelled: a cancel flag on a group that already ran this turn would
+        # persist and wrongly skip that decree column next turn
+        daylight_groups = self.actions[CallbackTimes.IN_DAYLIGHT]
+        first = daylight_groups.index(action_group) if action_group in daylight_groups else 1
+        for group in daylight_groups[max(first, 1):]:
+            group.cancel_action_group()
 
     def get_potential_vp(self, game_state):
         potential_vp = 0

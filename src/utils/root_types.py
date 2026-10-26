@@ -9,6 +9,11 @@ class Suits(Enum):
     BIRD = 4  # The bird is a wild card
 
 
+def suit_matches(card_suit: Suits, clearing_suit: Suits) -> bool:
+    """Whether a card of card_suit can be used for a clearing of clearing_suit (birds are wild)"""
+    return card_suit == Suits.BIRD or card_suit == clearing_suit
+
+
 # A type containing all non-wild (bird) suits
 BASE_SUITS = Literal[Suits.FOX, Suits.MOUSE, Suits.RABBIT]
 

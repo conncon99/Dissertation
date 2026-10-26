@@ -1,7 +1,7 @@
 from __future__ import annotations
 from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from src.utils.root_types import Suits
+from src.utils.root_types import Suits, suit_matches
 from src.pieces.eyrie_dynasties.eyrie_buildings import Roost
 from src.controllers.messages.game_messages import DecreeBuildMessage
 from src.actions.action_group_registry import ActionIDs
@@ -21,13 +21,12 @@ class DecreeBuildAction(Action):
         self.turmoil_action = True
 
     def can_perform(self, executor: EyrieDynasties, game_state=None):
-        return len(executor.roosts < executor.max_roosts) and any(clearing.get_suit() == self.suit and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots) for clearing in game_state.board.clearings)
+        return len(executor.roosts) < executor.max_roosts and any(suit_matches(self.suit, clearing.get_suit()) and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots) for clearing in game_state.board.clearings)
 
     def perform(self, game_state: GameState, executor: EyrieDynasties):
 
         # Make a list of clearings that the eyrie owns that matches the suit of this card
-        available_clearings = [clearing for clearing in game_state.board.clearings if clearing.get_suit(
-        ) == self.suit and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots)]
+        available_clearings = [clearing for clearing in game_state.board.clearings if suit_matches(self.suit, clearing.get_suit()) and clearing.get_owner() == executor.faction_id and clearing.has_free_slots() and all(not isinstance(slot, Roost) for slot in clearing.slots)]
 
         # Choose clearing
         response = yield DecreeBuildMessage(game_state, self.action_group, available_clearings)

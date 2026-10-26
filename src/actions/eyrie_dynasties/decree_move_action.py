@@ -2,7 +2,7 @@ from __future__ import annotations
 from src.actions.action_handler import Action
 from src.actions.factionless.move_action import MoveAction
 from typing import TYPE_CHECKING, List, Tuple
-from src.utils.root_types import Suits
+from src.utils.root_types import Suits, suit_matches
 from src.controllers.messages.game_messages import MoveFromMessage, MoveToMessage, MoveUnitsMessage
 from src.controllers.messages.controller_messages import MoveFromResponse, MoveToResponse, MoveUnitsResponse
 from src.actions.action_group_registry import ActionIDs
@@ -28,7 +28,7 @@ class DecreeMoveAction(MoveAction):
 
     def _valid_from_clearings(self, game_state, executor):
         return [
-            clearing for clearing in game_state.board.clearings if clearing.get_suit() == self.suit and len(clearing.units[executor.faction_id]) != 0]
+            clearing for clearing in game_state.board.clearings if suit_matches(self.suit, clearing.get_suit()) and len(clearing.units[executor.faction_id]) != 0]
 
     def perform(self, game_state: GameState, executor: EyrieDynasties):
         # 1. Get all possible moves
