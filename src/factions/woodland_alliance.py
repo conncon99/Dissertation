@@ -76,6 +76,14 @@ class WoodlandAlliance(Faction):
     def get_bonus_card_draws(self):
         return len([base for base in self.bases.values() if base is not None])
 
+    def place_sympathy(self, clearing: Clearing) -> Sympathy:
+        """Place a sympathy token and score the victory points on the space uncovered (8.4.2.III)"""
+        vp = self.sympathy_track[len(self.sympathy)][1]
+        token = Sympathy(clearing, self)
+        self.add_vp(vp)
+        self.logger.info(f" - Placed sympathy token on clearing {clearing.index}, scoring {vp} VP")
+        return token
+
     def get_base_count(self) -> int:
         return sum(base is not None for base in self.bases.values())
 
@@ -95,22 +103,16 @@ class WoodlandAlliance(Faction):
             triggerer.hand.remove(chosen_card)
             self.logger.info(
                 f" - {triggerer} has given matching card '{chosen_card}' to The {self}")
-        # 2. If the player does not have a matching card, they must show the alliance their hand, and the alliance chooses which card to take
-        elif len(triggerer.hand) > 0:
-            game_state.active_player = self
-            response = yield AllianceOutrageMessage(self.game_state, action_group, triggerer.hand)
-            chosen_card = response.chosen_card
-            triggerer.hand.remove(chosen_card)
-            self.logger.info(
-                f" - The {self} has taken non-matching card '{chosen_card}' from {triggerer}")
-            game_state.active_player = triggerer
-        # 3. If the player has no cards, the alliance draws a card from the deck
+        # 2. If the player has no matching card (including birds), they show their hand to the alliance
+        #    and the alliance draws a card from the deck instead
         else:
+            self.logger.info(
+                f" - {triggerer} has no matching card and shows their hand to the {self}: {triggerer.hand}")
             chosen_card = self.deck.draw(1)
             if chosen_card != []:
                 chosen_card = chosen_card[0]
                 self.logger.info(
-                    f" - {triggerer} has no cards, drew '{chosen_card}' from the deck")
+                    f" - The {self} drew '{chosen_card}' from the deck")
             else:
                 set_print_colour(triggerer.print_colour)
                 return

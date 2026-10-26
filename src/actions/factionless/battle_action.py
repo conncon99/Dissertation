@@ -21,8 +21,12 @@ if TYPE_CHECKING:
 
 class BattleModifiers():
     def __init__(self, attacker: Faction, defender: Faction, clearing: Clearing):
+        # Extra hits dealt by the attacker (to the defender) and by the defender (to the attacker)
         self.attacker_damage_modifier = 0
         self.defender_damage_modifier = 0
+        # Armorers: the rolled hits dealt by that side are ignored
+        self.ignore_attacker_rolled_hits = False
+        self.ignore_defender_rolled_hits = False
         self.attacker = attacker
         self.defender = defender
         self.clearing = clearing
@@ -51,7 +55,8 @@ class BattleAction(Action):
     def _get_valid_battle_clearings(self, game_state: GameState, executor: Faction) -> List[Clearing]:
         valid_clearings = []
         for clearing in game_state.board.clearings:
-            if clearing.get_faction_piece_count(executor.faction_id) == 0:
+            # Battles are started from clearings with your warriors or pawn (4.3)
+            if clearing.get_faction_warrior_count(executor.faction_id) == 0:
                 continue
             for faction in game_state.faction_list:
                 if faction.faction_id == executor.faction_id:
@@ -93,6 +98,7 @@ class BattleAction(Action):
         available_ambush_cards = [
             card for card in defender.hand if isinstance(card, AmbushCard) and (card.suit == clearing.get_suit() or card.suit == Suits.BIRD)]
         ambush_response = None
+        # Step 1: Defender may ambush (4.3.1)
         if available_ambush_cards != []:
             # If they have multiple ambush cards choose one, otherwise use the only one
             game_state.battle_data = BattleData(
@@ -103,11 +109,19 @@ class BattleAction(Action):
             if ambush_response.ambush_card is not None:
                 yield from ambush_response.ambush_card._callback(
                     game_state, self.action_group, battle_modifier)
+                # If no attacking warriors or pawns remain, the battle ends immediately (4.3.1.II)
+                if attacker.faction_id != Factions.VAGABOND.value and clearing.get_faction_warrior_count(attacker.faction_id) == 0:
+                    self.logger.info(
+                        " - No attacking warriors remain after the ambush, ending the battle")
+                    game_state.battle_data = None
+                    return
 
+        was_ambushed = ambush_response is not None and ambush_response.ambush_card is not None
+
+        # The Vagabond may attack alongside an allied faction (9.2.9.II.c)
+        chosen_ally = None
         if attacker.faction_id == Factions.VAGABOND.value:
-            pass
             # Get allies excluding the other faction involved
-            # Choose ally (can be None), friendly_warrior_count = undamaged swords + allied warriors on clearing
             available_allies = attacker.get_allied_warriors_in_clearing(
                 clearing)
             if defender in available_allies:
@@ -116,26 +130,26 @@ class BattleAction(Action):
             if available_allies != []:
                 available_allies.append(None)
                 game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id ==
-                                                    game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None)
+                                                    game_state.current_player.faction_id, was_ambushed)
                 game_state.active_player = attacker
                 response = yield ChooseAllyMessage(game_state, self.action_group, available_allies)
                 chosen_ally = response.chosen_ally
                 game_state.active_player = game_state.current_player
                 attacker.battle_ally = chosen_ally
-                friendly_warrior_count = attacker.satchel.get_non_damaged_count(Items.SWORD) if chosen_ally is None else attacker.satchel.get_non_damaged_count(
-                    Items.SWORD) + clearing.get_faction_warrior_count(chosen_ally.faction_id)
                 if chosen_ally is not None:
-                    pass
                     self.logger.info(
                         f" - Attacking with '{chosen_ally}' as ally")
-            else:
-                friendly_warrior_count = attacker.satchel.get_non_damaged_count(
-                    Items.SWORD)
+
+        # Step 2: Roll dice. Maximum rolled hits is limited by the number of warriors (4.3.2.I)
+        if attacker.faction_id == Factions.VAGABOND.value:
+            friendly_warrior_count = attacker.satchel.get_non_damaged_count(
+                Items.SWORD)
+            if chosen_ally is not None:
+                friendly_warrior_count += clearing.get_faction_warrior_count(
+                    chosen_ally.faction_id)
         else:
             friendly_warrior_count = clearing.get_faction_warrior_count(
                 attacker.faction_id)
-        friendly_warrior_count = clearing.get_faction_warrior_count(
-            attacker.faction_id) if attacker.faction_id != Factions.VAGABOND.value else attacker.satchel.get_non_damaged_count(Items.SWORD)
         enemy_warrior_count = clearing.get_faction_warrior_count(
             defender.faction_id) if defender.faction_id != Factions.VAGABOND.value else defender.satchel.get_non_damaged_count(Items.SWORD)
 
@@ -150,43 +164,59 @@ class BattleAction(Action):
             attacker_dmg = min(max(roll1, roll2), friendly_warrior_count)
             defender_dmg = min(min(roll1, roll2), enemy_warrior_count)
 
+        if game_state.use_manual_rolling:
+            attacker_dmg = int(input("Enter Attacker Damage: "))
+            defender_dmg = int(input("Enter Defender Damage: "))
+
         self.logger.debug(
             f" - Attacker ({attacker}) Damage before mods: {attacker_dmg}")
         self.logger.debug(
             f" - Defender ({defender}) Damage before mods: {defender_dmg}")
 
-        if game_state.use_manual_rolling:
-            attacker_dmg = int(input("Enter Attacker Damage: "))
-            defender_dmg = int(input("Enter Defender Damage: "))
+        def refresh_battle_data():
+            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, was_ambushed,
+                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
 
-        game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id,
-                                            ambush_response and ambush_response.ambush_card is not None, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
+        # Step 3: Use effects (4.3.3). Extra hits are not limited by the number of warriors
         if attacker.faction_id == Factions.EYRIE_DYNASTY.value and attacker.eyrie_leader == EyrieLeaders.Commander:
-            attacker_dmg += 1
+            battle_modifier.attacker_damage_modifier += 1
 
-        for callback in defender.battle_callbacks[BattleCallbackTimes.IN_BATTLE_ATTACKER]:
-            yield from callback(game_state, self.action_group, battle_modifier)
-            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
-                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
-        for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE_DEFENDER]:
-            yield from callback(game_state, self.action_group, battle_modifier)
-            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
-                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
-        for callback in attacker.battle_callbacks[BattleCallbackTimes.IN_BATTLE]:
-            yield from callback(game_state, self.action_group, battle_modifier)
-            game_state.battle_data = BattleData(attacker, defender, clearing, attacker.faction_id == game_state.current_player.faction_id, ambush_response and ambush_response.ambush_card is not None,
-                                                attacker_damage_modifier=battle_modifier.attacker_damage_modifier, defender_damage_modifier=battle_modifier.defender_damage_modifier, attacker_roll=attacker_dmg, defender_roll=defender_dmg)
+        # Defenseless: the attacker deals an extra hit if the defender has no warriors (4.3.3.II)
+        if enemy_warrior_count == 0:
+            self.logger.info(f" - {defender} is defenseless")
+            battle_modifier.attacker_damage_modifier += 1
 
-        attacker_dmg += battle_modifier.attacker_damage_modifier
-        defender_dmg += battle_modifier.defender_damage_modifier
-        attacker_dmg = max(attacker_dmg, 0)
-        defender_dmg = max(defender_dmg, 0)
+        refresh_battle_data()
 
+        for owner, callback_time in ((attacker, BattleCallbackTimes.IN_BATTLE_ATTACKER),
+                                     (attacker, BattleCallbackTimes.IN_BATTLE),
+                                     (defender, BattleCallbackTimes.IN_BATTLE_DEFENDER),
+                                     (defender, BattleCallbackTimes.IN_BATTLE)):
+            # Copy as cards remove themselves from the list when they are used
+            for callback in list(owner.battle_callbacks[callback_time]):
+                yield from callback(game_state, self.action_group, battle_modifier)
+                refresh_battle_data()
+
+        # Armorers: rolled hits are ignored, extra hits are not
+        if battle_modifier.ignore_attacker_rolled_hits:
+            attacker_dmg = 0
+        if battle_modifier.ignore_defender_rolled_hits:
+            defender_dmg = 0
+
+        attacker_dmg = max(attacker_dmg + battle_modifier.attacker_damage_modifier, 0)
+        defender_dmg = max(defender_dmg + battle_modifier.defender_damage_modifier, 0)
+
+        # Step 4: Deal hits (4.3.4)
+        if attacker.faction_id == Factions.VAGABOND.value:
+            attacker.infamy_active = True
         yield from clearing.damage(victim=defender, attacker=attacker,
                                    amount=attacker_dmg, logger=self.logger, action_group=self.action_group)
+        attacker_is_vagabond = attacker.faction_id == Factions.VAGABOND.value
+        if attacker_is_vagabond:
+            attacker.infamy_active = False
         yield from clearing.damage(victim=attacker, attacker=defender,
                                    amount=defender_dmg, logger=self.logger, action_group=self.action_group)
-        if attacker.faction_id == Factions.VAGABOND.value and attacker.battle_ally:
+        if attacker_is_vagabond and attacker.battle_ally:
             attacker.battle_ally = None
         set_print_colour(attacker.print_colour)
         game_state.battle_data = None

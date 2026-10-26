@@ -30,7 +30,7 @@ class Pawn(Piece, PieceWithID):
                 attacker.relationship_track.relationship_level[self.faction.faction_id] = HOSTILE
                 self.logger.info(
                     f" - {attacker} became hostile with {self.faction}")
-            elif not attacker.dominance:
+            elif attacker.infamy_active and not attacker.dominance:
                 attacker.add_vp(1)
                 self.logger.info(f" - {attacker} gained 1 VP due to Infamy")
 

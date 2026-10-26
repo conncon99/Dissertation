@@ -46,7 +46,7 @@ class MoveAction(Action):
             from_clearing.units[executor.faction_id].remove(unit)
             to_clearing.units[executor.faction_id].append(unit)
             unit.space = to_clearing
-        if any(faction.faction_id == Factions.WOODLAND_ALLIANCE for faction in game_state.faction_list) and executor.faction_id != Factions.WOODLAND_ALLIANCE.value and any(isinstance(item, Sympathy) for item in to_clearing.tokens[Factions.WOODLAND_ALLIANCE.value]):
+        if any(faction.faction_id == Factions.WOODLAND_ALLIANCE.value for faction in game_state.faction_list) and executor.faction_id != Factions.WOODLAND_ALLIANCE.value and any(isinstance(item, Sympathy) for item in to_clearing.tokens[Factions.WOODLAND_ALLIANCE.value]):
             self.logger.info(
                 " - Moved into clearing with a sympathy token: Outrage Triggered")
             # Trigger outrage

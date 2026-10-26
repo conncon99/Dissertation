@@ -23,9 +23,9 @@ class Building(Piece, PieceWithID):
         return super().damage(amount, attacker, action_group)
 
     def destroy(self, attacker: Faction, action_group=None):
-        if not attacker.dominance:
+        if attacker and not attacker.dominance:
             from src.factions.vagabond.relationship_track import HOSTILE
-            if attacker.faction_id == Factions.VAGABOND.value and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:
+            if attacker.faction_id == Factions.VAGABOND.value and attacker.infamy_active and attacker.relationship_track.relationship_level[self.faction.faction_id] == HOSTILE:
                 self.logger.info(f" - {attacker} gained 1 VP due to Infamy")
                 attacker.add_vp(1)
 

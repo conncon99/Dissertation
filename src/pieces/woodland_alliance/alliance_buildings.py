@@ -27,7 +27,7 @@ class AllianceBase(Building):
         # Discard all matching and bird supporters
         self.logger.info(
             f" - {self.suit.name.capitalize()} Base Destroyed, discarding all Bird and {self.suit.name.capitalize()} supporters")
-        for card in self.faction.supporters:
+        for card in list(self.faction.supporters):
             if card.suit == self.suit or card.suit == Suits.BIRD:
                 self.faction.supporters.remove(card)
                 self.faction.discard_card(card)
@@ -41,7 +41,7 @@ class AllianceBase(Building):
         if all(base is None for base in self.faction.bases.values()):
             self.logger.info(
                 f" - No bases remaining, discarding supporters down to 5")
-            num_to_discard = abs(5 - len(self.faction.supporters))
+            num_to_discard = max(len(self.faction.supporters) - 5, 0)
             for i in range(num_to_discard):
                 if self.faction.supporters == []:
                     break

@@ -17,11 +17,12 @@ class EveningRestAction(Action):
         return isinstance(executor.vagabond_pawn.space, Forest) and executor.satchel.has_damaged_items() and super().can_perform(executor, game_state)
 
     def perform(self, game_state, executor: Vagabond):
+        # Move every damaged item back to the satchel (or its track) face up
         for item in executor.satchel.exhausted_damaged_items.keys():
-            if executor.satchel.exhausted_damaged_items[item] > 0:
+            while executor.satchel.exhausted_damaged_items[item] > 0:
                 executor.satchel.refresh_item(item, True)
         for item in executor.satchel.available_damaged_items.keys():
-            if executor.satchel.available_damaged_items[item] > 0:
+            while executor.satchel.available_damaged_items[item] > 0:
                 executor.satchel.repair_item(item, False)
         return super().perform(game_state, executor)
         yield
