@@ -56,6 +56,9 @@ if not hasattr(MultiAgentPolicyManager, "_prio_patched"):
 
 BATCH_SIZE = 64
 TRAINING_NUM = 10
+# Rainbow value distribution (standard C51 atom count); must match nn_controller.py
+NUM_ATOMS = 51
+V_MIN, V_MAX = -10, 25
 
 faction_color_map = {
     'marquise': 'orange',
@@ -106,13 +109,13 @@ def _get_agents():
                   hidden_sizes=[1024, 1024, 512],
                   device=device,
                   softmax=True,
-                  num_atoms=340,
+                  num_atoms=NUM_ATOMS,
                   ).to(device)
 
         optim = torch.optim.Adam(net.parameters(), lr=1e-4)
 
         base_policy = RainbowPolicy(model=net, optim=optim,
-                                    action_space=env.action_space, estimation_step=3, target_update_freq=320, num_atoms=340, v_max=25, v_min=-10).to(device)
+                                    action_space=env.action_space, estimation_step=3, target_update_freq=320, num_atoms=NUM_ATOMS, v_max=V_MAX, v_min=V_MIN).to(device)
         # Feature extractor for ICM
         feature_net = Net(state_shape=obs_shape,
                           hidden_sizes=[256, 256], device=device)

@@ -24,7 +24,8 @@ class NN_Controller(Controller):
         self.state_dim = 896
         self.action_dim = 340
         self.mask = Mask(self.action_dim)
-        V_MIN, V_MAX, N_ATOMS = -10.0, 25.0, 340
+        # Must match the Rainbow configuration in main.py
+        V_MIN, V_MAX, N_ATOMS = -10.0, 25.0, 51
         self.SUPPORT = torch.linspace(V_MIN, V_MAX, N_ATOMS)
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,7 +37,7 @@ class NN_Controller(Controller):
             action_shape=self.action_dim,
             hidden_sizes=[1024, 1024, 512],
             softmax=True,
-            num_atoms=340,
+            num_atoms=N_ATOMS,
             device=device,
         ).to(device)
 
