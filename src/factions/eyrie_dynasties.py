@@ -108,11 +108,8 @@ class EyrieDynasties(Faction):
         return crafting_resources
 
     def get_bonus_card_draws(self):
-        if len(self.roosts) == 3:
-            return 1
-        elif len(self.roosts) == 6:
-            return 2
-        return 0
+        # One card per uncovered draw bonus: uncovered once 3 and 6 roosts are on the map
+        return (1 if len(self.roosts) >= 3 else 0) + (1 if len(self.roosts) >= 6 else 0)
 
     def add_card_to_decree(self, card: Card, decree_type: int):
         self.decree_cards[decree_type].append(card)
@@ -144,23 +141,23 @@ class EyrieDynasties(Faction):
                     self.discard_card(card)
         self.decree_cards: Dict[int, List[Card]] = {
             RECRUIT: [], MOVE: [], BATTLE: [], BUILD: []}
-        # The decree's actions live in the daylight decree groups and must be purged with the
-        # cards; otherwise every card ever added stays on the decree and turmoil becomes certain
-        daylight_groups = self.actions[CallbackTimes.IN_DAYLIGHT]
+        # The decree actions of the purged cards (and the old viziers) are removed too
         for decree_type in (RECRUIT, MOVE, BATTLE, BUILD):
-            daylight_groups[decree_type].actions.clear()
+            self.actions[CallbackTimes.IN_DAYLIGHT][decree_type].actions.clear()
         self.subtract_vp(victory_points_removed)
         if self.victory_points < 0:
             self.victory_points = 0
         self.logger.info(
             f" - Discarded decree and lost {victory_points_removed} victory points")
 
-        # 3. Depose - Choose a new leader and re-assign viziers - if there are no available leaders, they all become available
+        # 3. Depose - The current leader is set aside face down, then a new leader is chosen from those face up and the
+        #    viziers are re-assigned. If there are no face up leaders, they all flip face up (7.7.3)
         if not self.remaining_leaders:
             self.remaining_leaders = [leader for leader in EyrieLeaders]
 
         response = yield TurmoilLeaderMessage(self.game_state, action_group, self.remaining_leaders)
         self.eyrie_leader: EyrieLeaders = response.chosen_leader
+        self.remaining_leaders.remove(self.eyrie_leader)
         self.logger.info(
             f" - Chose {self.eyrie_leader.name.capitalize()} as new eyrie leader")
         self.assign_leader_viziers()

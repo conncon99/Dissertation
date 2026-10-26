@@ -97,6 +97,8 @@ class RangerCharacter(VagabondCharacter):
             ranger_response: RangerRepairResponse = yield RangerRepairMessage(game_state, action_group, available_damaged_items, exhausted_damaged_items)
             executor.satchel.repair_item(
                 ranger_response.chosen_item, ranger_response.is_exhausted)
+        # Then immediately end Daylight and begin Evening
+        action_group.cancel_action_group()
 
 
 class Characters(Enum):

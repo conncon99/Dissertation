@@ -28,7 +28,7 @@ class VagabondMoveAction(Action):
         available_clearings = self._generate_clearing_costs(
             executor, game_state, self.cobbler_move)
         for clearing, cost in available_clearings.items():
-            if executor.satchel.available_items[Items.BOOTS] > cost:
+            if executor.satchel.available_items[Items.BOOTS] >= cost:
                 return True
         return False
 

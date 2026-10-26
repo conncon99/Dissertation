@@ -13,7 +13,9 @@ class DominanceAction(Action):
 
     def perform(self, game_state, executor):
         if executor.dominance == Suits.BIRD:
-            if (game_state.board.clearings[0].get_owner() == executor.faction_id and game_state.board.clearings[11].get_owner() == executor.faction_id) or (game_state.board.clearings[1].get_owner() == executor.faction_id and game_state.board.clearings[8].get_owner() == executor.faction_id):
+            # Rule two opposite corner clearings (3.3.1.II)
+            board = game_state.board
+            if any(corner.get_owner() == executor.faction_id and board.get_opposite_corner(corner).get_owner() == executor.faction_id for corner in board.corner_clearings):
                 executor.has_won = True
                 self.logger.info(f"{executor} has acheived Bird Dominance")
         else:

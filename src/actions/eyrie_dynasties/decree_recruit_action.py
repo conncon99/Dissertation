@@ -1,7 +1,7 @@
 from __future__ import annotations
 from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from src.utils.root_types import Suits, suit_matches, EyrieLeaders, Factions
+from src.utils.root_types import Suits, EyrieLeaders, Factions
 from src.pieces.pawn import Pawn
 from src.controllers.messages.game_messages import DecreeRecruitClearingMessage
 from src.pieces.marquise_de_cat.marquise_tokens import Keep
@@ -22,25 +22,23 @@ class DecreeRecruitAction(Action):
         self.turmoil_action = True
 
     def can_perform(self, executor: EyrieDynasties, game_state=None):
-        return any(roost for roost in executor.roosts if suit_matches(self.suit, roost.get_suit()) and not any(isinstance(token, Keep) for token in roost.space.tokens[Factions.MARQUISE_DE_CAT.value])) and len(executor.units) < executor.max_warriors
+        # Charismatic must place two warriors, so both need to be in the supply (7.8.2)
+        warriors_needed = 2 if executor.eyrie_leader == EyrieLeaders.Charismatic else 1
+        return len(self._get_available_clearings(executor)) > 0 and executor.max_warriors - len(executor.units) >= warriors_needed
+
+    def _get_available_clearings(self, executor: EyrieDynasties):
+        # Bird cards match every clearing (2.1.1)
+        return [roost.space for roost in executor.roosts if (self.suit == Suits.BIRD or roost.get_suit() == self.suit) and not any(isinstance(token, Keep) for token in roost.space.tokens[Factions.MARQUISE_DE_CAT.value])]
 
     def perform(self, game_state, executor: EyrieDynasties):
-        valid_roosts = [
-            roost for roost in executor.roosts if suit_matches(self.suit, roost.get_suit())]
-
-        available_clearings = [roost.space for roost in valid_roosts if not any(isinstance(
-            token, Keep) for token in roost.space.tokens[Factions.MARQUISE_DE_CAT.value])]
+        available_clearings = list(
+            dict.fromkeys(self._get_available_clearings(executor)))
 
         response = yield DecreeRecruitClearingMessage(game_state, self.action_group, available_clearings)
         roost_clearing: Clearing = response.chosen_clearing
         Pawn(roost_clearing, executor)
 
         if executor.eyrie_leader == EyrieLeaders.Charismatic:
-            if len(executor.units) >= executor.max_warriors:
-                self.logger.info(
-                    f" - Cannot place any more warriors: TURMOIL TRIGGERED")
-                yield from executor.trigger_turmoil(self.action_group)
-                return
             Pawn(roost_clearing, executor)
 
         return super().perform(game_state, executor)

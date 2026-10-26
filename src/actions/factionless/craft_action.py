@@ -1,3 +1,4 @@
+import types
 from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
 from src.controllers.messages.game_messages import CraftMessage
@@ -40,7 +41,7 @@ class CraftAction(Action):
                 return False
 
         # Needs necessary resources
-        crafting_resources = executor.get_crafting_resources()
+        crafting_resources = executor.get_available_crafting_resources()
         remaining_fox = crafting_resources[Suits.FOX] - \
             card.crafting_recipe[Suits.FOX]
         remaining_mouse = crafting_resources[Suits.MOUSE] - \
@@ -68,14 +69,19 @@ class CraftAction(Action):
         # 3. Craft card
         self.logger.info(f" - '{executor}' Crafted '{card}'")
         card.owner = executor
+        executor.use_crafting_resources(card.crafting_recipe)
 
         if card.is_persistent:
             executor.hand.remove(card)
             executor.active_cards.append(card)
             self.logger.info(f" - Active Cards: {executor.active_cards}")
-            card.activate(game_state, self.action_group)
+            result = card.activate(game_state, self.action_group)
         else:
-            card.activate(game_state, self.action_group)
+            result = card.activate(game_state, self.action_group)
+        # Some effects (e.g. Favor cards) need to ask for decisions
+        if isinstance(result, types.GeneratorType):
+            yield from result
+        if not card.is_persistent:
             executor.discard_card(card)
         self.post_craft_callback(executor, card)
         super().perform(game_state, executor)

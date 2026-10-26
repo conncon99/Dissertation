@@ -24,14 +24,14 @@ class SpreadSympathyAction(Action):
         valid_clearings = []
         # 1. If no sympathy are on the board, all clearings are available (provided they can be paid for)
         if len(executor.sympathy) == 0:
-            return [clearing for clearing in game_state.board.clearings if self.can_afford_sympathy(executor, clearing, game_state)]
+            return [clearing for clearing in game_state.board.clearings if not clearing.has_keep() and self.can_afford_sympathy(executor, clearing, game_state)]
         else:
             # 2. Otherwise, the clearing must be adjacent to a sympathetic clearing - sympathy cannot be placed on a clearing that already has sympathy
             sympathetic_clearings: List[Clearing] = [
                 sympathy.space for sympathy in executor.sympathy]
             for sympathetic_clearing in sympathetic_clearings:
                 for adj_clearing in sympathetic_clearing.adjacent_clearings:
-                    if adj_clearing in sympathetic_clearings:
+                    if adj_clearing in sympathetic_clearings or adj_clearing in valid_clearings or adj_clearing.has_keep():
                         continue
                     if self.can_afford_sympathy(executor, adj_clearing, game_state):
                         valid_clearings.append(adj_clearing)
@@ -51,7 +51,7 @@ class SpreadSympathyAction(Action):
         for supporter in executor.supporters:
             if supporter.suit == Suits.BIRD or supporter.suit == clearing.get_suit():
                 total += 1
-            if total == cost:
+            if total >= cost:
                 return True
         return False
 
@@ -84,6 +84,6 @@ class SpreadSympathyAction(Action):
 
         # 3. Place sympathy on chosen clearing
 
-        Sympathy(chosen_clearing, executor)
+        executor.place_sympathy(chosen_clearing)
         game_state.selected_clearing = None
         return super().perform(game_state, executor)

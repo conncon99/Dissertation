@@ -16,3 +16,8 @@ class VagabondBattleAction(BattleAction):
 
     def can_perform(self, executor: Vagabond, game_state):
         return executor.satchel.available_items[Items.SWORD] > 0 and super().can_perform(executor, game_state)
+
+    def perform(self, game_state, executor: Vagabond):
+        # Exhaust one S to initiate a battle (9.5.2)
+        executor.satchel.exhaust_item(Items.SWORD)
+        yield from super().perform(game_state, executor)

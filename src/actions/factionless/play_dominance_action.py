@@ -25,7 +25,6 @@ class PlayDominanceAction(Action):
             return len(game_state.faction_list) >= 4 and any(card in executor.hand for card in DOMINANCE_CARDS) and not executor.dominance and executor.victory_points >= 10 and any(faction.dominance is None and faction.faction_id != executor.faction_id for faction in game_state.faction_list) and super().can_perform(executor, game_state)
 
     def perform(self, game_state, executor):
-        print("Played Dominance")
         # 1. Choose which dominance card to use if we have multiple
         available_dominance_cards = [
             card for card in executor.hand if card in DOMINANCE_CARDS]

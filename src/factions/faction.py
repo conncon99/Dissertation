@@ -64,9 +64,34 @@ class Faction(ABC):
             **{time: [] for time in CallbackTimes if time not in {CallbackTimes.DOMINANCE_TIME, CallbackTimes.BIRDSONG_START, CallbackTimes.DAYLIGHT_START, CallbackTimes.EVENING_START}}})
 
     used_spanning_actions: Dict[Action, int] = field(default_factory=dict)
+    # Crafting pieces activated this turn, by suit - each may only be activated once per turn (4.1.1)
+    crafting_used: Dict[Suits, int] = field(default_factory=dict)
 
     @abstractmethod
     def get_crafting_resources(self) -> Dict[Suits, int]: ...
+
+    def get_available_crafting_resources(self) -> Dict[Suits, int]:
+        """Crafting pieces that have not yet been activated this turn"""
+        resources = self.get_crafting_resources()
+        return {suit: resources[suit] - self.crafting_used.get(suit, 0) for suit in resources}
+
+    def use_crafting_resources(self, recipe: Dict[Suits, int]) -> None:
+        """Activates crafting pieces to pay for a recipe. Wild costs are paid from the suits with the most pieces left"""
+        available = self.get_available_crafting_resources()
+        for suit in (Suits.FOX, Suits.MOUSE, Suits.RABBIT):
+            amount = recipe.get(suit, 0)
+            available[suit] -= amount
+            self.crafting_used[suit] = self.crafting_used.get(suit, 0) + amount
+        for _ in range(recipe.get(Suits.BIRD, 0)):
+            suit = max((Suits.FOX, Suits.MOUSE, Suits.RABBIT),
+                       key=lambda s: available[s])
+            available[suit] -= 1
+            self.crafting_used[suit] = self.crafting_used.get(suit, 0) + 1
+
+    def reset_turn_state(self) -> None:
+        """Called at the end of this faction's turn"""
+        self.crafting_used = {}
+        self.used_spanning_actions.clear()
 
     @abstractmethod
     def setup_faction(
@@ -89,7 +114,7 @@ class Faction(ABC):
 
     def get_potential_vp(self, game_state: GameState) -> int:
         potential_vp = 0
-        if self.dominance and self.faction_id != Factions.VAGABOND:
+        if self.dominance and self.faction_id != Factions.VAGABOND.value:
             pass
         elif not self.dominance:
             potential_vp += RewardHelper.get_battle_rewards(self, game_state)

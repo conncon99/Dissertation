@@ -58,6 +58,8 @@ class Vagabond(Faction):
         self.prev_tea_track_count: int = 0
 
         self.battle_ally: Optional[Faction] = None
+        # True while the Vagabond is removing pieces in battle on his own turn (Infamy, 9.2.9.III.a)
+        self.infamy_active: bool = False
 
         self.completed_quests: Dict[Suits, int] = {
             suit: 0 for suit in Suits if suit != Suits.BIRD}
@@ -85,6 +87,17 @@ class Vagabond(Faction):
             crafting_resources[self.vagabond_pawn.space.get_suit(
             )] += self.satchel.available_items[Items.HAMMER]
         return crafting_resources
+
+    def get_available_crafting_resources(self):
+        # Hammers are exhausted when crafting, so there is nothing else to track
+        return self.get_crafting_resources()
+
+    def use_crafting_resources(self, recipe) -> None:
+        pass
+
+    def reset_turn_state(self) -> None:
+        super().reset_turn_state()
+        self.relationship_track.reset_aids_per_turn()
 
     def setup_faction(self, map: Map, deck: Deck, game_state: GameState):
         self.logger.info(f"Setting up {self}")

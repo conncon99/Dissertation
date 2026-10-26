@@ -91,7 +91,9 @@ class MarquiseBuild(Action):
                 executor.workshops)][1])
 
         for _ in range(cost):
-            response = yield WoodRemovalMessage(game_state, self.action_group, executor.wood)
+            # Wood can only come from the chosen clearing, or clearings connected to it through clearings the Marquise rule (6.5.4.II)
+            reachable_wood = self._get_reachable_wood(executor, clearing)
+            response = yield WoodRemovalMessage(game_state, self.action_group, reachable_wood)
             wood = response.chosen_wood_token
             wood.destroy(None, self.action_group)
 
@@ -102,6 +104,17 @@ class MarquiseBuild(Action):
             f" - Built {building} on clearing {clearing.index} for slot {building.slot_idx} for {cost} wood")
         game_state.selected_clearing = None
         return super().perform(game_state, executor)
+
+    def _get_reachable_wood(self, executor: Marquise, clearing: Clearing):
+        visited = [clearing]
+        queue = [clearing]
+        while queue:
+            current = queue.pop(0)
+            for adjacent in current.adjacent_clearings:
+                if adjacent not in visited and adjacent.get_owner() == executor.faction_id:
+                    visited.append(adjacent)
+                    queue.append(adjacent)
+        return [wood for wood in executor.wood if wood.space in visited]
 
     def _get_lowest_wood_cost(self, executor: Marquise, available_building_types):
         lowest_cost = math.inf

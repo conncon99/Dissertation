@@ -46,8 +46,9 @@ class GameManager:
         self._terminal_rewarded = set()
         self.compute_observations = True
         self.turn_limit = turn_limit
+        # Item supply (5.1.5): 2 boots, 2 bags, 1 crossbow, 1 hammer, 2 swords, 2 teas, 2 coins
         self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
-                                Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
+                                Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW]
         self.setup_complete = False
         self.current_group = None
         self.setup_order = []
@@ -236,7 +237,7 @@ class GameManager:
         winners = []
 
         for faction in self.settings.faction_list:
-            if faction.dominance and faction.faction_id != Factions.VAGABOND:
+            if faction.dominance and faction.faction_id != Factions.VAGABOND.value:
                 needed_clearings = 2 if faction.dominance == Suits.BIRD else 3
                 if faction.dominance == Suits.BIRD:
                     current_clearings = sum(1 if clearing.get_owner(
@@ -247,7 +248,7 @@ class GameManager:
 
                 self.logger.info(
                     f"{faction} is working towards {faction.dominance} dominance ({current_clearings}/{needed_clearings})")
-            elif faction.dominance and faction.faction_id == Factions.VAGABOND:
+            elif faction.dominance and faction.faction_id == Factions.VAGABOND.value:
                 self.logger.info(
                     f"{faction} is in a coalition with {faction.dominance}")
             else:
@@ -258,6 +259,11 @@ class GameManager:
                 winners.append(faction)
             elif faction.victory_points >= 30:
                 winners.append(faction)
+
+        # If multiple players win simultaneously, the player taking the current turn wins (3.1)
+        current = self.game_state.current_player
+        if len(winners) > 1 and current in winners:
+            winners = [current]
 
         # Coalition win check (for Vagabond)
         for faction in self.settings.faction_list:
@@ -412,6 +418,7 @@ class GameManager:
             self.current_time_index += 1
             if self.current_time_index >= len(list(CallbackTimes)):
                 self.current_time_index = 0
+                current_faction.reset_turn_state()
                 self.current_faction_index += 1
                 if self.current_faction_index >= len(self.turn_order):
                     self.current_faction_index = 0
