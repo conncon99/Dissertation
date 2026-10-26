@@ -19,6 +19,9 @@ import types
 import itertools
 import logging
 
+_CALLBACK_TIMES = list(CallbackTimes)
+_CALLBACK_PHASES = {time: time.get_phase() for time in CallbackTimes}
+
 
 class GameManager:
 
@@ -32,6 +35,7 @@ class GameManager:
         self.game_state = GameState()
         self.game_state.turn_limit = turn_limit
         self.turn_order = self.settings.randomize_turn_order()
+        self.game_state.turn_order = self.turn_order
         self.turn_count = 0
         self.current_message = None
         self.last_reward_player = None
@@ -336,9 +340,12 @@ class GameManager:
             self.game_state.current_player = current_faction
             self.game_state.active_player = current_faction
             set_print_colour(current_faction.print_colour)
-            current_time = list(CallbackTimes)[self.current_time_index]
+            current_time = _CALLBACK_TIMES[self.current_time_index]
+            self.game_state.current_phase = _CALLBACK_PHASES[current_time]
             current_group_set = current_faction.actions[current_time]
             current_group = current_group_set[self.current_group_index]
+            # The group being played is part of the observation
+            self.current_group = current_group
 
             # Action Group handles messages here
             if not self.action_group_iter:
@@ -408,6 +415,7 @@ class GameManager:
                 if self.current_faction_index >= len(self.turn_order):
                     self.current_faction_index = 0
                     self.turn_count += 1
+                    self.game_state.turn_count = self.turn_count
                     self.logger.info(f"Turn: {self.turn_count}")
 
     def _get_faction_by_id(self, faction_id: int) -> Faction:
@@ -418,7 +426,10 @@ class GameManager:
 
     def reset_ids(self):
         PieceWithID.reset_ids()
-        ActionGroupRegistry.reset()
+        # ActionGroupRegistry is not reset here: action group ids are assigned when the factions
+        # are constructed (before the GameManager), so resetting it afterwards left the registry
+        # empty and the observation's action group id feature always 0. It is reset before the
+        # factions are built by src.utils.global_state.reset_global_state
 
     def get_current_faction(self):
         if self.setup_complete and self.current_faction_setup_index < len(self.setup_order):

@@ -19,7 +19,7 @@ class CallbackTimes(Enum):
     IN_EVENING = auto()
 
     def get_phase(self):
-        if self == CallbackTimes.BIRDSONG_START or self == CallbackTimes.IN_BIRDSONG or CallbackTimes.DOMINANCE_TIME:
+        if self == CallbackTimes.BIRDSONG_START or self == CallbackTimes.IN_BIRDSONG or self == CallbackTimes.DOMINANCE_TIME:
             return GamePhase.BIRDSONG
         elif self == CallbackTimes.DAYLIGHT_START or self == CallbackTimes.IN_DAYLIGHT:
             return GamePhase.DAYLIGHT

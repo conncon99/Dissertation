@@ -41,18 +41,15 @@ class ObservationSpace:
             game_state.current_player.faction_id / 4,
             game_state.turn_count / game_state.turn_limit,  # Current Turn Count
             game_state.current_phase.value / 3,  # Current Phase
+            # Turn order position of each faction: 0 = first, 1 = last
             # Marquise de Cat Turn order
-            game_state.faction_list.index(
-                game_state.marquise) / len(game_state.faction_list) - 1,
+            cls._encode_turn_position(game_state, game_state.marquise),
             # Eyrie Dynasties Turn order
-            game_state.faction_list.index(
-                game_state.eyrie_dynasties) / len(game_state.faction_list) - 1,
+            cls._encode_turn_position(game_state, game_state.eyrie_dynasties),
             # Woodland Alliance Turn order
-            game_state.faction_list.index(
-                game_state.woodland_alliance) / len(game_state.faction_list) - 1,
+            cls._encode_turn_position(game_state, game_state.woodland_alliance),
             # Vagabond Turn order
-            game_state.faction_list.index(
-                game_state.vagabond) / len(game_state.faction_list) - 1,
+            cls._encode_turn_position(game_state, game_state.vagabond),
 
             game_state.marquise.victory_points / 30,  # Marquise Victory Points
             game_state.eyrie_dynasties.victory_points /
@@ -182,6 +179,13 @@ class ObservationSpace:
             observation_space.extend(
                 cls._encode_action_list(None))
         return np.array(observation_space)
+
+    @classmethod
+    def _encode_turn_position(cls, game_state: GameState, faction: Faction) -> float:
+        turn_order = game_state.turn_order
+        if not turn_order:
+            return 0.0
+        return turn_order.index(faction) / max(len(turn_order) - 1, 1)
 
     @classmethod
     def _encode_dominance(cls, dominance: Suits) -> float:
@@ -404,10 +408,15 @@ class ObservationSpace:
             1.0 if forest.units[_VAGABOND_ID] else 0.0
         ]
 
+    # Piece locations: 0 = not on the board, (clearing index + 1) / clearing count otherwise
+
+    @classmethod
+    def _encode_piece_clearing(cls, piece, game_state: GameState) -> float:
+        return 0.0 if piece is None else (piece.space.index + 1) / len(game_state.board.clearings)
+
     @classmethod
     def _encode_id_clearing(cls, piece_type: str, id: int, game_state: GameState) -> float:
-        piece = PieceWithID.get_by_id(piece_type, id)
-        return 0 if piece is None else (piece.space.index + 1) / len(game_state.board.clearings) + 1
+        return cls._encode_piece_clearing(PieceWithID.get_by_id(piece_type, id), game_state)
 
     @classmethod
     def _encode_id_clearings(cls, piece_type: str, count: int, game_state: GameState) -> List[float]:
@@ -417,8 +426,8 @@ class ObservationSpace:
         encoded = []
         for i in range(count):
             piece = pieces.get(i, None)
-            encoded.append(0 if piece is None else (
-                piece.space.index + 1) / clearing_count + 1)
+            encoded.append(0.0 if piece is None else (
+                piece.space.index + 1) / clearing_count)
         return encoded
 
     @classmethod
@@ -535,15 +544,14 @@ class ObservationSpace:
         # 10 Sympathy
         alliance_data.extend(cls._encode_id_clearings(
             "Sympathy Token", game_state.woodland_alliance.max_sympathy, game_state))
-        # The base encodings below reuse the last sympathy loop index, as before
-        i = game_state.woodland_alliance.max_sympathy - 1
-
+        # Fox, Rabbit and Mouse base locations (there is one base of each suit)
+        bases = game_state.woodland_alliance.bases
         alliance_data.append(
-            cls._encode_id_clearing("Alliance Fox Base", i, game_state))
+            cls._encode_piece_clearing(bases[Suits.FOX], game_state))
         alliance_data.append(
-            cls._encode_id_clearing("Alliance Rabbit Base", i, game_state))
+            cls._encode_piece_clearing(bases[Suits.RABBIT], game_state))
         alliance_data.append(
-            cls._encode_id_clearing("Alliance Mouse Base", i, game_state))
+            cls._encode_piece_clearing(bases[Suits.MOUSE], game_state))
 
         # 10 Warriors
         alliance_data.extend(cls._encode_id_clearings(

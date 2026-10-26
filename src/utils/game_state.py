@@ -33,6 +33,8 @@ class GameState:
         self.craftable_items: List[Items] = []
         self.current_phase: GamePhase = GamePhase.BIRDSONG
         self.faction_list: List[Faction] = []
+        # Factions in the order they take turns
+        self.turn_order: List[Faction] = []
         self.board: Map = None
         self.deck: Deck = None
         self.marquise: Marquise = None
