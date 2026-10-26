@@ -3,10 +3,11 @@
 Differences from ``src.pettingzoo_env.RootEnv`` (the game rules and reward function are untouched):
   * Steps where the game needs no decision (``current_message is None``) are advanced
     internally instead of being handed to an agent whose action is then ignored.
-  * Rewards are credited to the faction ``_calculate_reward`` was computed for, rather than
-    whichever agent happened to be selected.
+  * Every reward ``_calculate_reward`` computes is credited to the faction it was computed for
+    (``GameManager.pop_rewards``), rather than whichever agent happened to be selected.
   * Optionally, when the game ends every faction (not only the last active one) receives its
-    final ``_calculate_reward`` so the win/loss bonus reaches all players.
+    final ``_calculate_reward`` so the win/loss bonus reaches all players
+    (``GameManager.settle_terminal_rewards``; the bonus is given at most once per faction).
   * Every game is fully determined by its seed and action list, and produces a record that
     ``rl.records.replay`` can use to recreate and verify it.
 """
@@ -99,10 +100,14 @@ class RootGame:
     # ---------------------------------------------------------------- internals
 
     def _gm_step(self, action) -> None:
-        _, reward, _, _ = self.gm.step(action)
-        idx = faction_index(self.gm.last_reward_player)
-        self.rewards[idx] += reward
-        self.returns[idx] += reward
+        self.gm.step(action)
+        self._collect_rewards()
+
+    def _collect_rewards(self) -> None:
+        # Every reward the step computed, credited to the faction it was computed for
+        rewards = self.gm.pop_rewards()
+        self.rewards += rewards
+        self.returns += rewards
 
     def _advance(self) -> None:
         """Run the game forward until a faction must make a decision, or the game ends."""
@@ -133,14 +138,9 @@ class RootGame:
     def _finish(self) -> None:
         gm = self.gm
         if self.settle_terminal_rewards:
-            final_player = gm.last_reward_player
-            for faction in gm.settings.faction_list:
-                if faction is final_player:
-                    continue
-                gm.game_state.active_player = faction
-                reward = gm._calculate_reward()
-                self.rewards[faction_index(faction)] += reward
-                self.returns[faction_index(faction)] += reward
+            # Final reward for every faction that has not yet had its end-of-game reward
+            gm.settle_terminal_rewards()
+            self._collect_rewards()
         self.done = True
         self.obs = None
         self.mask = None

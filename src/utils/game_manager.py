@@ -35,6 +35,11 @@ class GameManager:
         self.turn_count = 0
         self.current_message = None
         self.last_reward_player = None
+        # Every reward _calculate_reward computes, per faction (index faction_id - 1), since the
+        # last pop_rewards() call. A single step() can produce rewards for several factions
+        self.pending_rewards = np.zeros(len(self.settings.faction_list), dtype=np.float64)
+        # Factions that have already received their end-of-game (win/loss/turn limit) reward
+        self._terminal_rewarded = set()
         self.compute_observations = True
         self.turn_limit = turn_limit
         self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
@@ -176,23 +181,51 @@ class GameManager:
                 f"{player} has earned a potential reward of {potential_reward}")
             reward += potential_reward
 
-        if isinstance(self.winner, list):
-            if player in self.winner:
-                reward += 20
-            else:
-                reward -= 5
-        elif self.winner is not None:
-            if player == self.winner:
-                reward += 20
-            else:
+        # End-of-game rewards are given at most once per faction, however many times the
+        # reward is computed after the game has been decided
+        if (self.winner is not None or self.turn_count >= self.turn_limit) and                 player.faction_id not in self._terminal_rewarded:
+            self._terminal_rewarded.add(player.faction_id)
+            if isinstance(self.winner, list):
+                if player in self.winner:
+                    reward += 20
+                else:
+                    reward -= 5
+            elif self.winner is not None:
+                if player == self.winner:
+                    reward += 20
+                else:
+                    reward -= 5
+
+            if self.turn_count >= self.turn_limit:
                 reward -= 5
         self.logger.debug(
             f"{self.game_state.active_player} gained reward of {reward}")
 
-        if self.turn_count >= self.turn_limit:
-            reward -= 5
+        reward = np.clip(reward, -50, 50)
+        self.pending_rewards[player.faction_id - 1] += reward
+        return reward
 
-        return np.clip(reward, -50, 50)
+    def pop_rewards(self) -> np.ndarray:
+        """Rewards computed for each faction (index faction_id - 1) since the previous call.
+
+        Unlike the reward returned by step(), which is only the last value computed (for
+        last_reward_player), this includes every reward computed during the step, including
+        those for action groups that ended without handing control to another faction."""
+        rewards = self.pending_rewards
+        self.pending_rewards = np.zeros_like(rewards)
+        return rewards
+
+    def settle_terminal_rewards(self) -> None:
+        """Once the game is over, compute a final reward for every faction that has not had its
+        end-of-game reward yet, so the win/loss bonus reaches all players (see pop_rewards)"""
+        active_player = self.game_state.active_player
+        last_reward_player = self.last_reward_player
+        for faction in self.settings.faction_list:
+            if faction.faction_id not in self._terminal_rewarded:
+                self.game_state.active_player = faction
+                self._calculate_reward()
+        self.game_state.active_player = active_player
+        self.last_reward_player = last_reward_player
 
     def _check_win_conditions(self):
         winners = []
