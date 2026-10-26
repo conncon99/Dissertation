@@ -72,8 +72,11 @@ Making games reproducible required three engine fixes. None of them changes the 
   building pieces, so piece IDs depended on the previous game. `RootGame` resets them before
   building as well.
 
-`tests/data/golden_games.jsonl` was recorded with the original engine code. Its games still
-replay bit-for-bit, which shows the speedups did not change behaviour.
+`tests/data/golden_games.jsonl` holds 20 games (random legal actions) recorded with
+`py -3.11 -m tools.bench_sim --games 20 --record ...`. The speedups below were verified
+against games recorded with the original engine; the file was then regenerated after the
+behaviour fixes in the last section, so it now guards that behaviour. Any change that makes
+these games replay differently changes the game, the observations or the rewards.
 
 ## Simulator speedups (no behaviour change)
 
@@ -87,29 +90,72 @@ Single-core decisions per second, random legal actions:
 | Faster `Clearing.get_owner`, cached ownership in Marquise wood searches, encoder constant lookups | ~3,700 |
 | Per-space piece counts in the observation encoder | ~3,800 |
 
-`RootEnv` (still used by `main.py`) benefits too: about 960 → 3,000 env steps/s.
+`RootEnv` (still used by `main.py`) benefits too: about 960 → 3,800 env steps/s (since the
+fixes below, every `RootEnv` step is a real decision).
 
-## Issues found but deliberately not changed
+## Behaviour fixes
 
-Fixing these would change behaviour, so it's your call:
+These were first left alone because they change behaviour, then fixed together; the golden
+games were regenerated afterwards.
 
-1. **`RootEnv` gives agents stale or wrong observations.** `step` stores the new observation
-   under the agent that just acted, but `agent_selection` only updates at the start of the
-   next `step`. So when the turn passes to another faction, the previous faction's policy
-   picks an action using the new faction's mask, and that action is then played for the new
-   faction. Agents are also asked to act on steps where `current_message is None`, and those
-   actions are ignored. `RootGame` avoids both problems.
-2. **Only the last active faction receives the end-of-game win/loss reward** from
-   `GameManager`. `RootGame` (with `settle_terminal_rewards`, the default) runs
-   `_calculate_reward` once more for each other faction when the game ends.
-3. **Rewards computed on paths that `continue` are discarded**
-   (`GameManager._run_game_step`). `_calculate_reward` still updates `prev_vp`, so VP gained
-   there never shows up as reward.
-4. **Most observation features saturate:**
-   - `_encode_id_clearing` returns `(index + 1) / 12 + 1`, which is always above 1, so after
-     `clip(0, 1)` every placed piece encodes as `1.0` and its location is lost.
-   - The turn-order features (`index / 4 - 1`) are always ≤ 0, so they clip to `0`.
-5. **The Woodland Alliance base features reuse the last loop index** from the sympathy loop
-   (`_encode_woodland_alliance_data`), so they look up the wrong base IDs.
-6. **The Rainbow setup in `main.py` uses `num_atoms=340`** (the usual value is 51). With
-   340 actions that makes the final layer about 59M weights per agent.
+1. **Eyrie scored ~0 VP in every game** (even with random play for everyone), because of
+   engine bugs rather than the rules:
+   - Bird decree cards are wild, but the decree recruit/move/battle/build actions only
+     matched clearings of exactly the card's suit. No clearing is a bird clearing, so the two
+     Royal Viziers (both birds) could never be resolved and every Eyrie turn ended in
+     turmoil before any roost was built.
+   - Turmoil reset `decree_cards` but not the decree's actions in the daylight action
+     groups, so every card ever added stayed on the decree.
+   - Turmoil cancelled every daylight decree group, including ones already played that
+     turn; the stale cancel flag then skipped that column on the next turn.
+   - `DecreeBuildAction.can_perform` raised `TypeError` (`len(roosts < max_roosts)`), which
+     the bare `except:` in `GameManager._run_game_step` silently turned into skipping the
+     group. `GameManager` now only catches `StopIteration`, so engine errors surface.
+   - `DecreeBattleAction.perform` called `self.battle(...)` without `yield from`, so decree
+     battles never happened.
+   - `DecreeRecruitAction` used the `DECREE_MOVE_*` action ids.
+
+   With random legal actions for every faction the Eyrie scored 0 VP in each of 10 diagnostic
+   games and never built a second roost (decree action lists grew to 10-36 entries). After
+   the fixes it averages 15.3 VP over 200 games (12.5 over the 20 golden games, winning 3).
+2. **`RootEnv` gave agents the wrong observations.** `step` stored the new observation under
+   the agent that had just acted and only updated `agent_selection` at the start of the next
+   `step`, so the previous faction's policy chose with the new faction's mask. Agents were
+   also asked to act on steps needing no decision, and the `rewards` dict was never cleared
+   between steps. `RootEnv` now advances no-decision steps internally like `RootGame`; after
+   every step `agent_selection` is the faction the game is waiting on, `observe` returns its
+   observation and mask (other agents get an all-zero mask), and `rewards` holds this step's
+   rewards per faction. `tests/test_pettingzoo_env.py` checks this, that `RootEnv` and
+   `RootGame` play identical games, and that it runs under Tianshou's `PettingZooEnv`.
+3. **Rewards were discarded and only reached the last active faction.**
+   `GameManager._run_game_step` computed `_calculate_reward` (which advances `prev_vp`) on
+   several paths and threw the value away, so VP gained there was never rewarded. Every
+   computed reward is now accumulated per faction and read with `GameManager.pop_rewards()`
+   (the reward returned by `step` is unchanged: the last value computed). The end-of-game
+   reward (win/loss bonus, turn-limit penalty) is given at most once per faction, and
+   `GameManager.settle_terminal_rewards()` gives it to every faction that has not had it
+   (used by `RootGame` and `RootEnv` with `settle_terminal_rewards`, the default). Because the
+   reward includes a potential-VP shaping term on every computation, factions now also
+   receive that term at the end of each action group, not only at decisions.
+4. **Observation features that saturated or never changed** (OBS_DIM is still 896). These
+   were found by recording the unclipped encoding over 20 random games:
+   - Piece locations were `(index + 1) / 12 + 1`, always above 1, so every placed piece
+     clipped to `1.0`. They are now `(index + 1) / 12`, with `0` meaning not on the board.
+   - Turn-order features were `faction_list.index(f) / 4 - 1` (always ≤ 0, and
+     `faction_list` is not the turn order). They are now the position in
+     `GameManager.turn_order` (as `game_state.turn_order`) scaled to [0, 1].
+   - The Woodland Alliance base features reused the last sympathy loop index as a piece ID
+     and were always 0. Each base's location is now read from `woodland_alliance.bases`.
+   - `game_state.turn_count` and `game_state.current_phase` were never updated (constant 0
+     and Birdsong); `CallbackTimes.get_phase` always returned Birdsong.
+   - `GameManager.current_group` was never set, so the action-group section (group id,
+     ordered, can abort, uses, available actions) was always 0.
+   - `GameManager.reset_ids` reset `ActionGroupRegistry` after the factions had registered
+     their groups, so the group id feature divided by an empty registry.
+
+   Still clipped, but left alone because they are only out of range at the extremes: VP / 30
+   (above 30 VP), the battle roll / 3 (rolls plus extra hits above 3) and the raw battle
+   damage modifiers (`-999` means "ignore hits").
+5. **The Rainbow setup in `main.py` used `num_atoms=340`** (the action count). `main.py`
+   and `NNController` now share the standard 51 atoms (v_min -10, v_max 25). Checkpoints
+   trained with 340 atoms no longer load.

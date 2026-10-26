@@ -1,7 +1,8 @@
 """Recorded games must replay identically: guards determinism and simulator optimisations.
 
-tests/data/golden_games.jsonl was recorded (random legal actions) before the simulator was
-optimised; every observation, reward total and final result must still match it exactly.
+tests/data/golden_games.jsonl holds games recorded with random legal actions
+(tools.bench_sim --record); every observation, reward total and final result must still match
+it exactly. Regenerate it only for an intended behaviour change.
 """
 import os
 

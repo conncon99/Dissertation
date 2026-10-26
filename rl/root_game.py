@@ -1,6 +1,7 @@
 """A lean, seeded, recordable wrapper around GameManager for RL training.
 
-Differences from ``src.pettingzoo_env.RootEnv`` (the game rules and reward function are untouched):
+Compared with driving GameManager directly (``src.pettingzoo_env.RootEnv`` does the same
+bookkeeping behind the PettingZoo API, and plays identical games for a seed and actions):
   * Steps where the game needs no decision (``current_message is None``) are advanced
     internally instead of being handed to an agent whose action is then ignored.
   * Every reward ``_calculate_reward`` computes is credited to the faction it was computed for
