@@ -137,11 +137,11 @@ class ActionGroup:
             modifier_actions = [action for action in self.actions if action.can_perform(
                 executor, game_state) and action.is_action_group_modifier]
 
-            if self.can_abort:
-                if primary_actions:
-                    primary_actions.append(None)
-                if modifier_actions:
-                    modifier_actions.append(None)
+            if self.can_abort and primary_actions:
+                primary_actions.append(None)
+            # Modifier actions (e.g. persistent card effects) are always optional ("may")
+            if modifier_actions:
+                modifier_actions.append(None)
 
             self.logger.debug(
                 f"{executor} modifier_actions: {modifier_actions}")
@@ -200,15 +200,20 @@ class ActionGroup:
         while not self.cancel_group and self.can_perform_any_action():
             available_actions = [
                 a for a in self._remaining_actions if a.can_perform(executor, game_state)]
-            if not available_actions:
+            # Modifier actions (e.g. persistent card effects) are optional ("may"), so they never have to be taken
+            required_actions = [
+                a for a in available_actions if not a.is_action_group_modifier]
+            if not required_actions:
                 if any(action.turmoil_action for action in self._remaining_actions):
                     self.logger.info(" - TURMOIL TRIGGERED")
                     yield from executor.trigger_turmoil(self)
                     break
-                else:
+                elif not available_actions:
                     self.logger.debug(
                         "- No available actions left to perform.")
                     break
+                # Only optional actions are left, so the group can be ended
+                available_actions.append(None)
 
             # Choose an action.
             if len(available_actions) == 1:

@@ -21,15 +21,16 @@ class OrganizeAction(Action):
     def get_replaceable_units(self, executor: WoodlandAlliance):
         sympathetic_clearings = [
             sympathy.space for sympathy in executor.sympathy]
-        return [unit for unit in executor.units if unit not in sympathetic_clearings]
+        return [unit for unit in executor.units if unit.space not in sympathetic_clearings and not unit.space.has_keep()]
 
     def perform(self, game_state, executor: WoodlandAlliance):
         response = yield OrganizeMessage(game_state, self.action_group, self.get_replaceable_units(executor))
         chosen_unit: Pawn = response.chosen_unit
 
-        Sympathy(chosen_unit.space, executor)
-        self.logger.info(
-            f" - Replaced warrior on clearing {chosen_unit.space.index} with a Sympathy token")
+        clearing = chosen_unit.space
         chosen_unit.destroy(None, self.action_group)
+        executor.place_sympathy(clearing)
+        self.logger.info(
+            f" - Replaced warrior on clearing {clearing.index} with a Sympathy token")
 
         return super().perform(game_state, executor)

@@ -1,4 +1,5 @@
 from src.actions.action_handler import Action
+from src.utils.root_types import Suits
 from src.controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
 from src.actions.action_group_registry import ActionIDs
 
@@ -9,16 +10,18 @@ class ClaimDominanceAction(Action):
         self.id = ActionIDs.CLAIM_DOMINANCE
 
     def can_perform(self, executor, game_state=None):
-        return super().can_perform(executor, game_state) and game_state.board.available_dominance_cards != [] and any(card.suit in self.get_suit_list(game_state) for card in executor.hand)
+        return super().can_perform(executor, game_state) and any(self._get_payment_cards(executor, dominance_card) for dominance_card in game_state.board.available_dominance_cards)
 
-    def get_suit_list(self, game_state):
-        return [card.suit for card in game_state.board.available_dominance_cards]
+    @staticmethod
+    def _get_payment_cards(executor, dominance_card):
+        """Cards that can be spent to take a dominance card: matching suit, or any bird card (unless the dominance card is a bird)"""
+        return [card for card in executor.hand if card.suit == dominance_card.suit or (card.suit == Suits.BIRD and dominance_card.suit != Suits.BIRD)]
 
     def perform(self, game_state, executor):
 
         # 1. Choose which dominance card to take
-        available_dominances = [d_card for d_card in game_state.board.available_dominance_cards if any(
-            d_card.suit == card.suit for card in executor.hand)]
+        available_dominances = [d_card for d_card in game_state.board.available_dominance_cards if self._get_payment_cards(
+            executor, d_card)]
 
         response = yield ClaimDominanceSuitMessage(game_state, self.action_group, available_dominances)
         chosen_dominance = response.chosen_dominance
@@ -26,8 +29,7 @@ class ClaimDominanceAction(Action):
 
         # 2. Expend card matching it
 
-        available_cards = [
-            card for card in executor.hand if card.suit == chosen_dominance.suit]
+        available_cards = self._get_payment_cards(executor, chosen_dominance)
         response = yield ClaimDominanceCardMessage(game_state, self.action_group, available_cards)
         chosen_discard = response.chosen_discard
         game_state.selected_suit = None

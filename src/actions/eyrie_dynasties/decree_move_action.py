@@ -28,7 +28,7 @@ class DecreeMoveAction(MoveAction):
 
     def _valid_from_clearings(self, game_state, executor):
         return [
-            clearing for clearing in game_state.board.clearings if clearing.get_suit() == self.suit and len(clearing.units[executor.faction_id]) != 0]
+            clearing for clearing in game_state.board.clearings if (self.suit == Suits.BIRD or clearing.get_suit() == self.suit) and len(clearing.units[executor.faction_id]) != 0]
 
     def perform(self, game_state: GameState, executor: EyrieDynasties):
         # 1. Get all possible moves

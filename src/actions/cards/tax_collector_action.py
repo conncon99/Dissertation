@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class TaxCollectorAction(Action):
     def __init__(self, name="Tax Collector", max_uses=1, is_action_group_modifier=True, group_spanning=True):
         super().__init__(name, max_uses, is_action_group_modifier, group_spanning)
-        self.id = ActionIDs.STAND_AND_DELIVER
+        self.id = ActionIDs.TAX_COLLECTOR
 
     def can_perform(self, executor, game_state=None):
         return super().can_perform(executor, game_state) and len(executor.units) > 0 and len(executor.deck.deck) + len(executor.deck.discard) > 0 and executor.faction_id != Factions.VAGABOND.value

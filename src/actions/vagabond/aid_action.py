@@ -1,6 +1,6 @@
 from __future__ import annotations
 from src.actions.action_handler import Action
-from src.utils.root_types import Items
+from src.utils.root_types import Items, Suits
 from typing import TYPE_CHECKING
 from src.board.clearing import Clearing
 from src.controllers.messages.game_messages import AidCardChoiceMessage, AidFactionChoiceMessage, AidExhaustItemChoiceMessage, AidTakeItemChoiceMessage
@@ -21,7 +21,7 @@ class AidAction(Action):
     def can_perform(self, executor: Vagabond, game_state=None):
         return executor.satchel.has_available_item() and isinstance(executor.vagabond_pawn.space, Clearing) \
             and any(executor.vagabond_pawn.space.get_faction_piece_count(faction.faction_id) and executor.faction_id != faction.faction_id for faction in game_state.faction_list) \
-            and any(card.suit == executor.vagabond_pawn.space.get_suit() for card in executor.hand)
+            and any(card.suit == executor.vagabond_pawn.space.get_suit() or card.suit == Suits.BIRD for card in executor.hand)
 
     def perform(self, game_state, executor: Vagabond):
         # 1. Get available players to aid
@@ -45,8 +45,9 @@ class AidAction(Action):
 
         # 4. Get available cards to give aided player
 
+        # Bird cards are wild (2.1.1)
         available_cards = [card for card in executor.hand if card.suit ==
-                           executor.vagabond_pawn.space.get_suit()]
+                           executor.vagabond_pawn.space.get_suit() or card.suit == Suits.BIRD]
 
         # 5. Choose card to give to aided player
 

@@ -107,7 +107,6 @@ class DominanceCard(Card):
         self.make_action_adder(CallbackTimes.DOMINANCE_TIME, DominanceAction())
 
     def activate(self, game_state: GameState, action_group):
-        print("Played Dominance")
         super().activate(game_state, action_group)
         self.owner.dominance = self.suit
         self.owner.hand.remove(self)
@@ -123,7 +122,11 @@ class CommandWarrenCard(Card):
 
     def activate(self, game_state: GameState, action_group):
         assert self.owner
-        self.action = BattleAction(max_uses=1)
+        if self.owner.faction_id == Factions.VAGABOND.value:
+            from src.actions.vagabond.vagabond_battle_action import VagabondBattleAction
+            self.action = VagabondBattleAction(max_uses=1)
+        else:
+            self.action = BattleAction(max_uses=1)
         self.owner.actions[self.callback_time][0].actions.append(
             self.action)
 
@@ -139,7 +142,7 @@ class CobblerCard(Card):
     def activate(self, game_state, action_group):
         if self.owner.faction_id == Factions.VAGABOND.value:
             from src.actions.vagabond.vagabond_move_action import VagabondMoveAction
-            self.action = VagabondMoveAction(cobbler_move=True, max_uses=1)
+            self.action = VagabondMoveAction(max_uses=1)
         else:
             self.action = MoveAction(max_uses=1)
         return super().activate(game_state)
@@ -158,18 +161,13 @@ class SappersCard(Card):
             return
             yield
 
-        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
-            self.logger.debug(
-                f" - Cannot use {self} in a defenseless clearing")
-            return
-            yield
-
         game_state.active_player = self.owner
         response = yield BattleUseCardMessage(game_state, action_group, self)
         use_card: bool = response.use_card
         game_state.active_player = game_state.current_player
         if use_card:
-            battle_modifier.attacker_damage_modifier += 1
+            # Extra hits are not limited by the warriors in the clearing (4.3.3.I)
+            battle_modifier.defender_damage_modifier += 1
             self.logger.debug(f"Active cards: {self.owner.active_cards}")
             self.logger.info(
                 f" - {self.owner} played {self.name} to deal an extra hit")
@@ -192,22 +190,16 @@ class BrutalTacticsCard(Card):
             return
             yield
 
-        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
-            self.logger.debug(
-                f" - Cannot use {self} in a defenseless clearing")
-            return
-            yield
-
         game_state.active_player = self.owner
         response = yield BattleUseCardMessage(game_state, action_group, self)
         use_card: bool = response.use_card
         game_state.active_player = game_state.current_player
 
         if use_card:
-            battle_modifier.defender_damage_modifier += 1
-            battle_modifier.attacker.add_vp(1)
+            battle_modifier.attacker_damage_modifier += 1
+            battle_modifier.defender.add_vp(1)
             self.logger.info(
-                f" - {self.owner} played {self.name} to deal an extra hit, {battle_modifier.attacker} gained 1 VP")
+                f" - {self.owner} played {self.name} to deal an extra hit, {battle_modifier.defender} gained 1 VP")
 
 
 class ArmorersCard(Card):
@@ -223,28 +215,23 @@ class ArmorersCard(Card):
             return
             yield
 
-        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
-            self.logger.debug(
-                f" - Cannot use {self} in a defenseless clearing")
-            return
-            yield
-
         game_state.active_player = self.owner
         response = yield BattleUseCardMessage(game_state, action_group, self)
         use_card: bool = response.use_card
         game_state.active_player = game_state.current_player
 
         if use_card:
+            # Only the rolled hits taken are ignored, extra hits still land
             if self.owner.faction_id == battle_modifier.attacker.faction_id:
-                battle_modifier.defender_damage_modifier = -999
-            elif self.owner.faction_id == battle_modifier.defender.faction_id:
-                battle_modifier.attacker_damage_modifier = -999
+                battle_modifier.ignore_defender_rolled_hits = True
+            else:
+                battle_modifier.ignore_attacker_rolled_hits = True
             self.owner.active_cards.remove(self)
             self.owner.discard_card(self)
             self.owner.battle_callbacks[self.callback_time].remove(
                 self._callback)
             self.logger.info(
-                f" - {self.owner} played {self.name} to ignore all hits")
+                f" - {self.owner} played {self.name} to ignore all rolled hits")
 
 
 class AmbushCard(Card):
@@ -255,12 +242,6 @@ class AmbushCard(Card):
         self.make_battle_modifier(BattleCallbackTimes.BATTLE_START_DEFENDER)
 
     def _callback(self, game_state: GameState, action_group, battle_modifier: BattleModifiers):
-
-        if battle_modifier.clearing.get_faction_warrior_count(battle_modifier.defender.faction_id) == 0:
-            self.logger.debug(
-                f" - Cannot use {self} in a defenseless clearing")
-            return
-            yield
 
         from src.cards.cards import SCOUTING_PARTY, SCOUTING_PARTY_2
         if SCOUTING_PARTY in battle_modifier.attacker.active_cards or SCOUTING_PARTY_2 in battle_modifier.attacker.active_cards:
@@ -299,7 +280,7 @@ class FavourCard(Card):
     def activate(self, game_state: GameState, action_group):
         for clearing in game_state.board.clearings:
             if clearing.get_suit() == self.suit:
-                self._kill_all_enemies(clearing, game_state, action_group)
+                yield from self._kill_all_enemies(clearing, game_state, action_group)
 
     def _kill_all_enemies(self, clearing: Clearing, game_state: GameState, action_group):
         for faction in game_state.faction_list:

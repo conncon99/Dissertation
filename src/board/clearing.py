@@ -35,17 +35,14 @@ class Clearing(Space):
         """Gets the faction id with the largest number of pieces in a clearing"""
         piece_count = {
             faction.faction_id: 0 for faction in self.game_state.faction_list}
-        # Counts warriors
+        # Counts warriors (the Vagabond pawn is not a warrior and is dropped below)
         for faction_id in piece_count.keys():
             piece_count[faction_id] += len(self.units[faction_id])
         # Counts Buildings
         for slot in self.slots:
             if slot and slot.faction:
                 piece_count[slot.faction.faction_id] += 1
-        # Counts Tokens
-        for token_list in self.tokens.values():
-            for token in token_list:
-                piece_count[token.faction.faction_id] += 1
+        # Tokens and pawns do not contribute to rule (2.5)
 
         if Factions.VAGABOND.value in piece_count.keys():
             del piece_count[Factions.VAGABOND.value]
@@ -65,6 +62,10 @@ class Clearing(Space):
 
     def get_suit(self):
         return self._suit
+
+    def has_keep(self) -> bool:
+        """Only the Marquise can place pieces in the clearing with the keep (6.2.2)"""
+        return any(token.name == "Keep Token" for token_list in self.tokens.values() for token in token_list)
 
     def has_free_slots(self) -> bool:
         return any(slot is None for slot in self.slots)
@@ -87,11 +88,6 @@ class Clearing(Space):
 
         victim_warrior_count = self.get_faction_warrior_count(
             victim.faction_id)
-
-        # The clearing is defenceless
-        if (victim_warrior_count == 0 or victim.faction_id == Factions.VAGABOND.value and victim.satchel.get_non_damaged_count(Items.SWORD) == 0) and amount != REMOVAL_DAMAGE:
-            logger.info(f" - {victim} is defenceless")
-            amount += 1
 
         if amount > 0 and victim.faction_id == Factions.VAGABOND.value:
             yield from self._handle_vagabond_take_damage(
@@ -149,9 +145,8 @@ class Clearing(Space):
     def _handle_vagabond_take_damage(self, victim: Vagabond, attacker: Faction, amount: int, logger: logging.Logger, action_group: Optional[ActionGroup] = None):
         if amount == REMOVAL_DAMAGE:
             logger.info(f" - {victim} cannot be removed, dealing 3 damage")
-            victim.vagabond_pawn.damage(3, attacker, action_group)
+            yield from victim.vagabond_pawn.damage(3, attacker, action_group)
             return
-            yield
         elif victim.battle_ally is not None:
             self.game_state.active_player = victim
             response = yield AllyDamageSplitMessage(self.game_state, action_group, min(amount, self.get_faction_warrior_count(victim.battle_ally.faction_id)))

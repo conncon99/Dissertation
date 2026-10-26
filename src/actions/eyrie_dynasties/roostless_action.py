@@ -28,7 +28,8 @@ class RoostlessAction(Action):
         peaceful_clearings = []
         lowest_clearing_warriors = math.inf
         for clearing in game_state.board.clearings:
-            if not clearing.has_free_slots():
+            # All pieces must be placeable, and nobody but the Marquise can place in the keep clearing (6.2.2)
+            if not clearing.has_free_slots() or clearing.has_keep():
                 continue
             clearing_warrior_count = self._get_total_warriors(
                 game_state, clearing)
@@ -44,14 +45,16 @@ class RoostlessAction(Action):
 
         # 3. Place a roost and 3 troops in that clearing
         Roost(chosen_clearing, executor, chosen_clearing.get_first_free_slot())
-        if not any(isinstance(token, Keep) for token in chosen_clearing.tokens[Factions.MARQUISE_DE_CAT.value]):
-            for i in range(3):
-                Pawn(chosen_clearing, executor)
+        for i in range(min(3, executor.max_warriors - len(executor.units))):
+            Pawn(chosen_clearing, executor)
         return super().perform(game_state, executor)
 
     def _get_total_warriors(self, game_state: GameState, clearing: Clearing) -> int:
         total_warriors = 0
         for faction in game_state.faction_list:
+            # The Vagabond pawn is not a warrior
+            if faction.faction_id == Factions.VAGABOND.value:
+                continue
             total_warriors += clearing.get_faction_warrior_count(
                 faction.faction_id)
         return total_warriors

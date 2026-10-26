@@ -30,6 +30,9 @@ class RevoltAction(Action):
             sympathetic_clearing: Clearing = sympathy.space
             if executor.bases[sympathetic_clearing.get_suit()] is not None:
                 continue
+            # The base must be placeable once all enemy pieces have been removed
+            if not any(slot is None or (slot.faction and slot.faction.faction_id != executor.faction_id) for slot in sympathetic_clearing.slots):
+                continue
             total = 0
             for card in executor.supporters:
                 if sympathetic_clearing.get_suit() == card.suit or card.suit == Suits.BIRD:

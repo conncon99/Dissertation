@@ -22,6 +22,7 @@ class RoyalClaimAction(Action):
             f" - {executor} gained {num_ruled} victory points from ruling {num_ruled} clearings")
 
         executor.active_cards.remove(self.card)
+        executor.discard_card(self.card)
 
         for action_group in executor.actions[CallbackTimes.IN_BIRDSONG]:
             if self in action_group.actions:
