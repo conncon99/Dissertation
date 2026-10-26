@@ -34,6 +34,8 @@ class GameManager:
         self.turn_order = self.settings.randomize_turn_order()
         self.turn_count = 0
         self.current_message = None
+        self.last_reward_player = None
+        self.compute_observations = True
         self.turn_limit = turn_limit
         self.craftable_items = [Items.BAG, Items.BAG, Items.BOOTS, Items.BOOTS, Items.SWORD, Items.SWORD, Items.HAMMER,
                                 Items.HAMMER, Items.TEA, Items.TEA, Items.COINS, Items.COINS, Items.CROSSBOW, Items.CROSSBOW]
@@ -122,9 +124,16 @@ class GameManager:
                 self.masker.action_size, dtype=np.float32).clip(0, 1)
         return obs
 
+    def _step_observation(self):
+        # Encoding is the most expensive part of a step; callers that build their own
+        # observation (e.g. rl.root_game) switch this off
+        return self.get_observation() if self.compute_observations else None
+
     def _calculate_reward(self):
         reward = 0.0
         player = self.game_state.active_player
+        # Lets callers attribute the returned reward to the right faction
+        self.last_reward_player = player
         # VP Reward
         if not player.dominance:
             vp_diff = player.victory_points - player.prev_vp
@@ -229,7 +238,7 @@ class GameManager:
         self.logger.debug("GM STEP")
         if self.done or self.turn_count >= self.turn_limit:  # If the game is already done, just return
             self.done = True
-            return self.get_observation(), self._calculate_reward(), True, {}
+            return self._step_observation(), self._calculate_reward(), True, {}
 
         if not self.setup_complete:  # Handle Setup First
             return self._run_setup_step(action)
@@ -252,7 +261,7 @@ class GameManager:
                     try:
                         self.current_message = next(self.faction_setup_iter)
                         if self.current_message is not None:
-                            return self.get_observation(), self._calculate_reward(), False, {}
+                            return self._step_observation(), self._calculate_reward(), False, {}
                     except:
                         # Faction setup completed immediately
                         self._advance_setup_index()
@@ -270,7 +279,7 @@ class GameManager:
             try:
                 self.current_message = self.faction_setup_iter.send(action)
                 if self.current_message is not None:
-                    return self.get_observation(), self._calculate_reward(), False, {}
+                    return self._step_observation(), self._calculate_reward(), False, {}
                 else:
                     continue
             except StopIteration:
@@ -278,7 +287,7 @@ class GameManager:
                 if self.setup_complete:
                     return self._run_game_step(None)
                 continue
-        return self.get_observation(), self._calculate_reward(), False, {}
+        return self._step_observation(), self._calculate_reward(), False, {}
 
     def _advance_setup_index(self):
         self.current_faction_setup_index += 1
@@ -309,12 +318,11 @@ class GameManager:
                         self.current_message = next(self.action_group_iter)
                         self._check_win_conditions()
                         if self.current_message is not None:
-                            return self.get_observation(), self._calculate_reward(), False, {}
+                            return self._step_observation(), self._calculate_reward(), False, {}
                         else:
                             continue
                     except:
                         self._check_win_conditions()
-                        obs = self.get_observation()
                         reward = self._calculate_reward()
                         self._advance_step_indexes()
                         # if self.current_faction_index != starting_faction_index:
@@ -323,7 +331,7 @@ class GameManager:
                 else:
                     # There were no yields
                     self._check_win_conditions()
-                    obs = self.get_observation()
+                    obs = self._step_observation()
                     reward = self._calculate_reward()
                     self._advance_step_indexes()
                     if self.current_faction_index != starting_faction_index:
@@ -334,18 +342,18 @@ class GameManager:
             try:
                 self.current_message = self.action_group_iter.send(action)
                 if self.current_message is not None:
-                    return self.get_observation(), self._calculate_reward(), False, {}
+                    return self._step_observation(), self._calculate_reward(), False, {}
                 else:
                     continue
             except StopIteration:
                 self._check_win_conditions()
-                obs = self.get_observation()
+                obs = self._step_observation()
                 reward = self._calculate_reward()
                 self._advance_step_indexes()
                 if self.current_faction_index != starting_faction_index:
                     return obs, reward, False, {}
                 continue
-        return self.get_observation(), self._calculate_reward(), True, {}
+        return self._step_observation(), self._calculate_reward(), True, {}
 
     def _advance_step_indexes(self):
         self.current_message = None

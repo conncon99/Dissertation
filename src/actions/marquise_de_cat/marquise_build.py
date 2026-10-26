@@ -131,8 +131,16 @@ class MarquiseBuild(Action):
         # For each wood token, we go through every clearing that can be traveled to on a path still owned by us
         # We add one to that clearings wood count
 
+        # The board does not change during this search, so each clearing's owner is computed once
+        owned = {}
+
+        def is_owned(clearing):
+            if clearing not in owned:
+                owned[clearing] = clearing.get_owner() == executor.faction_id
+            return owned[clearing]
+
         clearing_wood_counts = {
-            clearing: 0 for clearing in game_state.board.clearings if clearing.get_owner() == executor.faction_id and clearing.has_free_slots()}
+            clearing: 0 for clearing in game_state.board.clearings if is_owned(clearing) and clearing.has_free_slots()}
 
         for wood in executor.wood:
             current_clearing: Clearing = wood.space
@@ -141,7 +149,7 @@ class MarquiseBuild(Action):
             while len(queued) > 0:
                 queued.remove(current_clearing)
                 visited.append(current_clearing)
-                if current_clearing.get_owner() == executor.faction_id:
+                if is_owned(current_clearing):
                     if current_clearing.has_free_slots():
                         clearing_wood_counts[current_clearing] += 1
                     for adjacent_clearing in current_clearing.adjacent_clearings:

@@ -10,6 +10,15 @@ from src.factions.vagabond.quests import *
 from src.pieces.piece_with_id import PieceWithID
 from src.cards.cards import *
 
+# Enum .value is a Python-level property and the encoder runs on every decision
+_MARQUISE_ID = Factions.MARQUISE_DE_CAT.value
+_EYRIE_ID = Factions.EYRIE_DYNASTY.value
+_ALLIANCE_ID = Factions.WOODLAND_ALLIANCE.value
+_VAGABOND_ID = Factions.VAGABOND.value
+_CRAFTABLE_ITEM_VALUES = [Items.TEA.value, Items.HAMMER.value, Items.SWORD.value,
+                          Items.BOOTS.value, Items.COINS.value, Items.BAG.value, Items.CROSSBOW.value]
+_MESSAGE_COUNT = len(GameMessages)
+
 
 if TYPE_CHECKING:
     from src.actions.action_handler import ActionGroup
@@ -107,9 +116,10 @@ class ObservationSpace:
 
         # For each clearing
 
+        piece_counts = cls._count_pieces_by_space(game_state)
         for clearing in game_state.board.clearings:
             observation_space.extend(
-                cls._encode_clearing(clearing, game_state))
+                cls._encode_clearing(clearing, game_state, piece_counts))
 
         # For each Forest
         for forest in game_state.board.forests:
@@ -183,37 +193,36 @@ class ObservationSpace:
 
     @classmethod
     def _encode_crafted_items(cls, crafted_items: List[Items]) -> List[float]:
-        craftable_item_list = [Items.TEA, Items.HAMMER, Items.SWORD,
-                               Items.BOOTS, Items.COINS, Items.BAG, Items.CROSSBOW]
-        item_counts = {item: sum(
-            1 for i in crafted_items if i.value == item.value) for item in craftable_item_list}
+        crafted_values = [i.value for i in crafted_items]
+        tea, hammer, sword, boots, coins, bag, crossbow = (
+            crafted_values.count(value) for value in _CRAFTABLE_ITEM_VALUES)
         return [
-            1.0 if item_counts[Items.TEA] >= 1 else 0.0,  # Tea-1
-            1.0 if item_counts[Items.TEA] >= 2 else 0.0,  # Tea-2
-            1.0 if item_counts[Items.TEA] == 3 else 0.0,  # Tea-3
+            1.0 if tea >= 1 else 0.0,  # Tea-1
+            1.0 if tea >= 2 else 0.0,  # Tea-2
+            1.0 if tea == 3 else 0.0,  # Tea-3
 
-            1.0 if item_counts[Items.HAMMER] == 1 else 0.0,  # Hammer-1
+            1.0 if hammer == 1 else 0.0,  # Hammer-1
 
-            1.0 if item_counts[Items.SWORD] >= 1 else 0.0,  # Sword-1
-            1.0 if item_counts[Items.SWORD] >= 2 else 0.0,  # Sword-2
-            1.0 if item_counts[Items.SWORD] == 3 else 0.0,  # Sword-3
+            1.0 if sword >= 1 else 0.0,  # Sword-1
+            1.0 if sword >= 2 else 0.0,  # Sword-2
+            1.0 if sword == 3 else 0.0,  # Sword-3
 
-            1.0 if item_counts[Items.BOOTS] >= 1 else 0.0,  # Boots-1
-            1.0 if item_counts[Items.BOOTS] >= 2 else 0.0,  # Boots-2
-            1.0 if item_counts[Items.BOOTS] >= 3 else 0.0,  # Boots-3
-            1.0 if item_counts[Items.BOOTS] == 4 else 0.0,  # Boots-4
+            1.0 if boots >= 1 else 0.0,  # Boots-1
+            1.0 if boots >= 2 else 0.0,  # Boots-2
+            1.0 if boots >= 3 else 0.0,  # Boots-3
+            1.0 if boots == 4 else 0.0,  # Boots-4
 
-            1.0 if item_counts[Items.COINS] >= 1 else 0.0,  # Coins-1
-            1.0 if item_counts[Items.COINS] >= 2 else 0.0,  # Coins-2
-            1.0 if item_counts[Items.COINS] == 3 else 0.0,  # Coins-3
+            1.0 if coins >= 1 else 0.0,  # Coins-1
+            1.0 if coins >= 2 else 0.0,  # Coins-2
+            1.0 if coins == 3 else 0.0,  # Coins-3
 
-            1.0 if item_counts[Items.BAG] >= 1 else 0.0,  # Bag-1
-            1.0 if item_counts[Items.BAG] >= 2 else 0.0,  # Bag-2
-            1.0 if item_counts[Items.BAG] >= 3 else 0.0,  # Bag-3
-            1.0 if item_counts[Items.BAG] == 4 else 0.0,  # Bag-4
+            1.0 if bag >= 1 else 0.0,  # Bag-1
+            1.0 if bag >= 2 else 0.0,  # Bag-2
+            1.0 if bag >= 3 else 0.0,  # Bag-3
+            1.0 if bag == 4 else 0.0,  # Bag-4
 
-            1.0 if item_counts[Items.CROSSBOW] >= 1 else 0.0,  # Crossbow-1
-            1.0 if item_counts[Items.CROSSBOW] == 2 else 0.0,  # Crossbow-2
+            1.0 if crossbow >= 1 else 0.0,  # Crossbow-1
+            1.0 if crossbow == 2 else 0.0,  # Crossbow-2
         ]
 
     @classmethod
@@ -307,10 +316,34 @@ class ObservationSpace:
         ]
 
     @classmethod
-    def _encode_clearing(cls, clearing: Clearing, game_state: GameState) -> List[float]:
+    def _count_pieces_by_space(cls, game_state: GameState) -> Dict[str, Dict[Clearing, int]]:
+        """Counts each piece type per space in one pass, instead of rescanning every piece per clearing"""
+        def count(pieces):
+            counts = {}
+            for piece in pieces:
+                counts[piece.space] = counts.get(piece.space, 0) + 1
+            return counts
+
+        marquise = game_state.marquise
+        return {
+            "wood": count(marquise.wood),
+            "keep": count([marquise.keep] if marquise.keep else []),
+            "recruiters": count(marquise.recruiters),
+            "workshops": count(marquise.workshops),
+            "sawmills": count(marquise.sawmills),
+            "roosts": count(game_state.eyrie_dynasties.roosts),
+            "sympathy": count(game_state.woodland_alliance.sympathy),
+            "bases": count(base for base in game_state.woodland_alliance.bases.values() if base is not None),
+        }
+
+    @classmethod
+    def _encode_clearing(cls, clearing: Clearing, game_state: GameState, piece_counts=None) -> List[float]:
+        if piece_counts is None:
+            piece_counts = cls._count_pieces_by_space(game_state)
+        owner = clearing.get_owner()
         return [
             # Clearing faction ruler
-            clearing.get_owner() / 5 if clearing.get_owner() else 1.0,
+            owner / 5 if owner else 1.0,
             # Clearing suit
             clearing.get_suit().value / 3,
             # Total clearing slots
@@ -318,49 +351,45 @@ class ObservationSpace:
             # Available clearing slots
             sum(slot is None for slot in clearing.slots) / len(clearing.slots),
             # Marquise de cat warrior count (normalized via max faction warrior count)
-            len(clearing.units[Factions.MARQUISE_DE_CAT.value]) /
+            len(clearing.units[_MARQUISE_ID]) /
             game_state.marquise.max_warriors,
             # Eyrie Dynasties warrior count
-            len(clearing.units[Factions.EYRIE_DYNASTY.value]) /
+            len(clearing.units[_EYRIE_ID]) /
             game_state.eyrie_dynasties.max_warriors,
             # Woodland Alliance warrior count
-            len(clearing.units[Factions.WOODLAND_ALLIANCE.value]) /
+            len(clearing.units[_ALLIANCE_ID]) /
             game_state.woodland_alliance.max_warriors,
             # is vagabond pawn on this space?
-            len(clearing.units[Factions.VAGABOND.value]),
+            len(clearing.units[_VAGABOND_ID]),
 
             # MARQUISE
             # Wood one hot encoded
-            sum(1 for wood in game_state.marquise.wood if wood.space ==
-                clearing) / game_state.marquise.max_wood,
+            piece_counts["wood"].get(clearing, 0) / game_state.marquise.max_wood,
 
             # has Keep?
-            1.0 if game_state.marquise.keep and game_state.marquise.keep.space == clearing else 0.0,
+            1.0 if clearing in piece_counts["keep"] else 0.0,
 
             # Recruiter count
-            sum(1 for recruiter in game_state.marquise.recruiters if recruiter.space ==
-                clearing) / game_state.marquise.max_recruiters,
+            piece_counts["recruiters"].get(
+                clearing, 0) / game_state.marquise.max_recruiters,
 
             # Workshop count
-            sum(1 for workshop in game_state.marquise.workshops if workshop.space ==
-                clearing) / game_state.marquise.max_workshops,
+            piece_counts["workshops"].get(
+                clearing, 0) / game_state.marquise.max_workshops,
 
             # Sawmill Count
-            sum(1 for sawmill in game_state.marquise.sawmills if sawmill.space ==
-                clearing) / game_state.marquise.max_sawmills,
+            piece_counts["sawmills"].get(
+                clearing, 0) / game_state.marquise.max_sawmills,
 
             # EYRIE DYNASTIES
             # has Roost?
-            1.0 if any(
-                roost.space == clearing for roost in game_state.eyrie_dynasties.roosts) else 0.0,
+            1.0 if clearing in piece_counts["roosts"] else 0.0,
 
             # WOODLAND ALLIANCE
             # has Sympathy
-            1.0 if any(
-                sympathy.space == clearing for sympathy in game_state.woodland_alliance.sympathy) else 0.0,
+            1.0 if clearing in piece_counts["sympathy"] else 0.0,
             # has Base
-            1.0 if any(base is not None and base.space ==
-                       clearing for base in game_state.woodland_alliance.bases.values()) else 0.0,
+            1.0 if clearing in piece_counts["bases"] else 0.0,
 
             # Vagabond
             # has Ruin
@@ -372,13 +401,25 @@ class ObservationSpace:
     def _encode_forest(cls, forest: Forest) -> List[float]:
         return [
             # Is the vagabond pawn in this forest
-            1.0 if forest.units[Factions.VAGABOND.value] else 0.0
+            1.0 if forest.units[_VAGABOND_ID] else 0.0
         ]
 
     @classmethod
     def _encode_id_clearing(cls, piece_type: str, id: int, game_state: GameState) -> float:
         piece = PieceWithID.get_by_id(piece_type, id)
         return 0 if piece is None else (piece.space.index + 1) / len(game_state.board.clearings) + 1
+
+    @classmethod
+    def _encode_id_clearings(cls, piece_type: str, count: int, game_state: GameState) -> List[float]:
+        """_encode_id_clearing for ids 0..count-1"""
+        pieces = PieceWithID._instances.get(piece_type, {})
+        clearing_count = len(game_state.board.clearings)
+        encoded = []
+        for i in range(count):
+            piece = pieces.get(i, None)
+            encoded.append(0 if piece is None else (
+                piece.space.index + 1) / clearing_count + 1)
+        return encoded
 
     @classmethod
     def _encode_marquise_data(cls, game_state: GameState) -> List[float]:
@@ -398,29 +439,24 @@ class ObservationSpace:
             len(game_state.marquise.units) / game_state.marquise.max_warriors]
 
         # 8 Wood Token Clearings
-        for i in range(game_state.marquise.max_wood):
-            marquise_data.append(cls._encode_id_clearing(
-                "Wood Token", i, game_state))
+        marquise_data.extend(cls._encode_id_clearings(
+            "Wood Token", game_state.marquise.max_wood, game_state))
 
         # 6 Sawmills
-        for i in range(game_state.marquise.max_sawmills):
-            marquise_data.append(
-                cls._encode_id_clearing("Sawmill", i, game_state))
+        marquise_data.extend(cls._encode_id_clearings(
+            "Sawmill", game_state.marquise.max_sawmills, game_state))
 
         # 6 Workshops
-        for i in range(game_state.marquise.max_workshops):
-            marquise_data.append(
-                cls._encode_id_clearing("Workshop", i, game_state))
+        marquise_data.extend(cls._encode_id_clearings(
+            "Workshop", game_state.marquise.max_workshops, game_state))
 
         # 6 Recruiters
-        for i in range(game_state.marquise.max_recruiters):
-            marquise_data.append(
-                cls._encode_id_clearing("Recruiter", i, game_state))
+        marquise_data.extend(cls._encode_id_clearings(
+            "Recruiter", game_state.marquise.max_recruiters, game_state))
 
         # 25 Warriors
-        for i in range(game_state.marquise.max_warriors):
-            marquise_data.append(cls._encode_id_clearing(
-                "Marquise de Cat Pawn", i, game_state))
+        marquise_data.extend(cls._encode_id_clearings(
+            "Marquise de Cat Pawn", game_state.marquise.max_warriors, game_state))
 
         return marquise_data
 
@@ -451,14 +487,12 @@ class ObservationSpace:
         eyrie_data.extend(cls._encode_decree(game_state, BUILD))
 
         # 7 Roosts
-        for i in range(game_state.eyrie_dynasties.max_roosts):
-            eyrie_data.append(
-                cls._encode_id_clearing("Roost", i, game_state))
+        eyrie_data.extend(cls._encode_id_clearings(
+            "Roost", game_state.eyrie_dynasties.max_roosts, game_state))
 
         # 20 Warriors
-        for i in range(game_state.eyrie_dynasties.max_warriors):
-            eyrie_data.append(cls._encode_id_clearing(
-                "Eyrie Dynasties Pawn", i, game_state))
+        eyrie_data.extend(cls._encode_id_clearings(
+            "Eyrie Dynasties Pawn", game_state.eyrie_dynasties.max_warriors, game_state))
 
         return eyrie_data
 
@@ -488,20 +522,21 @@ class ObservationSpace:
             len(game_state.woodland_alliance.units) /
             game_state.woodland_alliance.max_warriors,
             # Makeup of supporters - private info for WA only
-            0.0 if faction_id != Factions.WOODLAND_ALLIANCE.value else (sum(
+            0.0 if faction_id != _ALLIANCE_ID else (sum(
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.FOX) / 54.0),
-            0.0 if faction_id != Factions.WOODLAND_ALLIANCE.value else (sum(
+            0.0 if faction_id != _ALLIANCE_ID else (sum(
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.RABBIT) / 54.0),
-            0.0 if faction_id != Factions.WOODLAND_ALLIANCE.value else (sum(
+            0.0 if faction_id != _ALLIANCE_ID else (sum(
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.MOUSE) / 54.0),
-            0.0 if faction_id != Factions.WOODLAND_ALLIANCE.value else (sum(
+            0.0 if faction_id != _ALLIANCE_ID else (sum(
                 1.0 for card in game_state.woodland_alliance.supporters if card.suit == Suits.BIRD) / 54.0),
         ]
 
         # 10 Sympathy
-        for i in range(game_state.woodland_alliance.max_sympathy):
-            alliance_data.append(
-                cls._encode_id_clearing("Sympathy Token", i, game_state))
+        alliance_data.extend(cls._encode_id_clearings(
+            "Sympathy Token", game_state.woodland_alliance.max_sympathy, game_state))
+        # The base encodings below reuse the last sympathy loop index, as before
+        i = game_state.woodland_alliance.max_sympathy - 1
 
         alliance_data.append(
             cls._encode_id_clearing("Alliance Fox Base", i, game_state))
@@ -511,9 +546,8 @@ class ObservationSpace:
             cls._encode_id_clearing("Alliance Mouse Base", i, game_state))
 
         # 10 Warriors
-        for i in range(game_state.woodland_alliance.max_warriors):
-            alliance_data.append(cls._encode_id_clearing(
-                "Woodland Alliance Pawn", i, game_state))
+        alliance_data.extend(cls._encode_id_clearings(
+            "Woodland Alliance Pawn", game_state.woodland_alliance.max_warriors, game_state))
 
         return alliance_data
 
@@ -530,13 +564,13 @@ class ObservationSpace:
             game_state.vagabond.active_coin_count / 3.0,
             # Marquise De Cat relatonship status
             game_state.vagabond.relationship_track.relationship_level[
-                Factions.MARQUISE_DE_CAT.value] / 4.0,
+                _MARQUISE_ID] / 4.0,
             # Eyrie Dynasties relationship status
             game_state.vagabond.relationship_track.relationship_level[
-                Factions.EYRIE_DYNASTY.value] / 4.0,
+                _EYRIE_ID] / 4.0,
             # Woodland Alliance relationship status
             game_state.vagabond.relationship_track.relationship_level[
-                Factions.WOODLAND_ALLIANCE.value] / 4.0,
+                _ALLIANCE_ID] / 4.0,
             # Completed Fox Quests number
             game_state.vagabond.completed_quests[Suits.FOX] / 5.0,
             # Completed Rabbit Quests number
@@ -574,46 +608,54 @@ class ObservationSpace:
         # One hot encoded damaged satchel items
         vagabond_data.extend(cls._encode_satchel_list(
             game_state.vagabond.satchel.available_damaged_items))
-        vagabond_data.extend([1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.MARQUISE_DE_CAT.value else 0,
-                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.EYRIE_DYNASTY.value else 0,
-                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.WOODLAND_ALLIANCE.value else 0,
-                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == Factions.VAGABOND.value else 0,])
+        vagabond_data.extend([1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == _MARQUISE_ID else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == _EYRIE_ID else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == _ALLIANCE_ID else 0,
+                              1.0 if game_state.vagabond.battle_ally and game_state.vagabond.battle_ally.faction_id == _VAGABOND_ID else 0,])
         return vagabond_data
 
     @classmethod
     def _encode_satchel_list(cls, item_list: Dict[Items, int]) -> List[float]:
+        boots = item_list[Items.BOOTS]
+        sword = item_list[Items.SWORD]
+        bag = item_list[Items.BAG]
+        hammer = item_list[Items.HAMMER]
+        tea = item_list[Items.TEA]
+        coins = item_list[Items.COINS]
+        crossbow = item_list[Items.CROSSBOW]
+        torch = item_list[Items.TORCH]
         return [
-            1.0 if item_list[Items.BOOTS] >= 1 else 0.0,
-            1.0 if item_list[Items.BOOTS] >= 2 else 0.0,
-            1.0 if item_list[Items.BOOTS] >= 3 else 0.0,
-            1.0 if item_list[Items.BOOTS] == 4 else 0.0,
+            1.0 if boots >= 1 else 0.0,
+            1.0 if boots >= 2 else 0.0,
+            1.0 if boots >= 3 else 0.0,
+            1.0 if boots == 4 else 0.0,
 
-            1.0 if item_list[Items.SWORD] >= 1 else 0.0,
-            1.0 if item_list[Items.SWORD] >= 2 else 0.0,
-            1.0 if item_list[Items.SWORD] >= 3 else 0.0,
-            1.0 if item_list[Items.SWORD] == 4 else 0.0,
+            1.0 if sword >= 1 else 0.0,
+            1.0 if sword >= 2 else 0.0,
+            1.0 if sword >= 3 else 0.0,
+            1.0 if sword == 4 else 0.0,
 
-            1.0 if item_list[Items.BAG] >= 1 else 0.0,
-            1.0 if item_list[Items.BAG] >= 2 else 0.0,
-            1.0 if item_list[Items.BAG] >= 3 else 0.0,
-            1.0 if item_list[Items.BAG] == 4 else 0.0,
+            1.0 if bag >= 1 else 0.0,
+            1.0 if bag >= 2 else 0.0,
+            1.0 if bag >= 3 else 0.0,
+            1.0 if bag == 4 else 0.0,
 
-            1.0 if item_list[Items.HAMMER] >= 1 else 0.0,
-            1.0 if item_list[Items.HAMMER] >= 2 else 0.0,
-            1.0 if item_list[Items.HAMMER] == 3 else 0.0,
+            1.0 if hammer >= 1 else 0.0,
+            1.0 if hammer >= 2 else 0.0,
+            1.0 if hammer == 3 else 0.0,
 
-            1.0 if item_list[Items.TEA] >= 1 else 0.0,
-            1.0 if item_list[Items.TEA] >= 2 else 0.0,
-            1.0 if item_list[Items.TEA] == 3 else 0.0,
+            1.0 if tea >= 1 else 0.0,
+            1.0 if tea >= 2 else 0.0,
+            1.0 if tea == 3 else 0.0,
 
-            1.0 if item_list[Items.COINS] >= 1 else 0.0,
-            1.0 if item_list[Items.COINS] >= 2 else 0.0,
-            1.0 if item_list[Items.COINS] == 3 else 0.0,
+            1.0 if coins >= 1 else 0.0,
+            1.0 if coins >= 2 else 0.0,
+            1.0 if coins == 3 else 0.0,
 
-            1.0 if item_list[Items.CROSSBOW] >= 1 else 0.0,
-            1.0 if item_list[Items.CROSSBOW] == 2 else 0.0,
+            1.0 if crossbow >= 1 else 0.0,
+            1.0 if crossbow == 2 else 0.0,
 
-            1.0 if item_list[Items.TORCH] == 1 else 0.0
+            1.0 if torch == 1 else 0.0
         ]
         # 4 Boots
         # 4 Bags,
@@ -632,10 +674,11 @@ class ObservationSpace:
 
     @classmethod
     def _encode_game_message(cls, message_type: GameMessages):
-        message_encoding = []
-        for i in range(len(GameMessages)):
-            message_encoding.append(
-                1.0 if message_type and message_type.value == i + 1 else 0.0)
+        message_encoding = [0.0] * _MESSAGE_COUNT
+        if message_type:
+            value = message_type.value
+            if isinstance(value, int) and 1 <= value <= _MESSAGE_COUNT:
+                message_encoding[value - 1] = 1.0
         return message_encoding
 
     @classmethod
@@ -695,8 +738,8 @@ class ObservationSpace:
     @classmethod
     def _encode_selected_faction(cls, game_state: GameState):
         return [
-            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.MARQUISE_DE_CAT.value else 0,
-            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.EYRIE_DYNASTY.value else 0,
-            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.WOODLAND_ALLIANCE.value else 0,
-            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == Factions.VAGABOND.value else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == _MARQUISE_ID else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == _EYRIE_ID else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == _ALLIANCE_ID else 0,
+            1.0 if game_state.selected_faction and game_state.selected_faction.faction_id == _VAGABOND_ID else 0,
         ]

@@ -16,6 +16,9 @@ if TYPE_CHECKING:
     from src.actions.action_handler import ActionGroup
 
 REMOVAL_DAMAGE = 999
+# Enum .value lookups are slow and get_owner is one of the hottest functions
+_VAGABOND_ID = Factions.VAGABOND.value
+_EYRIE_ID = Factions.EYRIE_DYNASTY.value
 
 
 class Clearing(Space):
@@ -33,11 +36,10 @@ class Clearing(Space):
 
     def get_owner(self):
         """Gets the faction id with the largest number of pieces in a clearing"""
-        piece_count = {
-            faction.faction_id: 0 for faction in self.game_state.faction_list}
         # Counts warriors
-        for faction_id in piece_count.keys():
-            piece_count[faction_id] += len(self.units[faction_id])
+        units = self.units
+        piece_count = {
+            faction.faction_id: len(units[faction.faction_id]) for faction in self.game_state.faction_list}
         # Counts Buildings
         for slot in self.slots:
             if slot and slot.faction:
@@ -47,20 +49,21 @@ class Clearing(Space):
             for token in token_list:
                 piece_count[token.faction.faction_id] += 1
 
-        if Factions.VAGABOND.value in piece_count.keys():
-            del piece_count[Factions.VAGABOND.value]
+        piece_count.pop(_VAGABOND_ID, None)
 
         max_pieces = max(piece_count.values())
+        if max_pieces <= 0:
+            return None
         factions_with_max = [
-            key for key, value in piece_count.items() if value == max_pieces and value > 0]
+            key for key, value in piece_count.items() if value == max_pieces]
 
         # Handles Ties
         if len(factions_with_max) == 1:
             return factions_with_max[0]
         else:
             # Lord of the Forest: Eyrie win ties for control
-            if Factions.EYRIE_DYNASTY.value in factions_with_max:
-                return Factions.EYRIE_DYNASTY.value
+            if _EYRIE_ID in factions_with_max:
+                return _EYRIE_ID
             return None
 
     def get_suit(self):

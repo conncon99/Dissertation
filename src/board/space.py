@@ -20,3 +20,8 @@ class Space:
         self.index = index
         self.adjacent_clearings: List[Clearing] = []
         self.adjacent_forests: List[Forest] = []
+
+    def __hash__(self) -> int:
+        # The default hash is the memory address, which made the iteration order of sets of
+        # spaces (and so some potential-VP rewards) differ between runs. Equality is unchanged.
+        return self.index

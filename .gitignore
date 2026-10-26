@@ -12,3 +12,4 @@ training/logs/
 training/logs/
 training/
 *.png
+runs/

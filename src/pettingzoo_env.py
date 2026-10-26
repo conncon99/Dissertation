@@ -56,7 +56,10 @@ class RootEnv(AECEnv):
         return self.action_spaces[agent]
 
     def observe(self, agent):
-        return self.observations.get(agent, self.gm.get_observation())
+        # Only encode when there is no stored observation (a .get default is always evaluated)
+        if agent in self.observations:
+            return self.observations[agent]
+        return self.gm.get_observation()
 
     def reset(self, seed=None, options=None):
         if seed is not None:
