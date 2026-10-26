@@ -1,18 +1,22 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Dict, List, TYPE_CHECKING, Optional, Callable
+from typing import Dict, List, TYPE_CHECKING, Optional, Callable, Generator, Any
+import logging
 
-from utils.root_types import Suits, Items
-from utils.callback_handler import CallbackTimes, BattleCallbackTimes
-from actions.action_handler import ActionGroup, Action
+from src.utils.root_types import Suits, Items, Factions
+from src.utils.callback_handler import CallbackTimes, BattleCallbackTimes
+from src.actions.action_handler import ActionGroup
+from src.controllers.nn_controllers.reward_helper import RewardHelper
 
 if TYPE_CHECKING:
-    from cards.card import Card
-    from pieces.pawn import Pawn
-    from controllers.base_controllers.controller import Controller
-    from cards.deck import Deck
-    from utils.game_state import GameState
+    from src.actions.action_handler import Action
+    from src.cards.card import Card
+    from src.pieces.pawn import Pawn
+    from src.controllers.base_controllers.controller import Controller
+    from src.cards.deck import Deck
+    from src.utils.game_state import GameState
+    from src.controllers.messages.game_messages import GameMessage
 
 
 @dataclass
@@ -23,14 +27,25 @@ class Faction(ABC):
     controller: Controller
 
     victory_points: int = 0
+
+    prev_vp: int = 0
+    prev_unit_count: int = 0
+    prev_clearings_controlled: int = 0
+    prev_dominance_clearings_controlled: int = 0
+    prev_active_cards_count: int = 0
+    last_vp_change: int = 0
+    last_dominance_change: int = 0
+
     hand: List[Card] = field(default_factory=list)
     items: List[Items] = field(default_factory=list)
     active_cards: List[Card] = field(default_factory=list)
     units: List[Pawn] = field(default_factory=list)
     hand_limit: int = 5
+    setup_order: int = -1
     deck: Deck = None
     print_colour: str = ""
     game_state: GameState = None
+    logger: logging.Logger = logging.getLogger()
 
     dominance: Optional[Suits] = None
     has_won: bool = False
@@ -54,7 +69,8 @@ class Faction(ABC):
     def get_crafting_resources(self) -> Dict[Suits, int]: ...
 
     @abstractmethod
-    def setup_faction(self, map, deck, game_state) -> None: ...
+    def setup_faction(
+        self, map, deck, game_state) -> Generator[GameMessage, Any, None]: ...
 
     @abstractmethod
     def get_bonus_card_draws(self) -> int: ...
@@ -70,3 +86,12 @@ class Faction(ABC):
     def subtract_vp(self, amount: int) -> None:
         if self.dominance is None:
             self.victory_points -= amount
+
+    def get_potential_vp(self, game_state: GameState) -> int:
+        potential_vp = 0
+        if self.dominance and self.faction_id != Factions.VAGABOND:
+            pass
+        elif not self.dominance:
+            potential_vp += RewardHelper.get_battle_rewards(self, game_state)
+            potential_vp += RewardHelper.get_crafting_reward(self, game_state)
+        return potential_vp

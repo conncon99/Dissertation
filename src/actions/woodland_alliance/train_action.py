@@ -1,12 +1,12 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import TrainMessage
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import TrainMessage
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
+    from src.factions.woodland_alliance import WoodlandAlliance
 
 
 class TrainAction(Action):
@@ -25,12 +25,12 @@ class TrainAction(Action):
     def perform(self, game_state, executor: WoodlandAlliance):
 
         available_cards = self.get_available_cards_for_suits(executor)
-        chosen_card = executor.controller.send_game_message(
-            TrainMessage(game_state, self.action_group, available_cards)).chosen_card
+        response = yield TrainMessage(game_state, self.action_group, available_cards)
+        chosen_card = response.chosen_card
 
         executor.discard_card(chosen_card)
         executor.officers += 1
-        print(
+        self.logger.info(
             f" - Increased Officers to {executor.officers} by expending '{chosen_card}'")
 
         return super().perform(game_state, executor)

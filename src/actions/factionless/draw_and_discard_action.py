@@ -1,7 +1,7 @@
-from actions.action_handler import Action
-from controllers.messages.game_messages import DiscardChoiceMessage
-from controllers.messages.controller_messages import DiscardChoiceResponse
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import DiscardChoiceMessage
+from src.controllers.messages.controller_messages import DiscardChoiceResponse
+from src.actions.action_group_registry import ActionIDs
 
 
 class DrawAndDiscardAction(Action):
@@ -14,15 +14,15 @@ class DrawAndDiscardAction(Action):
 
     def perform(self, game_state, executor):
         draw_count = 1 + executor.get_bonus_card_draws()
-        print(f" - Drawing {draw_count} cards")
+        self.logger.info(f" - Drawing {draw_count} cards")
         # Take draw_count cards from the deck
         executor.hand.extend(game_state.deck.draw(draw_count))
         # Choose which cards to discard down to the hand limit
         if len(executor.hand) > executor.hand_limit:
             discard_num = len(executor.hand) - executor.hand_limit
             for _ in range(discard_num):
-                discard_choice = executor.controller.send_game_message(
-                    DiscardChoiceMessage(game_state, self.action_group, executor.hand)).selected_card
+                response = yield DiscardChoiceMessage(game_state, self.action_group, executor.hand)
+                discard_choice = response.selected_card
                 executor.discard_card(discard_choice)
-        print(f" - Hand: {executor.hand}")
+        self.logger.info(f" - Hand: {executor.hand}")
         return super().perform(game_state, executor)

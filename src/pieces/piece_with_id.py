@@ -1,3 +1,6 @@
+import logging
+
+
 class PieceWithID:
     _next_ids = {}
     _free_ids = {}
@@ -5,6 +8,7 @@ class PieceWithID:
 
     def __init__(self, piece_type: str):
         self.piece_type = piece_type
+        self._logger = logging.getLogger()
         # Initialize ID tracking for this piece type if not already done
         if piece_type not in PieceWithID._next_ids:
             PieceWithID._next_ids[piece_type] = 0
@@ -20,10 +24,11 @@ class PieceWithID:
 
         # Store the instance in the dictionary
         PieceWithID._instances[piece_type][self.id] = self
-        print(f" - Spawned '{piece_type}' with ID {self.id}")
+        self._logger.debug(f" - Spawned '{piece_type}' with ID {self.id}")
 
     def destroy(self):
-        print(f" - Destroying '{self.piece_type}' with ID {self.id}")
+        self._logger.debug(
+            f" - Destroying '{self.piece_type}' with ID {self.id}")
         # Remove the instance from the tracking dictionary
         if self.id in PieceWithID._instances[self.piece_type]:
             del PieceWithID._instances[self.piece_type][self.id]
@@ -41,4 +46,5 @@ class PieceWithID:
         cls._next_ids.clear()
         cls._free_ids.clear()
         cls._instances.clear()
-        print(" - Reset all piece IDs")
+        logger = logging.getLogger()
+        logger.debug(" - Reset all piece IDs")

@@ -1,10 +1,13 @@
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
-from controllers.base_controllers.controller import Controller
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
+from src.controllers.base_controllers.controller import Controller
 from abc import abstractmethod
 
 
 class VagabondController(Controller):
+
+    ALLY_MOVEMENT_FACTION_MESSAGE = auto()
+    ALLY_MOVEMENT_UNITS_MESSAGE = auto()
 
     def _handle_faction_messages(self, msg: GameMessage):
         match msg.type:
@@ -50,13 +53,16 @@ class VagabondController(Controller):
                 return self._handle_battle_damage_item(msg)
             case GameMessages.COALITION_CHOICE_MESSAGE:
                 return self._handle_coalition_choice(msg)
-            case GameMessages.ALLY_MOVEMENT_MESSAGE:
-                return self._handle_ally_movement(msg)
+            case GameMessages.ALLY_MOVEMENT_FACTION_MESSAGE:
+                return self._handle_ally_movement_faction(msg)
+            case GameMessages.ALLY_MOVEMENT_UNITS_MESSAGE:
+                return self._handle_ally_movement_units_choice(msg)
             case GameMessages.CHOOSE_ALLY_MESSAGE:
                 return self._handle_choose_ally(msg)
             case GameMessages.ALLY_DAMAGE_SPLIT_MESSAGE:
                 return self._handle_ally_damage_split(msg)
-        return None
+        raise TypeError(
+            f"Invalid GameMessage Type {msg.type.name} for VagabondController")
 
     @abstractmethod
     def _handle_choose_character(
@@ -142,8 +148,12 @@ class VagabondController(Controller):
         self, msg: CoalitionChoiceMessage) -> CoalitionChoiceResponse: ...
 
     @abstractmethod
-    def _handle_ally_movement(
-        self, msg: AllyMovementMessage) -> AllyMovementResponse: ...
+    def _handle_ally_movement_faction(
+        self, msg: AllyMovementFactionMessage) -> AllyMovementFactionResponse: ...
+
+    @abstractmethod
+    def _handle_ally_movement_units_choice(
+        self, msg: AllyMovementUnitMessage) -> AllyMovementUnitResponse: ...
 
     @abstractmethod
     def _handle_choose_ally(

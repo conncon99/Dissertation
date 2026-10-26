@@ -1,6 +1,6 @@
-from actions.action_handler import Action
-from controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import ClaimDominanceCardMessage, ClaimDominanceSuitMessage
+from src.actions.action_group_registry import ActionIDs
 
 
 class ClaimDominanceAction(Action):
@@ -20,20 +20,21 @@ class ClaimDominanceAction(Action):
         available_dominances = [d_card for d_card in game_state.board.available_dominance_cards if any(
             d_card.suit == card.suit for card in executor.hand)]
 
-        chosen_dominance = executor.controller.send_game_message(
-            ClaimDominanceSuitMessage(game_state, self.action_group, available_dominances)).chosen_dominance
+        response = yield ClaimDominanceSuitMessage(game_state, self.action_group, available_dominances)
+        chosen_dominance = response.chosen_dominance
+        game_state.selected_suit = chosen_dominance.suit
 
         # 2. Expend card matching it
 
         available_cards = [
             card for card in executor.hand if card.suit == chosen_dominance.suit]
-        chosen_discard = executor.controller.send_game_message(
-            ClaimDominanceCardMessage(game_state, self.action_group, available_cards)).chosen_discard
-
+        response = yield ClaimDominanceCardMessage(game_state, self.action_group, available_cards)
+        chosen_discard = response.chosen_discard
+        game_state.selected_suit = None
         executor.discard_card(chosen_discard)
         executor.hand.append(chosen_dominance)
         game_state.board.available_dominance_cards.remove(chosen_dominance)
-        print(
+        self.logger.info(
             f" - {executor} expended '{chosen_discard}' to take '{chosen_dominance}'")
 
         return super().perform(game_state, executor)

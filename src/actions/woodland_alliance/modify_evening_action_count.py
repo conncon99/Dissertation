@@ -1,11 +1,11 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from utils.callback_handler import CallbackTimes
-from actions.action_group_registry import ActionIDs
+from src.utils.callback_handler import CallbackTimes
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
+    from src.factions.woodland_alliance import WoodlandAlliance
 
 
 class ModifyEveningActionCount(Action):
@@ -19,3 +19,4 @@ class ModifyEveningActionCount(Action):
     def perform(self, game_state, executor: WoodlandAlliance):
         executor.actions[CallbackTimes.IN_EVENING][1].max_total_uses = executor.officers
         return super().perform(game_state, executor)
+        yield

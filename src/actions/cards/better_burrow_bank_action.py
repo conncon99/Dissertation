@@ -1,6 +1,6 @@
-from actions.action_handler import Action
-from controllers.messages.game_messages import BetterBurrowBankMessage
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import BetterBurrowBankMessage
+from src.actions.action_group_registry import ActionIDs
 
 
 class BetterBurrowBankAction(Action):
@@ -13,20 +13,20 @@ class BetterBurrowBankAction(Action):
 
     def perform(self, game_state, executor):
         # 1. Choose other player
-        print(f" - {executor} Played Better Burrow Bank")
+        self.logger.info(f" - {executor} Played Better Burrow Bank")
         player_list = [
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id]
-        other_player = executor.controller.send_game_message(
-            BetterBurrowBankMessage(game_state, self.action_group, player_list)).chosen_player
-        print(f" - Selected {other_player} to draw card")
+        response = yield BetterBurrowBankMessage(game_state, self.action_group, player_list)
+        other_player = response.chosen_player
+        self.logger.info(f" - Selected {other_player} to draw card")
         # 2. Both of you draw a card
         card = executor.deck.draw(1)
         if card != []:
-            print(f" - {executor} drew '{card[0].name}'")
+            self.logger.info(f" - {executor} drew '{card[0].name}'")
             executor.hand.append(card[0])
         card2 = other_player.deck.draw(1)
         if card2 != []:
-            print(f" - {other_player} drew '{card2[0].name}'")
+            self.logger.info(f" - {other_player} drew '{card2[0].name}'")
             other_player.hand.append(card2[0])
 
         return super().perform(game_state, executor)

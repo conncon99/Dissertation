@@ -1,14 +1,14 @@
 from __future__ import annotations
-from pieces.building import Building
-from utils.root_types import Suits
+from src.pieces.building import Building
+from src.utils.root_types import Suits
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import AllianceNoBaseMessage
+from src.controllers.messages.game_messages import AllianceNoBaseMessage
 import math
-from utils.colour_utils import set_print_colour
+from src.utils.colour_utils import set_print_colour
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from board.clearing import Clearing
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.board.clearing import Clearing
 
 
 class AllianceBase(Building):
@@ -25,7 +25,7 @@ class AllianceBase(Building):
         set_print_colour(self.faction.print_colour)
         self.faction.bases[self.suit] = None
         # Discard all matching and bird supporters
-        print(
+        self.logger.info(
             f" - {self.suit.name.capitalize()} Base Destroyed, discarding all Bird and {self.suit.name.capitalize()} supporters")
         for card in self.faction.supporters:
             if card.suit == self.suit or card.suit == Suits.BIRD:
@@ -34,18 +34,21 @@ class AllianceBase(Building):
 
         # Remove half of all officers (rounded up)
         self.faction.officers -= math.ceil(self.faction.officers/2)
-        print(
+        self.logger.info(
             f" - Lost half of all officers - down to {self.faction.officers}")
 
         # If no bases are left, discard supporters down to 5
         if all(base is None for base in self.faction.bases.values()):
-            print(f" - No bases remaining, discarding supporters down to 5")
+            self.logger.info(
+                f" - No bases remaining, discarding supporters down to 5")
             num_to_discard = abs(5 - len(self.faction.supporters))
             for i in range(num_to_discard):
                 if self.faction.supporters == []:
                     break
-                chosen_discard = self.faction.controller.send_game_message(AllianceNoBaseMessage(
-                    self.faction.game_state, action_group, self.faction.supporters)).chosen_card
+                self.faction.game_state.active_player = self.faction
+                response = yield AllianceNoBaseMessage(self.faction.game_state, action_group, self.faction.supporters)
+                chosen_discard = response.chosen_card
+                self.faction.game_state.active_player = attacker
                 self.faction.discard_card(chosen_discard)
                 self.faction.supporters.remove(chosen_discard)
 

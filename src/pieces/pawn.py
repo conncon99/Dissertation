@@ -1,13 +1,12 @@
 from __future__ import annotations
-from pieces.piece import Piece
+from src.pieces.piece import Piece
 from typing import TYPE_CHECKING
-from utils.root_types import Factions
-from factions.vagabond.relationship_track import HOSTILE
-from pieces.piece_with_id import PieceWithID
+from src.utils.root_types import Factions
+from src.pieces.piece_with_id import PieceWithID
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.space import Space
+    from src.factions.faction import Faction
+    from src.board.space import Space
 
 
 class Pawn(Piece, PieceWithID):
@@ -26,12 +25,14 @@ class Pawn(Piece, PieceWithID):
     def destroy(self, attacker: Faction, action_group=None):
         PieceWithID.destroy(self)
         if attacker and attacker.faction_id == Factions.VAGABOND.value:
+            from src.factions.vagabond.relationship_track import HOSTILE
             if attacker.relationship_track.relationship_level[self.faction.faction_id] != HOSTILE:
                 attacker.relationship_track.relationship_level[self.faction.faction_id] = HOSTILE
-                print(f" - {attacker} became hostile with {self.faction}")
+                self.logger.info(
+                    f" - {attacker} became hostile with {self.faction}")
             elif not attacker.dominance:
                 attacker.add_vp(1)
-                print(f" - {attacker} gained 1 VP due to Infamy")
+                self.logger.info(f" - {attacker} gained 1 VP due to Infamy")
 
         if self in self.space.units[self.faction.faction_id]:
             self.space.units[self.faction.faction_id].remove(self)

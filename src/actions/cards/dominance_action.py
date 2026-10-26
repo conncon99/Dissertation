@@ -1,6 +1,6 @@
-from actions.action_handler import Action
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 
 class DominanceAction(Action):
@@ -15,16 +15,17 @@ class DominanceAction(Action):
         if executor.dominance == Suits.BIRD:
             if (game_state.board.clearings[0].get_owner() == executor.faction_id and game_state.board.clearings[11].get_owner() == executor.faction_id) or (game_state.board.clearings[1].get_owner() == executor.faction_id and game_state.board.clearings[8].get_owner() == executor.faction_id):
                 executor.has_won = True
-                print(f"{executor} has acheived Bird Dominance")
+                self.logger.info(f"{executor} has acheived Bird Dominance")
         else:
             dominance_count = 0
             for clearing in game_state.board.clearings:
                 if clearing.get_suit() == executor.dominance and clearing.get_owner() == executor.faction_id:
                     dominance_count += 1
-            print(
+            self.logger.info(
                 f" - {executor} controls {dominance_count} {executor.dominance.name.capitalize()} Clearings")
             if dominance_count >= 3:
-                print(
+                self.logger.info(
                     f" - {executor} has achieved {executor.dominance.name.capitalize()} Dominance and won")
                 executor.has_won = True
         return super().perform(game_state, executor)
+        yield

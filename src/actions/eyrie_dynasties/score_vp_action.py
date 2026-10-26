@@ -1,10 +1,10 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from actions.action_group_registry import ActionIDs
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.eyrie_dynasties import EyrieDynasties
+    from src.factions.eyrie_dynasties import EyrieDynasties
 
 
 class ScoreVpAction(Action):
@@ -18,4 +18,7 @@ class ScoreVpAction(Action):
 
     def perform(self, game_state, executor: EyrieDynasties):
         executor.add_vp(executor.roost_track[len(executor.roosts)])
+        self.logger.info(
+            f"Gained {executor.roost_track[len(executor.roosts)]} VP")
         return super().perform(game_state, executor)
+        yield

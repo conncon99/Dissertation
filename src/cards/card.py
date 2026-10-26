@@ -1,19 +1,19 @@
 from __future__ import annotations
-from controllers.messages.game_messages import AmbushMessage
-from utils.root_types import Suits, Items, Factions, EyrieLeaders
+from src.controllers.messages.game_messages import AmbushMessage
+from src.utils.root_types import Suits, Items, Factions, EyrieLeaders
 from typing import TYPE_CHECKING, Optional
-from utils.callback_handler import CallbackTimes, BattleCallbackTimes
-from actions.cards import *
-from actions.factionless.battle_action import BattleAction, BattleModifiers
-from actions.factionless.move_action import MoveAction
-from controllers.messages.game_messages import BattleUseCardMessage
-from controllers.messages.controller_messages import AmbushResponse
+from src.utils.callback_handler import CallbackTimes, BattleCallbackTimes
+from src.actions.factionless.battle_action import BattleAction, BattleModifiers
+from src.actions.factionless.move_action import MoveAction
+from src.controllers.messages.game_messages import BattleUseCardMessage
+from src.controllers.messages.controller_messages import AmbushResponse
+import logging
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
-    from board.clearing import Clearing
-    from utils.game_state import GameState
-    from actions.action_handler import Action
+    from src.factions.faction import Faction
+    from src.board.clearing import Clearing
+    from src.utils.game_state import GameState
+    from src.actions.action_handler import Action
 
 
 class Card:
@@ -22,6 +22,7 @@ class Card:
     def __init__(self, suit: Suits, name: str, is_persistent: bool, description: str) -> None:
         self.suit = suit
         self.name = name
+        self.logger = logging.getLogger()
         self.description = description
         self.is_persistent = is_persistent
         self.is_craftable = False
@@ -70,8 +71,8 @@ class Card:
             self.owner.battle_callbacks[self.callback_time].append(
                 self._callback)
 
-    def _callback(game_state, action_group, self) -> None:
-        print("default callback called")
+    def _callback(self, game_state: GameState, action_group) -> None:
+        self.logger.warning("default callback called")
 
 
 class ItemCard(Card):
@@ -102,9 +103,11 @@ class DominanceCard(Card):
         else:
             description = f"You win the game if you rule three {suit.name.lower()} clearings at the start of your birdsong."
         super().__init__(suit, name, False, description)
+        from src.actions.cards import DominanceAction
         self.make_action_adder(CallbackTimes.DOMINANCE_TIME, DominanceAction())
 
     def activate(self, game_state: GameState, action_group):
+        print("Played Dominance")
         super().activate(game_state, action_group)
         self.owner.dominance = self.suit
         self.owner.hand.remove(self)
@@ -135,7 +138,7 @@ class CobblerCard(Card):
 
     def activate(self, game_state, action_group):
         if self.owner.faction_id == Factions.VAGABOND.value:
-            from actions.vagabond.vagabond_move_action import VagabondMoveAction
+            from src.actions.vagabond.vagabond_move_action import VagabondMoveAction
             self.action = VagabondMoveAction(cobbler_move=True, max_uses=1)
         else:
             self.action = MoveAction(max_uses=1)
@@ -149,15 +152,27 @@ class SappersCard(Card):
         self.make_craftable(mouse_count=1)
         self.make_battle_modifier(BattleCallbackTimes.IN_BATTLE_DEFENDER)
 
-    def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
+    def _callback(self, game_state: GameState, action_group, battle_modifier: BattleModifiers):
 
-        use_card: bool = self.owner.controller.send_game_message(
-            BattleUseCardMessage(game_state, action_group, self)).use_card
+        if not self.owner:
+            return
+            yield
 
+        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
+            self.logger.debug(
+                f" - Cannot use {self} in a defenseless clearing")
+            return
+            yield
+
+        game_state.active_player = self.owner
+        response = yield BattleUseCardMessage(game_state, action_group, self)
+        use_card: bool = response.use_card
+        game_state.active_player = game_state.current_player
         if use_card:
-            battle_modifier.defender_damage_modifier += 1
-            print(f"Active cards: {self.owner.active_cards}")
-            print(f" - {self.owner} played {self.name} to deal an extra hit")
+            battle_modifier.attacker_damage_modifier += 1
+            self.logger.debug(f"Active cards: {self.owner.active_cards}")
+            self.logger.info(
+                f" - {self.owner} played {self.name} to deal an extra hit")
             self.owner.active_cards.remove(self)
             self.owner.discard_card(self)
             self.owner.battle_callbacks[self.callback_time].remove(
@@ -171,15 +186,27 @@ class BrutalTacticsCard(Card):
         self.make_craftable(mouse_count=1)
         self.make_battle_modifier(BattleCallbackTimes.IN_BATTLE_ATTACKER)
 
-    def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
+    def _callback(self, game_state: GameState, action_group, battle_modifier: BattleModifiers):
 
-        use_card: bool = self.owner.controller.send_game_message(
-            BattleUseCardMessage(game_state, action_group, self)).use_card
+        if not self.owner:
+            return
+            yield
+
+        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
+            self.logger.debug(
+                f" - Cannot use {self} in a defenseless clearing")
+            return
+            yield
+
+        game_state.active_player = self.owner
+        response = yield BattleUseCardMessage(game_state, action_group, self)
+        use_card: bool = response.use_card
+        game_state.active_player = game_state.current_player
 
         if use_card:
             battle_modifier.defender_damage_modifier += 1
-            battle_modifier.defender.add_vp(1)
-            print(
+            battle_modifier.attacker.add_vp(1)
+            self.logger.info(
                 f" - {self.owner} played {self.name} to deal an extra hit, {battle_modifier.attacker} gained 1 VP")
 
 
@@ -192,8 +219,20 @@ class ArmorersCard(Card):
 
     def _callback(self, game_state, action_group, battle_modifier: BattleModifiers):
 
-        use_card: bool = self.owner.controller.send_game_message(
-            BattleUseCardMessage(game_state, action_group, self)).use_card
+        if not self.owner:
+            return
+            yield
+
+        if battle_modifier.clearing.get_faction_warrior_count(self.owner.faction_id) == 0:
+            self.logger.debug(
+                f" - Cannot use {self} in a defenseless clearing")
+            return
+            yield
+
+        game_state.active_player = self.owner
+        response = yield BattleUseCardMessage(game_state, action_group, self)
+        use_card: bool = response.use_card
+        game_state.active_player = game_state.current_player
 
         if use_card:
             if self.owner.faction_id == battle_modifier.attacker.faction_id:
@@ -204,7 +243,7 @@ class ArmorersCard(Card):
             self.owner.discard_card(self)
             self.owner.battle_callbacks[self.callback_time].remove(
                 self._callback)
-            print(
+            self.logger.info(
                 f" - {self.owner} played {self.name} to ignore all hits")
 
 
@@ -215,32 +254,40 @@ class AmbushCard(Card):
         super().__init__(suit, name, False, description)
         self.make_battle_modifier(BattleCallbackTimes.BATTLE_START_DEFENDER)
 
-    def _callback(self, game_state, action_group, battle_modifer: BattleModifiers) -> None:
+    def _callback(self, game_state: GameState, action_group, battle_modifier: BattleModifiers):
 
-        from cards.cards import SCOUTING_PARTY, SCOUTING_PARTY_2
-        if SCOUTING_PARTY in battle_modifer.attacker.active_cards or SCOUTING_PARTY_2 in battle_modifer.attacker.active_cards:
-            print(" - Scouting party blocked ambush")
+        if battle_modifier.clearing.get_faction_warrior_count(battle_modifier.defender.faction_id) == 0:
+            self.logger.debug(
+                f" - Cannot use {self} in a defenseless clearing")
+            return
+            yield
+
+        from src.cards.cards import SCOUTING_PARTY, SCOUTING_PARTY_2
+        if SCOUTING_PARTY in battle_modifier.attacker.active_cards or SCOUTING_PARTY_2 in battle_modifier.attacker.active_cards:
+            self.logger.info(" - Scouting party blocked ambush")
             # Scouting Party blocks ambushes
             return
+            yield
 
-        print(f" - {battle_modifer.defender} has chosen to Ambush {battle_modifer.attacker} on Clearing {battle_modifer.clearing.index}")
-        battle_modifer.defender.discard_card(self)
+        self.logger.info(
+            f" - {battle_modifier.defender} has chosen to Ambush {battle_modifier.attacker} on Clearing {battle_modifier.clearing.index}")
+        battle_modifier.defender.discard_card(self)
 
         available_ambush_cards = [
-            card for card in battle_modifer.attacker.hand if isinstance(card, AmbushCard) and (card.suit == battle_modifer.clearing.get_suit() or card.suit == Suits.BIRD)]
+            card for card in battle_modifier.attacker.hand if isinstance(card, AmbushCard) and (card.suit == battle_modifier.clearing.get_suit() or card.suit == Suits.BIRD)]
 
+        game_state.active_player = battle_modifier.attacker
         if available_ambush_cards != []:
-            ambush_response: AmbushResponse = battle_modifer.attacker.controller.send_game_message(AmbushMessage(
-                game_state, action_group, battle_modifer.attacker, battle_modifer.defender, battle_modifer.clearing, True, True, available_ambush_cards))
+            ambush_response: AmbushResponse = yield AmbushMessage(game_state, action_group, battle_modifier.attacker, battle_modifier.defender, battle_modifier.clearing, True, True, available_ambush_cards)
             if ambush_response.ambush_card is not None:
-                print(
-                    f" - {battle_modifer.attacker} Counter-Ambushed using '{ambush_response.ambush_card}'")
-                battle_modifer.attacker.discard_card(
+                self.logger.info(
+                    f" - {battle_modifier.attacker} Counter-Ambushed using '{ambush_response.ambush_card}'")
+                battle_modifier.attacker.discard_card(
                     ambush_response.ambush_card)
                 return
 
-        battle_modifer.clearing.damage(
-            victim=battle_modifer.attacker, attacker=battle_modifer.defender, amount=2, action_group=action_group)
+        yield from battle_modifier.clearing.damage(
+            victim=battle_modifier.attacker, attacker=battle_modifier.defender, amount=2, logger=self.logger, action_group=action_group)
 
 
 class FavourCard(Card):
@@ -257,7 +304,7 @@ class FavourCard(Card):
     def _kill_all_enemies(self, clearing: Clearing, game_state: GameState, action_group):
         for faction in game_state.faction_list:
             if faction.faction_id != self.owner.faction_id and clearing.get_faction_piece_count(faction.faction_id) > 0:
-                clearing.damage(faction, self.owner, 999, action_group)
+                yield from clearing.damage(faction, self.owner, 999, self.logger, action_group)
 
 
 class BetterBurrowBankCard(Card):
@@ -265,6 +312,7 @@ class BetterBurrowBankCard(Card):
         super().__init__(Suits.RABBIT, "Better Burrow Bank", True,
                          "At start of Birdsong, you and another play draw a card")
         self.make_craftable(rabbit_count=2)
+        from src.actions.cards import BetterBurrowBankAction
         self.make_action_adder(
             CallbackTimes.BIRDSONG_START, BetterBurrowBankAction())
 
@@ -274,6 +322,7 @@ class StandAndDeliverCard(Card):
         super().__init__(Suits.FOX, "Stand and Deliver", True,
                          "In Birdsong, may take a random card from another player. That player scores one point")
         self.make_craftable(mouse_count=3)
+        from src.actions.cards import StandAndDeliverAction
         self.make_action_adder(CallbackTimes.IN_BIRDSONG,
                                StandAndDeliverAction())
 
@@ -283,6 +332,7 @@ class TaxCollectorsCard(Card):
         super().__init__(Suits.FOX, "Tax Collector", True,
                          "Once in Daylight, may remove one of your warriors to draw a card.")
         self.make_craftable(fox_count=1, mouse_count=1, rabbit_count=1)
+        from src.actions.cards import TaxCollectorAction
         self.make_action_adder(CallbackTimes.IN_DAYLIGHT, TaxCollectorAction())
 
 
@@ -291,6 +341,7 @@ class CodebreakersCard(Card):
         super().__init__(Suits.MOUSE, "Codebreakers", True,
                          "Once in Daylight, may look at another player's hand.")
         self.make_craftable(mouse_count=1)
+        from src.actions.cards import CodebreakersAction
         self.make_action_adder(CallbackTimes.IN_DAYLIGHT, CodebreakersAction())
 
 
@@ -299,5 +350,6 @@ class RoyalClaimCard(Card):
         super().__init__(Suits.BIRD, "Royal Claim", True,
                          "In Birdsong, may discard this to score one point per clearing you rule.")
         self.make_craftable(wild_count=4)
+        from src.actions.cards import RoyalClaimAction
         self.make_action_adder(CallbackTimes.IN_BIRDSONG,
                                RoyalClaimAction(self))

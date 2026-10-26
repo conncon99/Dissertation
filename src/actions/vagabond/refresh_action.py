@@ -1,12 +1,12 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import RefreshItemMessage
-from controllers.messages.controller_messages import RefreshItemResponse
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import RefreshItemMessage
+from src.controllers.messages.controller_messages import RefreshItemResponse
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class RefreshAction(Action):
@@ -27,8 +27,7 @@ class RefreshAction(Action):
                 item for item, amount in executor.satchel.exhausted_damaged_items.items() for _ in range(amount)]
             exhausted_available_items = [
                 item for item, amount in executor.satchel.exhausted_items.items() for _ in range(amount)]
-            refresh_response: RefreshItemResponse = executor.controller.send_game_message(
-                RefreshItemMessage(game_state, self.action_group, exhausted_damaged_items, exhausted_available_items, remaining_refreshes))
+            refresh_response: RefreshItemResponse = yield RefreshItemMessage(game_state, self.action_group, exhausted_damaged_items, exhausted_available_items, remaining_refreshes)
             executor.satchel.refresh_item(
                 refresh_response.chosen_item, refresh_response.is_damaged)
 

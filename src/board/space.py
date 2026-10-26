@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import Dict, TYPE_CHECKING, List
-from utils.root_types import Factions
+from src.utils.root_types import Factions
 if TYPE_CHECKING:
-    from utils.game_settings import GameSettings
-    from pieces.pawn import Pawn
-    from board.clearing import Clearing
-    from board.forest import Forest
-    from utils.game_state import GameState
+    from src.utils.game_settings import GameSettings
+    from src.pieces.pawn import Pawn
+    from src.board.clearing import Clearing
+    from src.board.forest import Forest
+    from src.utils.game_state import GameState
 
 
 class Space:

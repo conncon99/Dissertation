@@ -1,17 +1,18 @@
 
 from __future__ import annotations
-import random
+import numpy as np
 from typing import List, TYPE_CHECKING
-from utils.root_types import Items, Suits
+from src.utils.root_types import Items, Suits
 from enum import Enum
 from abc import abstractmethod, ABC
-from board.clearing import Clearing
-from controllers.messages.controller_messages import RangerRepairResponse
-from controllers.messages.game_messages import RangerRepairMessage, TinkerCardMessage, ThiefStealMessage
+from src.board.clearing import Clearing
+from src.controllers.messages.controller_messages import RangerRepairResponse
+from src.controllers.messages.game_messages import RangerRepairMessage, TinkerCardMessage, ThiefStealMessage
+import logging
 
 if TYPE_CHECKING:
-    from utils.game_state import GameState
-    from factions.vagabond.vagabond import Vagabond
+    from src.utils.game_state import GameState
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class VagabondCharacter(ABC):
@@ -47,9 +48,9 @@ class ThiefCharacter(VagabondCharacter):
         available_players = [faction for faction in game_state.faction_list if executor.vagabond_pawn.space.get_faction_piece_count(
             faction.faction_id) and faction.faction_id != executor.faction_id and len(faction.hand) > 0]
 
-        chosen_player = executor.controller.send_game_message(
-            ThiefStealMessage(game_state, action_group, available_players)).chosen_player
-        selected_card = random.choice(chosen_player.hand)
+        response = yield ThiefStealMessage(game_state, action_group, available_players)
+        chosen_player = response.chosen_player
+        selected_card = np.random.choice(chosen_player.hand)
         chosen_player.hand.remove(selected_card)
         executor.hand.append(selected_card)
 
@@ -68,11 +69,12 @@ class TinkerCharacter(VagabondCharacter):
         executor.satchel.exhaust_item(Items.TORCH)
         available_cards = [card for card in game_state.deck.discard if card.suit ==
                            Suits.BIRD or card.suit == executor.vagabond_pawn.space.get_suit()]
-        chosen_card = executor.controller.send_game_message(
-            TinkerCardMessage(game_state, action_group, available_cards)).chosen_card
+        response = yield TinkerCardMessage(game_state, action_group, available_cards)
+        chosen_card = response.chosen_card
         executor.hand.append(chosen_card)
         game_state.deck.discard.remove(chosen_card)
-        print(f" - Taken '{chosen_card}' from the discard pile")
+        logger = logging.getLogger()
+        logger.info(f" - Taken '{chosen_card}' from the discard pile")
 
 
 class RangerCharacter(VagabondCharacter):
@@ -92,8 +94,7 @@ class RangerCharacter(VagabondCharacter):
                 item for item, amount in executor.satchel.available_damaged_items.items() for _ in range(amount)]
             exhausted_damaged_items = [
                 item for item, amount in executor.satchel.exhausted_damaged_items.items() for _ in range(amount)]
-            ranger_response: RangerRepairResponse = executor.controller.send_game_message(RangerRepairMessage(
-                game_state, action_group, available_damaged_items, exhausted_damaged_items))
+            ranger_response: RangerRepairResponse = yield RangerRepairMessage(game_state, action_group, available_damaged_items, exhausted_damaged_items)
             executor.satchel.repair_item(
                 ranger_response.chosen_item, ranger_response.is_exhausted)
 

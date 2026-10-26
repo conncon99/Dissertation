@@ -1,9 +1,9 @@
 from __future__ import annotations
-from pieces.building import Building
+from src.pieces.building import Building
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from utils.root_types import Items
-    from board.clearing import Clearing
+    from src.utils.root_types import Items
+    from src.board.clearing import Clearing
 
 
 class Ruin(Building):
@@ -13,4 +13,4 @@ class Ruin(Building):
 
     def destroy(self, attacker, action_group=None):
         self.space.slots[self.slot_idx] = None
-        print(" - Ruin is empty, destroying")
+        self.logger.info(" - Ruin is empty, destroying")

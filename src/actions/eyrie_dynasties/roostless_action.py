@@ -1,18 +1,18 @@
 from __future__ import annotations
 import math
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from pieces.pawn import Pawn
-from pieces.eyrie_dynasties.eyrie_buildings import Roost
-from pieces.marquise_de_cat.marquise_tokens import Keep
-from controllers.messages.game_messages import RoostlessMessage
-from utils.root_types import Factions
-from actions.action_group_registry import ActionIDs
+from src.pieces.pawn import Pawn
+from src.pieces.eyrie_dynasties.eyrie_buildings import Roost
+from src.pieces.marquise_de_cat.marquise_tokens import Keep
+from src.controllers.messages.game_messages import RoostlessMessage
+from src.utils.root_types import Factions
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.eyrie_dynasties import EyrieDynasties
-    from utils.game_state import GameState
-    from board.clearing import Clearing
+    from src.factions.eyrie_dynasties import EyrieDynasties
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
 
 
 class RoostlessAction(Action):
@@ -39,8 +39,8 @@ class RoostlessAction(Action):
                 peaceful_clearings.append(clearing)
 
         # 2. Choose which peaceful clearing to use
-        chosen_clearing: Clearing = executor.controller.send_game_message(
-            RoostlessMessage(game_state, self.action_group, peaceful_clearings)).chosen_clearing
+        response = yield RoostlessMessage(game_state, self.action_group, peaceful_clearings)
+        chosen_clearing: Clearing = response.chosen_clearing
 
         # 3. Place a roost and 3 troops in that clearing
         Roost(chosen_clearing, executor, chosen_clearing.get_first_free_slot())

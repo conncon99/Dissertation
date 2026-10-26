@@ -1,15 +1,15 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING, List
-from pieces.woodland_alliance.alliance_tokens import Sympathy
-from controllers.messages.game_messages import SpreadSympathyClearingMessage, SpreadSympathyDiscardMessage
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.pieces.woodland_alliance.alliance_tokens import Sympathy
+from src.controllers.messages.game_messages import SpreadSympathyClearingMessage, SpreadSympathyDiscardMessage
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
-    from utils.game_state import GameState
-    from board.clearing import Clearing
+    from src.factions.woodland_alliance import WoodlandAlliance
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
 
 
 class SpreadSympathyAction(Action):
@@ -41,14 +41,11 @@ class SpreadSympathyAction(Action):
         cost = executor.sympathy_track[len(executor.sympathy)][0]
 
         # If there are 3 or more enemy warriors on a clearing, the cost increases by 1
-        enemy_count = 0
         for faction in game_state.faction_list:
             if faction.faction_id != executor.faction_id:
-                enemy_count += clearing.get_faction_warrior_count(
-                    faction.faction_id)
-
-        if enemy_count >= 3:
-            cost += 1
+                if clearing.get_faction_warrior_count(faction.faction_id) >= 3:
+                    cost += 1
+                    break
 
         total = 0
         for supporter in executor.supporters:
@@ -66,10 +63,12 @@ class SpreadSympathyAction(Action):
 
         available_clearings = self.get_valid_clearings(executor, game_state)
 
-        chosen_clearing = executor.controller.send_game_message(
-            SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)).chosen_clearing
+        response = yield SpreadSympathyClearingMessage(game_state, self.action_group, available_clearings)
+        chosen_clearing = response.chosen_clearing
+        game_state.selected_clearing = chosen_clearing
 
-        print(f" - Spread sympathy to clearing {chosen_clearing.index}")
+        self.logger.info(
+            f" - Spread sympathy to clearing {chosen_clearing.index}")
 
         # 2. Choose supporters to discard
 
@@ -78,13 +77,13 @@ class SpreadSympathyAction(Action):
         for i in range(num_to_discard):
             valid_supporters = self.get_available_supporters(
                 executor, chosen_clearing)
-            discard_choice = executor.controller.send_game_message(SpreadSympathyDiscardMessage(
-                game_state, self.action_group, valid_supporters)).chosen_discard
+            response = yield SpreadSympathyDiscardMessage(game_state, self.action_group, valid_supporters)
+            discard_choice = response.chosen_discard
             executor.discard_card(discard_choice)
             executor.supporters.remove(discard_choice)
 
         # 3. Place sympathy on chosen clearing
 
         Sympathy(chosen_clearing, executor)
-
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)

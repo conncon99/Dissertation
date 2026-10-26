@@ -1,12 +1,12 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from utils.root_types import Factions
-from controllers.messages.game_messages import TaxCollectorMessage
+from src.actions.action_handler import Action
+from src.utils.root_types import Factions
+from src.controllers.messages.game_messages import TaxCollectorMessage
 from typing import TYPE_CHECKING
-from actions.action_group_registry import ActionIDs
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from pieces.pawn import Pawn
+    from src.pieces.pawn import Pawn
 
 
 class TaxCollectorAction(Action):
@@ -20,15 +20,15 @@ class TaxCollectorAction(Action):
     def perform(self, game_state, executor):
         # 1. Choose warrior to remove
 
-        chosen_unit: Pawn = executor.controller.send_game_message(
-            TaxCollectorMessage(game_state, self.action_group, executor.units)).chosen_unit
-        print(
+        response = yield TaxCollectorMessage(game_state, self.action_group, executor.units)
+        chosen_unit: Pawn = response.chosen_unit
+        self.logger.info(
             f" - {executor} removed its own warrior on clearing {chosen_unit.space.index}")
         chosen_unit.destroy(None, self.action_group)
 
         # 2. Draw a card
         card = executor.deck.draw(1)
         if card != []:
-            print(f" - {executor} drew '{card[0].name}'")
+            self.logger.info(f" - {executor} drew '{card[0].name}'")
             executor.hand.append(card[0])
         return super().perform(game_state, executor)

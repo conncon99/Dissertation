@@ -1,17 +1,17 @@
 from __future__ import annotations
 import math
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from pieces.marquise_de_cat.marquise_buildings import Sawmill, Recruiter, Workshop
-from controllers.messages.game_messages import WoodRemovalMessage, MarquiseBuildingMessage
-from controllers.messages.controller_messages import WoodRemovalResponse, MarquiseBuildingResponse
-from pieces.building import Building
-from actions.action_group_registry import ActionIDs
+from src.pieces.marquise_de_cat.marquise_buildings import Sawmill, Recruiter, Workshop
+from src.controllers.messages.game_messages import WoodRemovalMessage, MarquiseBuildingClearingMessage, MarquiseBuildingTypeMessage
+from src.controllers.messages.controller_messages import WoodRemovalResponse, MarquiseBuildingClearingResponse, MarquiseBuildingTypeResponse
+from src.pieces.building import Building
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.marquise_de_cat import Marquise
-    from utils.game_state import GameState
-    from board.clearing import Clearing
+    from src.factions.marquise_de_cat import Marquise
+    from src.utils.game_state import GameState
+    from src.board.clearing import Clearing
 
 
 # 1. Choose the building type to build
@@ -67,10 +67,13 @@ class MarquiseBuild(Action):
         clearing_building_options = {clearing: building_options for clearing,
                                      building_options in clearing_building_options.items() if building_options}
 
-        building_response: MarquiseBuildingResponse = executor.controller.send_game_message(
-            MarquiseBuildingMessage(game_state, self.action_group, clearing_building_options))
-        clearing = building_response.chosen_clearing
-        BuildingChoice = building_response.chosen_building_type
+        building_clearing_response: MarquiseBuildingClearingResponse = yield MarquiseBuildingClearingMessage(game_state, self.action_group, clearing_building_options)
+        clearing = building_clearing_response.chosen_clearing
+        game_state.selected_clearing = clearing
+
+        building_type_response: MarquiseBuildingTypeResponse = yield MarquiseBuildingTypeMessage(game_state, self.action_group, clearing_building_options[clearing])
+
+        BuildingChoice = building_type_response.chosen_building_type
 
         # 4. Receive victory points from the building track and pay wood cost
         cost = -1
@@ -86,16 +89,18 @@ class MarquiseBuild(Action):
             cost = self._get_workshop_cost(executor)
             executor.add_vp(executor.workshop_track[len(
                 executor.workshops)][1])
+
         for _ in range(cost):
-            wood = executor.controller.send_game_message(
-                WoodRemovalMessage(game_state, self.action_group, executor.wood)).chosen_wood_token
+            response = yield WoodRemovalMessage(game_state, self.action_group, executor.wood)
+            wood = response.chosen_wood_token
             wood.destroy(None, self.action_group)
 
         # 5. Build the building
         building = BuildingChoice(
             clearing, executor, clearing.get_first_free_slot())
-        print(
+        self.logger.info(
             f" - Built {building} on clearing {clearing.index} for slot {building.slot_idx} for {cost} wood")
+        game_state.selected_clearing = None
         return super().perform(game_state, executor)
 
     def _get_lowest_wood_cost(self, executor: Marquise, available_building_types):

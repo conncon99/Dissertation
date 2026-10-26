@@ -1,13 +1,13 @@
-from actions.action_handler import Action
-from typing import TYPE_CHECKING, List
-from controllers.messages.game_messages import CraftMessage
-from cards.card import ItemCard
-from utils.root_types import Suits
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from typing import TYPE_CHECKING
+from src.controllers.messages.game_messages import CraftMessage
+from src.cards.card import ItemCard
+from src.utils.root_types import Suits
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from cards.card import Card
-    from factions.faction import Faction
+    from src.cards.card import Card
+    from src.factions.faction import Faction
 
 
 # How controller works:
@@ -58,21 +58,21 @@ class CraftAction(Action):
 
         return True
 
-    def perform(self, game_state, executor) -> None:
+    def perform(self, game_state, executor):
         # 1. Get list of craftable cards
         crafting_options = [
             card for card in executor.hand if self._can_craft(card, executor, game_state)]
         # 2. Send crafting message to choose card and get card response
-        card: 'Card' = executor.controller.send_game_message(
-            CraftMessage(game_state, self.action_group, crafting_options)).chosen_card
+        response = yield CraftMessage(game_state, self.action_group, crafting_options)
+        card: 'Card' = response.chosen_card
         # 3. Craft card
-        print(f" - '{executor}' Crafted '{card}'")
+        self.logger.info(f" - '{executor}' Crafted '{card}'")
         card.owner = executor
 
         if card.is_persistent:
             executor.hand.remove(card)
             executor.active_cards.append(card)
-            print(f" - Active Cards: {executor.active_cards}")
+            self.logger.info(f" - Active Cards: {executor.active_cards}")
             card.activate(game_state, self.action_group)
         else:
             card.activate(game_state, self.action_group)

@@ -1,15 +1,13 @@
 from __future__ import annotations
-from controllers.base_controllers.eyrie_dynasties_controller import EyrieDynastiesController
-from controllers.messages.game_messages import *
-from controllers.messages.controller_messages import *
-from utils.root_types import Suits
+from src.controllers.base_controllers.eyrie_dynasties_controller import EyrieDynastiesController
+from src.controllers.messages.game_messages import *
+from src.controllers.messages.controller_messages import *
+from src.utils.root_types import Suits
 
 from typing import TYPE_CHECKING, List
 
-import random
-
 if TYPE_CHECKING:
-    from board.clearing import Clearing
+    from src.board.clearing import Clearing
 
 
 class EyriePlayerController(EyrieDynastiesController):
@@ -48,176 +46,161 @@ class EyriePlayerController(EyrieDynastiesController):
         return {str(i): item for i, item in enumerate(options)}
 
     def _handle_ambushes(self, msg: AmbushMessage) -> AmbushResponse:
-        print("Choose Ambush Card:")
+        self.logger.info("Choose Ambush Card:")
         msg.available_ambush_cards.append(None)
         response_mapping = self.setup_mapping(msg.available_ambush_cards)
         return AmbushResponse(response_mapping[self._get_response(response_mapping)])
 
-    def _handle_battle_end(self, msg: BattleEndMessage):
-        raise NotImplementedError
-
     def _handle_piece_targeting(self, msg: PieceTargetingMessage) -> PieceTargetingResponse:
-        print("Choose Piece to Destroy:")
+        self.logger.info("Choose Piece to Destroy:")
         response_mapping = self.setup_mapping(msg.targets)
         return PieceTargetingResponse(response_mapping[self._get_response(response_mapping)])
 
-    def _handle_movement(self, msg: MoveMessage) -> MoveResponse:
+    def _handle_move_from(self, msg: MoveFromMessage) -> MoveFromResponse:
+        self.logger.info("Choose Move From Clearing:")
+        from_response_mapping = self.setup_mapping(
+            msg.available_from_clearings)
+        return MoveFromResponse(from_response_mapping[self._get_response(from_response_mapping)])
 
-        print("Choose Move From Clearing:")
-        from_clearings = set([move[0] for move in msg.available_moves])
-        from_response_mapping = self.setup_mapping(from_clearings)
-        from_clearing = from_response_mapping[self._get_response(
-            from_response_mapping)]
+    def _handle_move_to(self, msg: MoveToMessage) -> MoveToResponse:
+        self.logger.info("Choose Move To Clearing:")
+        to_response_mapping = self.setup_mapping(
+            msg.available_to_clearings)
+        return MoveToResponse(to_response_mapping[self._get_response(to_response_mapping)])
 
-        print("Choose Move To Clearing:")
-        to_clearings = set([move[1]
-                            for move in msg.available_moves if move[0] == from_clearing])
-        to_response_mapping = self.setup_mapping(to_clearings)
-        to_clearing = to_response_mapping[self._get_response(
-            to_response_mapping)]
-
-        for movement in msg.available_moves:
-            if movement[0] == from_clearing and movement[1] == to_clearing:
-                all_units = movement[2]
-                break
-
-        if len(all_units) == 1:
-            units = all_units
-        else:
+    def _handle_move_units(self, msg: MoveUnitsMessage) -> MoveUnitsResponse:
+        if len(msg.available_units) == 1:
+            return MoveUnitsResponse(1)
+        response = int(
+            input(f"Enter Number of Units To Move (Max: {len(msg.available_units)})"))
+        while response < 0 or response > len(msg.available_units):
             response = int(
-                input(f"Enter Number of Units To Move (Max: {len(all_units)})"))
-            while response < 0 or response > len(all_units):
-                response = int(
-                    input(f"Enter Number of Units To Move (Max: {len(all_units)})"))
-            units = all_units[:response]
-        return MoveResponse(from_clearing, to_clearing, units)
+                input(f"Enter Number of Units To Move (Max: {len(msg.available_units)})"))
+        return MoveUnitsResponse(response)
 
     def _handle_crafting(self, msg: CraftMessage) -> CraftResponse:
-        print("Choose Card to Craft:")
+        self.logger.info("Choose Card to Craft:")
         response_mapping = self.setup_mapping(msg.crafting_options)
         return CraftResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_action_choice(self, msg: ActionChoiceMessage) -> ActionChoiceResponse:
-        print("Choose Action to Take:")
+        self.logger.info("Choose Action to Take:")
         response_mapping = self.setup_mapping(msg.available_actions)
         return ActionChoiceResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_stand_and_deliver(self, msg: StandAndDeliverMessage) -> StandAndDeliverResponse:
-        print("Choose Faction to Target:")
+        self.logger.info("Choose Faction to Target:")
         response_mapping = self.setup_mapping(msg.available_players)
         return StandAndDeliverResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_tax_collector(self, msg: TaxCollectorMessage) -> TaxCollectorResponse:
-        print("Choose Unit to Remove:")
+        self.logger.info("Choose Unit to Remove:")
         response_mapping = self.setup_mapping(msg.available_units)
         return TaxCollectorResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_codebreakers(self, msg: CodebreakersMessage) -> CodebreakersResponse:
-        print("Choose Faction to Target:")
+        self.logger.info("Choose Faction to Target:")
         response_mapping = self.setup_mapping(msg.available_players)
         return CodebreakersResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_claim_dominance_card(self, msg: ClaimDominanceCardMessage) -> ClaimDominanceCardResponse:
-        print("Choose Card to Discard In exchange for Dominance:")
+        self.logger.info("Choose Card to Discard In exchange for Dominance:")
         response_mapping = self.setup_mapping(msg.available_discard_cards)
         return ClaimDominanceCardResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_claim_dominance_suit(self, msg: ClaimDominanceSuitMessage) -> ClaimDominanceSuitResponse:
-        print("Choose Dominance card to claim:")
+        self.logger.info("Choose Dominance card to claim:")
         response_mapping = self.setup_mapping(msg.available_dominance_cards)
         return ClaimDominanceSuitResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_battle_clearing_choice(self, msg: BattleClearingChoiceMessage) -> BattleClearingChoiceResponse:
-        print("Choose Clearing to Battle On:")
+        self.logger.info("Choose Clearing to Battle On:")
         response_mapping = self.setup_mapping(msg.available_clearings)
         return BattleClearingChoiceResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_battle_card_message(self, msg: BattleUseCardMessage) -> BattleUseCardResponse:
-        print("Choose whether to use a card in battle:")
+        self.logger.info("Choose whether to use a card in battle:")
         response_mapping = self.setup_mapping([True, False])
         return BattleUseCardResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_better_burrow_bank(self, msg: BetterBurrowBankMessage) -> BetterBurrowBankResponse:
-        print("Choose other player to also draw card:")
+        self.logger.info("Choose other player to also draw card:")
         response_mapping = self.setup_mapping(msg.available_players)
         return BetterBurrowBankResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_dominance_choice(self, msg: ChooseDominanceMessage) -> ChooseDominanceResponse:
-        print("Choose dominance to play:")
+        self.logger.info("Choose dominance to play:")
         response_mapping = self.setup_mapping(msg.available_cards)
         return ChooseDominanceResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_battle_target_choice(self, msg: BattleTargetChoiceMessage) -> BattleTargetResponse:
-        print("Choose target to battle:")
+        self.logger.info("Choose target to battle:")
         response_mapping = self.setup_mapping(msg.battle_target_list)
         return BattleTargetResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_discard_choice(self, msg: DiscardChoiceMessage) -> DiscardChoiceResponse:
-        print("Choose card to discard:")
+        self.logger.info("Choose card to discard:")
         response_mapping = self.setup_mapping(msg.discard_options)
         return DiscardChoiceResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_triggerer_outrage_message(self, msg: TriggererOutrageMessage) -> TriggererOutrageResponse:
-        print("Choose card to give the Woodland Alliance:")
+        self.logger.info("Choose card to give the Woodland Alliance:")
         response_mapping = self.setup_mapping(msg.valid_cards)
         return TriggererOutrageResponse(response_mapping[self._get_response(response_mapping)])
 
 # Eyrie Controller
 
     def _handle_roostless_message(self, msg: RoostlessMessage) -> RoostlessResponse:
-        print("Choose Clearing to place Roost:")
+        self.logger.info("Choose Clearing to place Roost:")
         response_mapping = self.setup_mapping(msg.available_clearings)
         return RoostlessResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_roost_setup_message(self, msg: RoostSetupMessage) -> RoostSetupResponse:
-        print("Choose Clearing to place Roost:")
+        self.logger.info("Choose Clearing to place Roost:")
         response_mapping = self.setup_mapping(msg.available_clearings)
         return RoostSetupResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_leader_setup_message(self, msg: LeaderSetupMessage) -> LeaderSetupResponse:
-        print("Choose Starting Eyrie Leader:")
+        self.logger.info("Choose Starting Eyrie Leader:")
         response_mapping = self.setup_mapping(msg.leader_choices)
         return LeaderSetupResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_decree_recruit_message(self, msg: DecreeRecruitClearingMessage) -> DecreeRecruitClearingResponse:
-        print("Choose Clearing to Recruit In:")
+        self.logger.info("Choose Clearing to Recruit In:")
         response_mapping = self.setup_mapping(msg.available_clearings)
         return DecreeRecruitClearingResponse(response_mapping[self._get_response(response_mapping)])
 
-    def _handle_extend_decree_message_1(self, msg: ExtendDecreeMessage1) -> ExtendDecreeResponse1:
-        print("Choose Decree Type to Extend:")
+    def _handle_extend_decree_card_1(self, msg: ExtendDecreeCardMessage1) -> ExtendDecreeCardResponse1:
+        self.logger.info("Choose Card to add to Decree:")
+        card_response_mapping = self.setup_mapping(msg.available_cards)
+        return ExtendDecreeCardResponse1(card_response_mapping[self._get_response(
+            card_response_mapping)])
+
+    def _handle_extend_decree_action_1(self, msg: ExtendDecreeActionMessage1) -> ExtendDecreeActionResponse1:
+        self.logger.info("Choose Decree Type to Extend:")
         decree_response_mapping = self.setup_mapping(
             ["Recruit", "Move", "Battle", "Build"])
-        chosen_decree_type = int(self._get_response(
-            decree_response_mapping)) + 1
-        print("Choose Card to add to Decree:")
-        card_response_mapping = self.setup_mapping(msg.available_cards)
-        chosen_card = card_response_mapping[self._get_response(
-            card_response_mapping)]
-        return ExtendDecreeResponse1(chosen_card, chosen_decree_type)
+        return ExtendDecreeActionResponse1(int(self._get_response(decree_response_mapping)) + 1)
 
-    def _handle_extend_decree_message_2(self, msg: ExtendDecreeMessage2) -> ExtendDecreeResponse2:
-        print("Choose Decree Type to Extend:")
+    def _handle_extend_decree_card_2(self, msg: ExtendDecreeCardMessage2) -> ExtendDecreeCardResponse2:
+        self.logger.info("Choose Card to add to Decree:")
+        card_response_mapping = self.setup_mapping(msg.available_cards)
+        ExtendDecreeCardResponse2(
+            card_response_mapping[self._get_response(card_response_mapping)])
+
+    def _handle_extend_decree_action_2(self, msg: ExtendDecreeActionMessage2) -> ExtendDecreeActionResponse2:
+        self.logger.info("Choose Decree Type to Extend:")
         decree_response_mapping = self.setup_mapping(
             ["Recruit", "Move", "Battle", "Build", None])
         decoder = {'0': 1, '1': 2, '2': 3, '3': 4, '4': None}
-        chosen_decree_type = decoder[self._get_response(
-            decree_response_mapping)]
-
-        if chosen_decree_type is None:
-            return ExtendDecreeResponse2(None, None)
-        print("Choose Card to add to Decree:")
-        card_response_mapping = self.setup_mapping(msg.available_cards)
-        chosen_card = card_response_mapping[self._get_response(
-            card_response_mapping)]
-        return ExtendDecreeResponse2(chosen_card, chosen_decree_type)
+        return ExtendDecreeActionResponse2(decoder[self._get_response(decree_response_mapping)])
 
     def _handle_decree_build_message(self, msg: DecreeBuildMessage) -> DecreeBuildResponse:
-        print("Choose Clearing to Build Roost In:")
+        self.logger.info("Choose Clearing to Build Roost In:")
         response_mapping = self.setup_mapping(msg.available_clearings)
         return DecreeBuildResponse(response_mapping[self._get_response(response_mapping)])
 
     def _handle_turmoil_leader_message(self, msg: TurmoilLeaderMessage) -> TurmoilLeaderResponse:
-        print("Choose new Eyrie Leader:")
+        self.logger.info("Choose new Eyrie Leader:")
         response_mapping = self.setup_mapping(msg.available_leaders)
         return TurmoilLeaderResponse(response_mapping[self._get_response(response_mapping)])

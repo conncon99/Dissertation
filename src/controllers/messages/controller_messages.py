@@ -2,7 +2,7 @@ from __future__ import annotations
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pieces.piece import Piece
+    from src.pieces.piece import Piece
 
 
 class UnexpectedControllerMessage(Exception):
@@ -13,7 +13,9 @@ class UnexpectedControllerMessage(Exception):
 class ControllerMessages(Enum):
     AMBUSH_RESPONSE = auto()
     PIECE_TARGETING_RESPONSE = auto()
-    MOVE_RESPONSE = auto()
+    MOVE_FROM_RESPONSE = auto()
+    MOVE_TO_RESPONSE = auto()
+    MOVE_UNITS_RESPONSE = auto()
     CRAFT_RESPONSE = auto()
     BATTLE_USE_CARD_RESPONSE = auto()
     CHOOSE_DOMINANCE_RESPONSE = auto()
@@ -30,12 +32,15 @@ class ControllerMessages(Enum):
 
     # Marquise messages
     KEEP_CLEARING_RESPONSE = auto()
-    MARCH_1_RESPONSE = auto()
-    MARCH_2_RESPONSE = auto()
-    OVERWORK_RESPONSE = auto()
-    MARQUISE_BUILDING_RESPONSE = auto()
+    MARCH_AGAIN_RESPONSE = auto()
+    OVERWORK_CLEARING_RESPONSE = auto()
+    OVERWORK_DISCARD_RESPONSE = auto()
+    MARQUISE_BUILDING_CLEARING_RESPONSE = auto()
+    MARQUISE_BUILDING_TYPE_RESPONSE = auto()
     WOOD_REMOVAL_RESPONSE = auto()
-    MARQUISE_BUILDING_SETUP_RESPONSE = auto()
+    MARQUISE_WORKSHOP_SETUP_RESPONSE = auto()
+    MARQUISE_RECRUITER_SETUP_RESPONSE = auto()
+    MARQUISE_SAWMILL_SETUP_RESPONSE = auto()
     MARQUISE_SPEND_BIRD_CARD_RESPONSE = auto()
     FIELD_HOSPITAL_RESPONSE = auto()
 
@@ -44,8 +49,10 @@ class ControllerMessages(Enum):
     ROOST_SETUP_RESPONSE = auto()
     LEADER_SETUP_RESPONSE = auto()
     DECREE_RECRUIT_CLEARING_RESPONSE = auto()
-    EXTEND_DECREE_RESPONSE_1 = auto()
-    EXTEND_DECREE_RESPONSE_2 = auto()
+    EXTEND_DECREE_CARD_RESPONSE_1 = auto()
+    EXTEND_DECREE_ACTION_RESPONSE_1 = auto()
+    EXTEND_DECREE_CARD_RESPONSE_2 = auto()
+    EXTEND_DECREE_ACTION_RESPONSE_2 = auto()
     DECREE_BUILD_RESPONSE = auto()
     TURMOIL_LEADER_RESPONSE = auto()
 
@@ -84,7 +91,8 @@ class ControllerMessages(Enum):
     AID_TAKE_ITEM_CHOICE_RESPONSE = auto()
     BATTLE_DAMAGE_ITEM_RESPONSE = auto()
     COALITION_CHOICE_RESPONSE = auto()
-    ALLY_MOVEMENT_RESPONSE = auto()
+    ALLY_MOVEMENT_FACTION_RESPONSE = auto()
+    ALLY_MOVEMENT_UNIT_RESPONSE = auto()
     CHOOSE_ALLY_RESPONSE = auto()
     ALLY_DAMAGE_SPLIT_RESPONSE = auto()
 
@@ -144,10 +152,22 @@ class PieceTargetingResponse(ControllerMessage):
         self.target = target
 
 
-class MoveResponse(ControllerMessage):
-    def __init__(self, from_clearing, to_clearing, units) -> None:
-        super().__init__(ControllerMessages.MOVE_RESPONSE)
-        self.move = from_clearing, to_clearing, units
+class MoveFromResponse(ControllerMessage):
+    def __init__(self, from_clearing) -> None:
+        super().__init__(ControllerMessages.MOVE_FROM_RESPONSE)
+        self.from_clearing = from_clearing
+
+
+class MoveToResponse(ControllerMessage):
+    def __init__(self, to_clearing) -> None:
+        super().__init__(ControllerMessages.MOVE_TO_RESPONSE)
+        self.to_clearing = to_clearing
+
+
+class MoveUnitsResponse(ControllerMessage):
+    def __init__(self, num_units) -> None:
+        super().__init__(ControllerMessages.MOVE_UNITS_RESPONSE)
+        self.num_units = num_units
 
 
 class CraftResponse(ControllerMessage):
@@ -202,29 +222,33 @@ class KeepClearingResponse(ControllerMessage):
         self.keep_clearing = keep_clearing
 
 
-class March1Response(ControllerMessage):
-    def __init__(self, from_clearing, to_clearing, units):
-        super().__init__(ControllerMessages.MARCH_1_RESPONSE)
-        self.move = from_clearing, to_clearing, units
+class MarchAgainResponse(ControllerMessage):
+    def __init__(self, march_again):
+        super().__init__(ControllerMessages.MARCH_AGAIN_RESPONSE)
+        self.march_again = march_again
 
 
-class March2Response(ControllerMessage):
-    def __init__(self, from_clearing, to_clearing, units):
-        super().__init__(ControllerMessages.MARCH_2_RESPONSE)
-        self.move = from_clearing, to_clearing, units
-
-
-class OverworkResponse(ControllerMessage):
-    def __init__(self, discard_choice, chosen_clearing):
-        super().__init__(ControllerMessages.OVERWORK_RESPONSE)
-        self.discard_choice = discard_choice
+class OverworkClearingResponse(ControllerMessage):
+    def __init__(self, chosen_clearing):
+        super().__init__(ControllerMessages.OVERWORK_CLEARING_RESPONSE)
         self.chosen_clearing = chosen_clearing
 
 
-class MarquiseBuildingResponse(ControllerMessage):
-    def __init__(self, clearing, building_type):
-        super().__init__(ControllerMessages.MARQUISE_BUILDING_RESPONSE)
+class OverworkDiscardResponse(ControllerMessage):
+    def __init__(self, discard_choice):
+        super().__init__(ControllerMessages.OVERWORK_DISCARD_RESPONSE)
+        self.discard_choice = discard_choice
+
+
+class MarquiseBuildingClearingResponse(ControllerMessage):
+    def __init__(self, clearing):
+        super().__init__(ControllerMessages.MARQUISE_BUILDING_CLEARING_RESPONSE)
         self.chosen_clearing = clearing
+
+
+class MarquiseBuildingTypeResponse(ControllerMessage):
+    def __init__(self, building_type):
+        super().__init__(ControllerMessages.MARQUISE_BUILDING_TYPE_RESPONSE)
         self.chosen_building_type = building_type
 
 
@@ -234,12 +258,22 @@ class WoodRemovalResponse(ControllerMessage):
         self.chosen_wood_token = chosen_wood_token
 
 
-class MarquiseBuildingSetupResponse(ControllerMessage):
-    def __init__(self, workshop_clearing, recruiter_clearing, sawmill_clearing):
-        super().__init__(ControllerMessages.MARQUISE_BUILDING_SETUP_RESPONSE)
-        self.workshop_clearing = workshop_clearing
+class MarquiseRecruiterSetupResponse(ControllerMessage):
+    def __init__(self, recruiter_clearing):
+        super().__init__(ControllerMessages.MARQUISE_RECRUITER_SETUP_RESPONSE)
         self.recruiter_clearing = recruiter_clearing
+
+
+class MarquiseSawmillSetupResponse(ControllerMessage):
+    def __init__(self, sawmill_clearing):
+        super().__init__(ControllerMessages.MARQUISE_SAWMILL_SETUP_RESPONSE)
         self.sawmill_clearing = sawmill_clearing
+
+
+class MarquiseWorkshopSetupResponse(ControllerMessage):
+    def __init__(self, workshop_clearing):
+        super().__init__(ControllerMessages.MARQUISE_WORKSHOP_SETUP_RESPONSE)
+        self.workshop_clearing = workshop_clearing
 
 
 class MarquiseSpendBirdCardResponse(ControllerMessage):
@@ -282,18 +316,28 @@ class DecreeRecruitClearingResponse(ControllerMessage):
         self.chosen_clearing = chosen_clearing
 
 
-class ExtendDecreeResponse1(ControllerMessage):
-    def __init__(self, chosen_card, chosen_action):
-        super().__init__(ControllerMessages.EXTEND_DECREE_RESPONSE_1)
-        self.chosen_card = chosen_card
+class ExtendDecreeActionResponse1(ControllerMessage):
+    def __init__(self, chosen_action):
+        super().__init__(ControllerMessages.EXTEND_DECREE_ACTION_RESPONSE_1)
         self.chosen_action = chosen_action
 
 
-class ExtendDecreeResponse2(ControllerMessage):
-    def __init__(self, chosen_card, chosen_action):
-        super().__init__(ControllerMessages.EXTEND_DECREE_RESPONSE_2)
+class ExtendDecreeCardResponse1(ControllerMessage):
+    def __init__(self, chosen_card):
+        super().__init__(ControllerMessages.EXTEND_DECREE_CARD_RESPONSE_1)
         self.chosen_card = chosen_card
+
+
+class ExtendDecreeActionResponse2(ControllerMessage):
+    def __init__(self, chosen_action):
+        super().__init__(ControllerMessages.EXTEND_DECREE_ACTION_RESPONSE_2)
         self.chosen_action = chosen_action
+
+
+class ExtendDecreeCardResponse2(ControllerMessage):
+    def __init__(self, chosen_card):
+        super().__init__(ControllerMessages.EXTEND_DECREE_CARD_RESPONSE_2)
+        self.chosen_card = chosen_card
 
 
 class DecreeBuildResponse(ControllerMessage):
@@ -395,10 +439,9 @@ class VagabondPlacementResponse(ControllerMessage):
 
 
 class RangerRepairResponse(ControllerMessage):
-    def __init__(self, chosen_item, is_exhausted):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.RANGER_REPAIR_RESPONSE)
-        self.chosen_item = chosen_item
-        self.is_exhausted = is_exhausted
+        self.chosen_item, self.is_exhausted, _ = item_details
 
 
 class TinkerCardResponse(ControllerMessage):
@@ -420,10 +463,9 @@ class SlipResponse(ControllerMessage):
 
 
 class RefreshItemResponse(ControllerMessage):
-    def __init__(self, is_damaged, chosen_item):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.REFRESH_ITEM_RESPONSE)
-        self.is_damaged = is_damaged
-        self.chosen_item = chosen_item
+        self.chosen_item, _, self.is_damaged = item_details
 
 
 class VagabondMoveResponse(ControllerMessage):
@@ -445,18 +487,15 @@ class ChooseQuestRewardResponse(ControllerMessage):
 
 
 class RepairItemResponse(ControllerMessage):
-    def __init__(self, is_exhausted, chosen_item):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.REPAIR_ITEM_RESPONSE)
-        self.chosen_item = chosen_item
-        self.is_exhausted = is_exhausted
+        self.chosen_item, self.is_exhausted, _ = item_details
 
 
 class EmptySatchelResponse(ControllerMessage):
-    def __init__(self, chosen_item, is_damaged, is_exhausted):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.EMPTY_SATCHEL_RESPONSE)
-        self.chosen_item = chosen_item
-        self.is_damaged = is_damaged
-        self.is_exhausted = is_exhausted
+        self.chosen_item, self.is_exhausted, self.is_damaged = item_details
 
 
 class StrikeFactionChoiceResponse(ControllerMessage):
@@ -484,10 +523,9 @@ class AidCardChoiceResponse(ControllerMessage):
 
 
 class AidExhaustItemChoiceResponse(ControllerMessage):
-    def __init__(self, chosen_item, use_item_track):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.AID_EXHAUST_ITEM_CHOICE_RESPONSE)
-        self.chosen_item = chosen_item
-        self.use_item_track = use_item_track
+        self.chosen_item, self.use_item_track = item_details
 
 
 class AidTakeItemChoiceResponse(ControllerMessage):
@@ -497,11 +535,9 @@ class AidTakeItemChoiceResponse(ControllerMessage):
 
 
 class BattleDamageItemResponse(ControllerMessage):
-    def __init__(self, chosen_item, is_exhausted, use_item_track):
+    def __init__(self, item_details):
         super().__init__(ControllerMessages.BATTLE_DAMAGE_ITEM_RESPONSE)
-        self.chosen_item = chosen_item
-        self.is_exhausted = is_exhausted
-        self.use_item_track = use_item_track
+        self.chosen_item, self.is_exhausted, self.use_item_track = item_details
 
 
 class CoalitionChoiceResponse(ControllerMessage):
@@ -510,11 +546,16 @@ class CoalitionChoiceResponse(ControllerMessage):
         self.chosen_faction = chosen_faction
 
 
-class AllyMovementResponse(ControllerMessage):
-    def __init__(self, chosen_ally, chosen_units):
-        super().__init__(ControllerMessages.ALLY_MOVEMENT_RESPONSE)
+class AllyMovementFactionResponse(ControllerMessage):
+    def __init__(self, chosen_ally):
+        super().__init__(ControllerMessages.ALLY_MOVEMENT_FACTION_RESPONSE)
         self.chosen_ally = chosen_ally
-        self.chosen_units = chosen_units
+
+
+class AllyMovementUnitResponse(ControllerMessage):
+    def __init__(self, chosen_unit_count):
+        super().__init__(ControllerMessages.ALLY_MOVEMENT_UNIT_RESPONSE)
+        self.chosen_unit_count = chosen_unit_count
 
 
 class ChooseAllyResponse(ControllerMessage):

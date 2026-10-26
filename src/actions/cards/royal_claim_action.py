@@ -1,6 +1,6 @@
-from actions.action_handler import Action
-from utils.callback_handler import CallbackTimes
-from actions.action_group_registry import ActionIDs
+from src.actions.action_handler import Action
+from src.utils.callback_handler import CallbackTimes
+from src.actions.action_group_registry import ActionIDs
 
 
 class RoyalClaimAction(Action):
@@ -18,7 +18,7 @@ class RoyalClaimAction(Action):
             if clearing.get_owner() == executor.faction_id:
                 num_ruled += 1
         executor.add_vp(num_ruled)
-        print(
+        self.logger.info(
             f" - {executor} gained {num_ruled} victory points from ruling {num_ruled} clearings")
 
         executor.active_cards.remove(self.card)
@@ -28,3 +28,4 @@ class RoyalClaimAction(Action):
                 action_group.actions.remove(self)
 
         return super().perform(game_state, executor)
+        yield

@@ -1,11 +1,11 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from controllers.messages.game_messages import MobilizeMessage
-from actions.action_group_registry import ActionIDs
+from src.controllers.messages.game_messages import MobilizeMessage
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.woodland_alliance import WoodlandAlliance
+    from src.factions.woodland_alliance import WoodlandAlliance
 
 
 class MobilizeAction(Action):
@@ -17,9 +17,9 @@ class MobilizeAction(Action):
         return len(executor.hand) > 0 and super().can_perform(executor, game_state) and ((len(executor.supporters) < 5 and executor.get_base_count() == 0) or executor.get_base_count() > 0)
 
     def perform(self, game_state, executor: WoodlandAlliance):
-        chosen_card = executor.controller.send_game_message(
-            MobilizeMessage(game_state, self.action_group, executor.hand)).chosen_card
+        response = yield MobilizeMessage(game_state, self.action_group, executor.hand)
+        chosen_card = response.chosen_card
         executor.hand.remove(chosen_card)
         executor.add_supporter(chosen_card)
-        print(f" - Added '{chosen_card}' to Supporters")
+        self.logger.info(f" - Added '{chosen_card}' to Supporters")
         return super().perform(game_state, executor)

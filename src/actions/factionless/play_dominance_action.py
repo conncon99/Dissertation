@@ -1,17 +1,16 @@
 from __future__ import annotations
-from actions.action_handler import Action
-from cards.cards import DOMINANCE_CARDS
+from src.actions.action_handler import Action
+from src.cards.cards import DOMINANCE_CARDS
 from typing import TYPE_CHECKING
-from utils.root_types import Factions
-from controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
-from factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
-from actions.action_group_registry import ActionIDs
+from src.utils.root_types import Factions
+from src.controllers.messages.game_messages import ChooseDominanceMessage, CoalitionChoiceMessage
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from cards.card import DominanceCard
-    from utils.game_state import GameState
-    from factions.faction import Faction
-    from factions.vagabond.vagabond import Vagabond
+    from src.cards.card import DominanceCard
+    from src.utils.game_state import GameState
+    from src.factions.faction import Faction
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class PlayDominanceAction(Action):
@@ -26,13 +25,14 @@ class PlayDominanceAction(Action):
             return len(game_state.faction_list) >= 4 and any(card in executor.hand for card in DOMINANCE_CARDS) and not executor.dominance and executor.victory_points >= 10 and any(faction.dominance is None and faction.faction_id != executor.faction_id for faction in game_state.faction_list) and super().can_perform(executor, game_state)
 
     def perform(self, game_state, executor):
+        print("Played Dominance")
         # 1. Choose which dominance card to use if we have multiple
         available_dominance_cards = [
             card for card in executor.hand if card in DOMINANCE_CARDS]
 
         if len(available_dominance_cards) > 1:
-            chosen_card: DominanceCard = executor.controller.send_game_message(
-                ChooseDominanceMessage(game_state, self.action_group, available_dominance_cards)).chosen_card
+            response = yield ChooseDominanceMessage(game_state, self.action_group, available_dominance_cards)
+            chosen_card: DominanceCard = response.chosen_card
         else:
             chosen_card: DominanceCard = available_dominance_cards[0]
 
@@ -41,7 +41,7 @@ class PlayDominanceAction(Action):
         if executor.faction_id != Factions.VAGABOND.value:
             chosen_card.owner = executor
             chosen_card.activate(game_state.board, self.action_group)
-            print(f" - {executor} has activated {chosen_card}")
+            self.logger.info(f" - {executor} has activated {chosen_card}")
         else:
             # Get the player other than the vagabond with the lowest VP
             # On a tie the vagabond chooses between the tied players
@@ -51,17 +51,19 @@ class PlayDominanceAction(Action):
             if len(lowest_scoring_factions) == 1:
                 chosen_faction: Faction = lowest_scoring_factions[0]
             else:
-                chosen_faction: Faction = executor.controller.send_game_message(
-                    CoalitionChoiceMessage(game_state, self.action_group, lowest_scoring_factions)).chosen_faction
+                response = yield CoalitionChoiceMessage(game_state, self.action_group, lowest_scoring_factions)
+                chosen_faction: Faction = response.chosen_faction
             executor.dominance = chosen_faction
             # If the faction is hostile, move their relationship to indifferent
+            from src.factions.vagabond.relationship_track import HOSTILE, INDIFFERENT
             if executor.relationship_track.relationship_level[chosen_faction.faction_id] == HOSTILE:
                 executor.relationship_track.relationship_level[chosen_faction.faction_id] = INDIFFERENT
             executor.relationship_track.relationship_level
             executor.hand.remove(chosen_card)
-            print(
+            self.logger.info(
                 f" - {executor} has activated {chosen_card} to form a coalition with {chosen_faction}")
         return super().perform(game_state, executor)
+        yield
 
     def _get_lowest_scoring_factions(self, game_state: GameState, executor: Faction):
         lowest_score = 999

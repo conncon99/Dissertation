@@ -1,10 +1,10 @@
 from __future__ import annotations
-from actions.action_handler import Action
+from src.actions.action_handler import Action
 from typing import TYPE_CHECKING
-from actions.action_group_registry import ActionIDs
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.vagabond.vagabond import Vagabond
+    from src.factions.vagabond.vagabond import Vagabond
 
 
 class SpecialAction(Action):
@@ -16,6 +16,6 @@ class SpecialAction(Action):
         return executor.character.can_perform_special_action(executor, game_state)
 
     def perform(self, game_state, executor: Vagabond):
-        executor.character.perform_special_action(
+        yield from executor.character.perform_special_action(
             executor, game_state, self.action_group)
         return super().perform(game_state, executor)

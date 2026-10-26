@@ -1,12 +1,12 @@
 
 from __future__ import annotations
-from actions.action_handler import Action
-from controllers.messages.game_messages import CodebreakersMessage
+from src.actions.action_handler import Action
+from src.controllers.messages.game_messages import CodebreakersMessage
 from typing import TYPE_CHECKING
-from actions.action_group_registry import ActionIDs
+from src.actions.action_group_registry import ActionIDs
 
 if TYPE_CHECKING:
-    from factions.faction import Faction
+    from src.factions.faction import Faction
 
 
 class CodebreakersAction(Action):
@@ -21,9 +21,9 @@ class CodebreakersAction(Action):
         available_players = [
             faction for faction in game_state.faction_list if faction.faction_id != executor.faction_id]
 
-        chosen_player: Faction = executor.controller.send_game_message(
-            CodebreakersMessage(game_state, self.action_group, available_players)).chosen_player
+        response = yield CodebreakersMessage(game_state, self.action_group, available_players)
+        chosen_player: Faction = response.chosen_player
         # TODO: Make interact with Neural networks
-        print(f" - {chosen_player}'s Hand: {chosen_player.hand}")
+        self.logger.info(f" - {chosen_player}'s Hand: {chosen_player.hand}")
 
         return super().perform(game_state, executor)
